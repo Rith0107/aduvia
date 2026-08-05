@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 
 import { calculateRoutineEfficiency } from "@/lib/metrics";
 
@@ -12,7 +13,12 @@ type TodayDashboardProps = {
   sideQuest: SideQuestSummary;
 };
 
-const navItems = ["Today", "Habits", "Quests", "Insights"];
+const navItems = [
+  { label: "Today", href: "/" },
+  { label: "Habits", href: "/habits" },
+  { label: "Quests", href: "/quests" },
+  { label: "Insights", href: "/insights" },
+];
 
 const statusStyles = {
   pending: "border-stone-300 bg-white text-transparent",
@@ -86,18 +92,18 @@ export function TodayDashboard({
 
           <nav aria-label="Primary" className="mt-14 space-y-1">
             {navItems.map((item, index) => (
-              <button
+              <Link
                 className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition ${
                   index === 0
                     ? "bg-[#e5ece5] text-[#174f3a]"
                     : "text-stone-500 hover:bg-stone-100 hover:text-stone-900"
                 }`}
-                key={item}
-                type="button"
+                href={item.href}
+                key={item.label}
               >
                 <span className={`size-1.5 rounded-full ${index === 0 ? "bg-[#174f3a]" : "bg-stone-300"}`} />
-                {item}
-              </button>
+                {item.label}
+              </Link>
             ))}
           </nav>
 
@@ -138,20 +144,20 @@ export function TodayDashboard({
 
           <nav aria-label="Mobile navigation" className="mt-6 flex gap-2 overflow-x-auto pb-1 lg:hidden">
             {navItems.map((item, index) => (
-              <button
+              <Link
                 className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium ${
                   index === 0 ? "bg-[#174f3a] text-white" : "bg-white text-stone-500"
                 }`}
-                key={item}
-                type="button"
+                href={item.href}
+                key={item.label}
               >
-                {item}
-              </button>
+                {item.label}
+              </Link>
             ))}
           </nav>
 
           <section className="mt-8 grid gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(300px,0.8fr)]">
-            <section className="rounded-[24px] border border-black/[0.06] bg-white p-5 shadow-[0_12px_35px_rgba(31,38,34,0.04)] sm:p-7">
+            <section className="rounded-[24px] border border-[#d8ded7] bg-[#f7faf7] p-5 shadow-[0_12px_35px_rgba(31,38,34,0.04)] sm:p-7">
               <div className="flex items-center justify-between gap-5 border-b border-black/[0.06] pb-6">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">Daily rhythm</p>
@@ -163,7 +169,7 @@ export function TodayDashboard({
                   className="grid size-[74px] place-items-center rounded-full"
                   role="progressbar"
                   style={{
-                    background: `radial-gradient(circle at center, white 61%, transparent 63%), conic-gradient(#174f3a ${completionRate}%, #e7e5df 0)`,
+                    background: `radial-gradient(circle at center, #f7faf7 61%, transparent 63%), conic-gradient(#174f3a ${completionRate}%, #dce5dc 0)`,
                   }}
                 >
                   <span className="text-sm font-semibold">{completionRate}%</span>
@@ -242,7 +248,7 @@ export function TodayDashboard({
             </div>
           </section>
 
-          <section className="mt-5 flex flex-col gap-4 rounded-[24px] border border-black/[0.06] bg-white p-5 sm:flex-row sm:items-center sm:p-6">
+          <section className="mt-5 flex flex-col gap-4 rounded-[24px] border border-[#eadcc9] bg-[#fbf5eb] p-5 sm:flex-row sm:items-center sm:p-6">
             <div className="sm:w-56">
               <p className="text-sm font-semibold">Daily note</p>
               <p className="mt-1 text-xs leading-5 text-stone-400">Capture one thing worth remembering.</p>
