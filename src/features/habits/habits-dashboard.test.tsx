@@ -25,4 +25,17 @@ describe("HabitsDashboard", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create habit" }));
     expect(screen.getByText("Drink water")).toBeInTheDocument();
   });
+
+  it("requires and saves selected days for a custom schedule", () => {
+    render(<HabitsDashboard initialHabits={sampleHabitSummaries} />);
+    fireEvent.click(screen.getByRole("button", { name: "+ New habit" }));
+    fireEvent.change(screen.getByLabelText("Habit name"), { target: { value: "Practice guitar" } });
+    fireEvent.click(screen.getByRole("button", { name: "Custom" }));
+    expect(screen.getByRole("button", { name: "Create habit" })).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "Monday" }));
+    fireEvent.click(screen.getByRole("button", { name: "Wednesday" }));
+    fireEvent.click(screen.getByRole("button", { name: "Create habit" }));
+    expect(screen.getByText("Practice guitar")).toBeInTheDocument();
+    expect(screen.getByText(/Mon · Wed/)).toBeInTheDocument();
+  });
 });

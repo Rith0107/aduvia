@@ -326,6 +326,11 @@ h3 {
 @media (min-width: 520px) { .creation-options { grid-template-columns: repeat(4,1fr); } }
 .creation-options button { min-height: 2.65rem; border-radius: .75rem; color: var(--soft-muted); font-size: .68rem; font-weight: 800; }
 .creation-options button[aria-pressed="true"] { background: white; color: var(--soft-ink); box-shadow: 0 7px 20px rgb(37 48 42 / 9%); }
+.creation-days > div { display: grid; grid-template-columns: repeat(7,1fr); gap: .35rem; margin-top: 1.15rem; }
+.creation-days button { display: grid; min-width: 0; aspect-ratio: 1; place-items: center; border: 1px solid rgb(37 48 42 / 8%); border-radius: 50%; background: rgb(255 255 255 / 48%); color: var(--soft-muted); font-size: .7rem; font-weight: 850; transition: background .15s ease, color .15s ease, scale .12s ease; }
+.creation-days button[aria-pressed="true"] { border-color: var(--soft-ink); background: var(--soft-ink); color: white; box-shadow: 0 8px 18px rgb(37 48 42 / 15%); }
+.creation-days button:active { scale: .92; }
+.creation-days > p { margin-top: .7rem; color: var(--soft-muted); font-size: .62rem; font-weight: 650; }
 .creation-guidance { display: flex; align-items: center; gap: .75rem; border-left: 2px solid var(--soft-accent); background: rgb(239 221 210 / 48%); padding: .85rem 1rem; color: var(--soft-muted); font-size: .72rem; line-height: 1.5; }
 .creation-guidance > span { color: var(--soft-accent); font-size: 1.1rem; }
 .creation-guidance strong { color: var(--soft-ink); }
