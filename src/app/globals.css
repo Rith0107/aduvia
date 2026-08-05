@@ -108,6 +108,33 @@ button {
   background: color-mix(in srgb, var(--soft-tint-c) 74%, white);
 }
 
+.soft-task-cards > article {
+  border-radius: 1.75rem;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 42%);
+  transition: translate 180ms ease, box-shadow 180ms ease;
+}
+
+.soft-task-cards > article:hover {
+  translate: 0 -2px;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 55%), 0 14px 35px rgb(43 55 47 / 7%);
+}
+
+.soft-task-cards > article:nth-child(4n + 1) {
+  background: color-mix(in srgb, var(--soft-tint-a) 82%, transparent);
+}
+
+.soft-task-cards > article:nth-child(4n + 2) {
+  background: color-mix(in srgb, var(--soft-tint-b) 78%, transparent);
+}
+
+.soft-task-cards > article:nth-child(4n + 3) {
+  background: color-mix(in srgb, var(--soft-tint-c) 82%, transparent);
+}
+
+.soft-task-cards > article:nth-child(4n) {
+  background: rgb(255 255 255 / 45%);
+}
+
 .quest-canvas {
   background-color: #e5ebe3;
   background-image:

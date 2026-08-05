@@ -29,12 +29,12 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
   return (
     <AppShell active="Today" eyebrow={dateLabel} title={<>A softer way<br />to show up.</>} action={<div className="max-w-xs border-l border-black/[0.12] pl-5"><p className="text-sm leading-6 text-[var(--soft-muted)]">You’ve already done {completedCount === 0 ? "the hard part: starting" : `${completedCount} of ${habits.length}`}. The rest can be light.</p></div>}>
       <section className="mt-12 grid gap-10 xl:grid-cols-[minmax(0,1.5fr)_minmax(300px,.62fr)] xl:gap-16">
-        <div className="soft-flow border-y border-black/[0.08]">
+        <div className="soft-flow soft-task-cards grid gap-3 sm:grid-cols-2">
           {habits.map((habit) => (
-            <article className="group grid min-h-28 grid-cols-[52px_1fr_auto] items-center gap-4 border-b border-black/[0.08] py-5 last:border-b-0 sm:grid-cols-[60px_1fr_auto_auto]" key={habit.id}>
+            <article className="group grid min-h-36 grid-cols-[52px_1fr_auto] items-center gap-4 border border-white/50 p-5 sm:grid-cols-[60px_1fr_auto]" key={habit.id}>
               <span className="grid size-12 place-items-center rounded-full bg-white/45 text-[var(--soft-ink)]"><ActivityIcon activity={`${habit.name} ${habit.category}`} /></span>
               <div className="min-w-0"><h2 className={`text-lg font-bold ${habit.status === "complete" ? "text-[var(--soft-muted)] line-through" : ""}`}>{habit.name}</h2><p className="mt-1 text-sm text-[var(--soft-muted)]">{habit.target} · {habit.category}</p></div>
-              {habit.priority === 3 && <span className="hidden text-[10px] font-black uppercase tracking-[0.14em] text-[var(--soft-accent)] sm:block">Today’s anchor</span>}
+              {habit.priority === 3 && <span className="col-start-2 text-[10px] font-black uppercase tracking-[0.14em] text-[var(--soft-accent)]">Today’s anchor</span>}
               <button aria-label={`${habit.status === "complete" ? "Undo" : "Complete"} ${habit.name}`} className={`grid size-13 shrink-0 place-items-center rounded-full border-2 text-lg transition ${habit.status === "complete" ? "border-[var(--soft-ink)] bg-[var(--soft-ink)] text-white" : "border-[color:rgb(41_50_44/15%)] text-transparent hover:border-[var(--soft-ink)]"}`} onClick={() => toggleHabit(habit.id)} type="button">✓</button>
             </article>
           ))}
