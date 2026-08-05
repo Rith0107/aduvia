@@ -20,4 +20,14 @@ describe("EveningCheckIn", () => {
     fireEvent.click(finish);
     expect(screen.getByText("You’re done for today.")).toBeInTheDocument();
   });
+
+  it("counts completed habits instead of all answered habits", () => {
+    render(<EveningCheckIn initialHabits={sampleHabits} />);
+
+    expect(screen.getByText("0")).toBeInTheDocument();
+    fireEvent.click(screen.getAllByRole("button", { name: "✓ Done" })[0]);
+    expect(screen.getByText("1")).toBeInTheDocument();
+    fireEvent.click(screen.getAllByRole("button", { name: "Not today" })[0]);
+    expect(screen.getByText("0")).toBeInTheDocument();
+  });
 });

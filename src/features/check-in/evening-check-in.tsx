@@ -52,8 +52,8 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
               <p className="soft-kicker text-[var(--soft-accent)]">60-second check-in</p>
               <h1>Tap. Finish.<br />Rest.</h1>
             </div>
-            <div className="evening-progress-dial" style={{ "--check-progress": `${(answeredCount / habits.length) * 360}deg` } as React.CSSProperties}>
-              <div><strong>{answeredCount}</strong><span>of {habits.length}</span></div>
+            <div className="evening-progress-dial" style={{ "--check-progress": `${(completedCount / habits.length) * 360}deg` } as React.CSSProperties}>
+              <div><strong>{completedCount}</strong><span>of {habits.length} done</span></div>
             </div>
             <div className="evening-intro-copy">
               <p>No typing. No judgement.<br />Just tell us what happened.</p>
