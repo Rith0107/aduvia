@@ -133,13 +133,10 @@ export function TodayDashboard({
                 Make today count<span className="text-[#d89a42]">.</span>
               </h1>
             </div>
-            <button
-              aria-label="Open profile"
-              className="grid size-11 shrink-0 place-items-center rounded-full border border-black/10 bg-white text-xs font-semibold shadow-sm transition hover:-translate-y-0.5"
-              type="button"
-            >
-              QL
-            </button>
+            <div className="flex items-center gap-2">
+              <Link className="hidden min-h-11 items-center rounded-xl bg-[#174f3a] px-4 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 sm:flex" href="/check-in">Evening check-in</Link>
+              <button aria-label="Open profile" className="grid size-11 shrink-0 place-items-center rounded-full border border-black/10 bg-white text-xs font-semibold shadow-sm transition hover:-translate-y-0.5" type="button">QL</button>
+            </div>
           </header>
 
           <nav aria-label="Mobile navigation" className="mt-6 flex gap-2 overflow-x-auto pb-1 lg:hidden">
