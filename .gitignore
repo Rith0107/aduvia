@@ -1,0 +1,20 @@
+# Local Codex project metadata
+AGENTS.md
+sources/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Dependencies and generated output
+node_modules/
+.next/
+dist/
+build/
+coverage/
+
+# Logs and operating-system files
+*.log
+.DS_Store
+
