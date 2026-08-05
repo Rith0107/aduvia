@@ -23,11 +23,15 @@ describe("EveningCheckIn", () => {
 
   it("counts completed habits instead of all answered habits", () => {
     render(<EveningCheckIn initialHabits={sampleHabits} />);
+    const completedProgress = screen.getByRole("progressbar", { name: "Completed habits" });
 
     expect(screen.getByText("0")).toBeInTheDocument();
+    expect(completedProgress).toHaveAttribute("aria-valuenow", "0");
     fireEvent.click(screen.getAllByRole("button", { name: "✓ Done" })[0]);
     expect(screen.getByText("1")).toBeInTheDocument();
+    expect(completedProgress).toHaveAttribute("aria-valuenow", "1");
     fireEvent.click(screen.getAllByRole("button", { name: "Not today" })[0]);
     expect(screen.getByText("0")).toBeInTheDocument();
+    expect(completedProgress).toHaveAttribute("aria-valuenow", "0");
   });
 });

@@ -57,7 +57,7 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
             </div>
             <div className="evening-intro-copy">
               <p>No typing. No judgement.<br />Just tell us what happened.</p>
-              <div className="evening-progress-line"><span style={{ width: `${(answeredCount / habits.length) * 100}%` }} /></div>
+              <div aria-label="Completed habits" aria-valuemax={habits.length} aria-valuemin={0} aria-valuenow={completedCount} className="evening-progress-line" role="progressbar"><span style={{ width: `${(completedCount / habits.length) * 100}%` }} /></div>
               <small>{allAnswered ? "Ready to close" : `${habits.length - answeredCount} left to answer`}</small>
             </div>
           </div>
