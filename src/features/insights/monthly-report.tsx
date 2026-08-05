@@ -2,6 +2,19 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+} from "recharts";
 
 type CellState = "done" | "missed" | "off";
 type ShareFormat = "square" | "story";
@@ -21,6 +34,31 @@ const navItems = [
 ];
 
 const completedQuests = ["Created a monthly budget", "Shipped my portfolio homepage"];
+
+const consistencyTrend = [
+  { label: "Jul 6", score: 58 },
+  { label: "Jul 13", score: 66 },
+  { label: "Jul 20", score: 63 },
+  { label: "Jul 27", score: 74 },
+  { label: "Aug 3", score: 82 },
+];
+
+const categoryBalance = [
+  { name: "Growth", value: 34, color: "#174f3a" },
+  { name: "Wellbeing", value: 28, color: "#d89a42" },
+  { name: "Career", value: 23, color: "#3d6678" },
+  { name: "Creative", value: 15, color: "#9c4b38" },
+];
+
+const weekdayRhythm = [
+  { day: "M", score: 88 },
+  { day: "T", score: 74 },
+  { day: "W", score: 91 },
+  { day: "T", score: 68 },
+  { day: "F", score: 83 },
+  { day: "S", score: 57 },
+  { day: "S", score: 62 },
+];
 
 function buildDays(seed: number, weekdaysOnly = false): CellState[] {
   return Array.from({ length: 31 }, (_, index) => {
@@ -146,9 +184,44 @@ export function MonthlyReport() {
         </aside>
 
         <div className="min-w-0 px-4 py-6 sm:px-8 sm:py-8 xl:px-10">
-          <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><div><Link className="flex items-center gap-2 lg:hidden" href="/"><span className="grid size-7 place-items-center rounded-lg bg-[#174f3a] text-xs font-semibold text-white">Q</span><span className="text-sm font-semibold">QuestLog</span></Link><p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-400 lg:mt-0">Monthly review</p><h1 className="mt-2 text-3xl font-semibold tracking-[-0.045em] sm:text-[40px]">August in rows<span className="text-[#d89a42]">.</span></h1></div><div className="flex items-center gap-2 rounded-xl bg-[#e5ece5] p-1 text-xs font-semibold text-[#174f3a]"><button className="rounded-lg px-3 py-2" type="button">←</button><span className="px-2">August 2026</span><button className="rounded-lg px-3 py-2 opacity-30" disabled type="button">→</button></div></header>
+          <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><div><Link className="flex items-center gap-2 lg:hidden" href="/"><span className="grid size-7 place-items-center rounded-lg bg-[#174f3a] text-xs font-semibold text-white">Q</span><span className="text-sm font-semibold">QuestLog</span></Link><p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-400 lg:mt-0">Monthly review</p><h1 className="mt-2 text-3xl font-semibold tracking-[-0.045em] sm:text-[40px]">Your month, in motion<span className="text-[#d89a42]">.</span></h1></div><div className="flex items-center gap-2 rounded-xl bg-[#e5ece5] p-1 text-xs font-semibold text-[#174f3a]"><button className="rounded-lg px-3 py-2" type="button">←</button><span className="px-2">August 2026</span><button className="rounded-lg px-3 py-2 opacity-30" disabled type="button">→</button></div></header>
 
           <nav aria-label="Mobile navigation" className="mt-6 flex gap-2 overflow-x-auto pb-1 lg:hidden">{navItems.map((item) => <Link className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium ${item.label === "Insights" ? "bg-[#174f3a] text-white" : "bg-white/70 text-stone-500"}`} href={item.href} key={item.label}>{item.label}</Link>)}</nav>
+
+          <section className="mt-7 grid gap-4 xl:grid-cols-[1.35fr_0.75fr]">
+            <article className="relative overflow-hidden rounded-[28px] bg-[#143d31] p-6 text-white shadow-[0_22px_55px_rgba(20,61,49,0.2)] sm:p-8">
+              <div className="absolute -right-20 -top-20 size-64 rounded-full border-[46px] border-[#d89a42]/10" />
+              <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+                <div><p className="text-xs font-semibold uppercase tracking-[0.17em] text-[#d5b77c]">Consistency signal</p><p className="mt-4 text-6xl font-semibold tracking-[-0.065em]">{overallConsistency}%</p><p className="mt-1 text-sm text-white/50">Up 8 points from July</p></div>
+                <div className="grid grid-cols-7 gap-1.5 rounded-2xl bg-white/[0.06] p-4" aria-label="August activity heatmap">{Array.from({ length: 35 }, (_, index) => <span className={`size-3 rounded-[4px] ${index > 30 ? "bg-transparent" : index % 7 === 5 ? "bg-[#d89a42]" : index % 5 === 0 ? "bg-[#9c4b38]/70" : "bg-[#8eb5a6]"}`} key={index} />)}</div>
+              </div>
+              <div className="relative mt-8 h-52 w-full">
+                <ResponsiveContainer height="100%" width="100%">
+                  <AreaChart data={consistencyTrend} margin={{ left: 0, right: 8, top: 8, bottom: 0 }}>
+                    <defs><linearGradient id="consistencyFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="#d89a42" stopOpacity={0.5} /><stop offset="100%" stopColor="#d89a42" stopOpacity={0} /></linearGradient></defs>
+                    <CartesianGrid stroke="rgba(255,255,255,0.08)" strokeDasharray="3 6" vertical={false} />
+                    <XAxis axisLine={false} dataKey="label" tick={{ fill: "rgba(255,255,255,0.42)", fontSize: 10 }} tickLine={false} />
+                    <Tooltip contentStyle={{ background: "#fffaf0", border: 0, borderRadius: 12, color: "#17201c", fontSize: 12 }} cursor={{ stroke: "rgba(255,255,255,0.2)" }} />
+                    <Area dataKey="score" fill="url(#consistencyFill)" stroke="#d89a42" strokeWidth={3} type="monotone" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </article>
+
+            <article className="rounded-[28px] border border-[#174f3a]/10 bg-[#fffaf0] p-6 sm:p-7">
+              <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">Life balance</p><h2 className="mt-2 text-xl font-semibold tracking-[-0.03em]">Where your effort went</h2></div>
+              <div className="relative mx-auto mt-3 h-56 max-w-[280px]">
+                <ResponsiveContainer height="100%" width="100%"><PieChart><Pie cx="50%" cy="50%" data={categoryBalance} dataKey="value" innerRadius={62} outerRadius={91} paddingAngle={4} stroke="none">{categoryBalance.map((entry) => <Cell fill={entry.color} key={entry.name} />)}</Pie><Tooltip contentStyle={{ background: "#fffaf0", border: "1px solid rgba(23,79,58,.1)", borderRadius: 12, fontSize: 12 }} /></PieChart></ResponsiveContainer>
+                <div className="pointer-events-none absolute inset-0 grid place-items-center text-center"><div><p className="text-3xl font-semibold">4</p><p className="text-[10px] uppercase tracking-[0.12em] text-stone-400">focus areas</p></div></div>
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3">{categoryBalance.map((item) => <div className="flex items-center gap-2 text-xs" key={item.name}><span className="size-2.5 rounded-full" style={{ backgroundColor: item.color }} /><span className="text-stone-500">{item.name}</span><span className="ml-auto font-semibold">{item.value}%</span></div>)}</div>
+            </article>
+          </section>
+
+          <section className="mt-4 grid gap-4 lg:grid-cols-[0.72fr_1.28fr]">
+            <article className="rounded-[24px] bg-[#dfe8ed] p-6 text-[#284f61]"><p className="text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Best day</p><div className="mt-3 flex items-end justify-between"><div><p className="text-3xl font-semibold tracking-[-0.04em]">Wednesday</p><p className="mt-1 text-sm opacity-60">Your midweek momentum peak.</p></div><span className="text-4xl">↗</span></div></article>
+            <article className="rounded-[24px] bg-[#f3e7ca] p-5 text-[#6e5b3c] sm:p-6"><div className="flex items-center justify-between"><div><p className="text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Weekly rhythm</p><p className="mt-2 text-lg font-semibold">Completion by weekday</p></div><p className="text-xs opacity-60">Last 30 days</p></div><div className="mt-4 h-28"><ResponsiveContainer height="100%" width="100%"><BarChart data={weekdayRhythm}><XAxis axisLine={false} dataKey="day" tick={{ fill: "#876f47", fontSize: 10 }} tickLine={false} /><Tooltip contentStyle={{ background: "#fffaf0", border: 0, borderRadius: 12, fontSize: 12 }} cursor={{ fill: "rgba(135,111,71,.08)" }} /><Bar dataKey="score" fill="#876f47" radius={[7, 7, 2, 2]} /></BarChart></ResponsiveContainer></div></article>
+          </section>
 
           <section className="mt-7 rounded-[24px] border border-[#174f3a]/10 bg-[#f8fbf7] p-4 sm:p-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-xl font-semibold">Daily consistency map</h2><p className="mt-1 text-sm text-stone-500">Tap a scheduled day to correct its completion.</p></div><div className="flex gap-3 text-xs text-stone-500"><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[#174f3a]" />Done</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[#f4dfd9]" />Missed</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-stone-200" />Not scheduled</span></div></div>
