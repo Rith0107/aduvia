@@ -4,12 +4,19 @@ import Link from "next/link";
 import { useState } from "react";
 
 type Direction = "aurora" | "editorial" | "soft";
+type SoftPalette = "forest" | "coastal" | "clay";
 
 const directions: Array<{ id: Direction; label: string; note: string }> = [
   { id: "aurora", label: "Midnight Aurora", note: "Atmospheric timeline" },
   { id: "editorial", label: "Solar Editorial", note: "Bold structured print" },
   { id: "soft", label: "Soft Digital", note: "Gentle spatial canvas" },
 ];
+
+const softPalettes = {
+  forest: { label: "Forest Dawn", base: "#e8eee7", ink: "#20372e", accent: "#d5a75b", glowA: "#bedbc9", glowB: "#efd5c1", cards: ["#cfe2d4", "#f0dfb9", "#f7f3e9", "#ead7cf"] },
+  coastal: { label: "Coastal Quiet", base: "#e5edef", ink: "#18324a", accent: "#d88467", glowA: "#badfd8", glowB: "#c8d6ef", cards: ["#cce3de", "#f3d8c8", "#dbe6f3", "#edf1ec"] },
+  clay: { label: "Clay & Moss", base: "#ede6d8", ink: "#34382d", accent: "#a85c45", glowA: "#c8d2a7", glowB: "#e1ad91", cards: ["#dce2c7", "#eac7b5", "#f4eddf", "#d4d7bc"] },
+} satisfies Record<SoftPalette, { label: string; base: string; ink: string; accent: string; glowA: string; glowB: string; cards: string[] }>;
 
 const habits = [
   { time: "07:00", name: "Morning walk", detail: "30 minutes", done: true },
@@ -75,31 +82,34 @@ function EditorialDirection() {
   );
 }
 
-function SoftDirection() {
+function SoftDirection({ palette }: { palette: SoftPalette }) {
+  const colors = softPalettes[palette];
   return (
-    <section className="relative min-h-[760px] overflow-hidden rounded-[42px] bg-[#e9e0ff] text-[#28243f] shadow-[0_35px_90px_rgba(76,58,125,0.2)]">
-      <div className="absolute -left-32 top-24 size-96 rounded-full bg-[#baf5d3] blur-3xl" /><div className="absolute -right-40 top-0 size-[500px] rounded-full bg-[#ffbfd9] opacity-70 blur-3xl" />
-      <header className="relative flex items-center justify-between px-7 py-7 sm:px-12"><p className="text-xl font-black tracking-[-0.04em]">quest<span className="text-[#6950bf]">/</span>log</p><nav className="hidden rounded-full bg-white/35 p-1 backdrop-blur-md sm:flex">{["Today", "Habits", "Quests", "Reflect"].map((item, index) => <button className={`rounded-full px-5 py-2 text-xs font-bold ${index === 0 ? "bg-[#28243f] text-white" : "text-[#28243f]/50"}`} key={item} type="button">{item}</button>)}</nav><span className="size-10 rounded-full border-4 border-white/50 bg-[#6950bf]" /></header>
+    <section className="relative min-h-[760px] overflow-hidden rounded-[42px] shadow-[0_35px_90px_rgba(50,65,55,0.18)]" style={{ backgroundColor: colors.base, color: colors.ink }}>
+      <div className="absolute -left-32 top-24 size-96 rounded-full opacity-80 blur-3xl" style={{ backgroundColor: colors.glowA }} /><div className="absolute -right-40 top-0 size-[500px] rounded-full opacity-65 blur-3xl" style={{ backgroundColor: colors.glowB }} />
+      <header className="relative flex items-center justify-between px-7 py-7 sm:px-12"><p className="text-xl font-black tracking-[-0.04em]">quest<span style={{ color: colors.accent }}>/</span>log</p><nav className="hidden rounded-full bg-white/35 p-1 backdrop-blur-md sm:flex">{["Today", "Habits", "Quests", "Reflect"].map((item, index) => <button className="rounded-full px-5 py-2 text-xs font-bold" key={item} style={index === 0 ? { backgroundColor: colors.ink, color: "white" } : { color: `${colors.ink}88` }} type="button">{item}</button>)}</nav><span className="size-10 rounded-full border-4 border-white/50" style={{ backgroundColor: colors.accent }} /></header>
       <div className="relative mx-auto max-w-6xl px-6 pb-12 pt-8 sm:px-12">
-        <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.22em] text-[#6950bf]">Your gentle plan</p><h1 className="mt-4 text-5xl font-semibold leading-[0.95] tracking-[-0.055em] sm:text-7xl">A softer way<br />to show up.</h1></div><div className="max-w-xs rounded-[28px] bg-white/38 p-5 backdrop-blur-xl"><p className="text-sm leading-6 text-[#28243f]/55">You’ve already done the two things that mattered most. The rest can be light.</p></div></div>
+        <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: colors.accent }}>Your gentle plan</p><h1 className="mt-4 text-5xl font-semibold leading-[0.95] tracking-[-0.055em] sm:text-7xl">A softer way<br />to show up.</h1></div><div className="max-w-xs rounded-[28px] bg-white/38 p-5 backdrop-blur-xl"><p className="text-sm leading-6 opacity-55">You’ve already done the two things that mattered most. The rest can be light.</p></div></div>
         <div className="mt-14 grid gap-3 md:grid-cols-2">
-          {habits.map((habit, index) => <article className={`group flex min-h-32 items-center gap-5 rounded-[30px] border border-white/45 p-5 backdrop-blur-xl transition hover:-translate-y-1 ${index === 0 ? "bg-[#baf5d3]/65" : index === 1 ? "bg-[#fff2a9]/65" : index === 2 ? "bg-white/38" : "bg-[#ffbfd9]/45"}`} key={habit.name}><button className={`grid size-12 shrink-0 place-items-center rounded-full text-lg ${habit.done ? "bg-[#28243f] text-white" : "border-2 border-[#28243f]/15 text-transparent"}`} type="button">✓</button><div className="flex-1"><p className={`text-lg font-bold ${habit.done ? "opacity-35 line-through" : ""}`}>{habit.name}</p><p className="mt-1 text-sm text-[#28243f]/42">{habit.detail}</p></div><span className="text-xs font-bold text-[#28243f]/25">{habit.time}</span></article>)}
+          {habits.map((habit, index) => <article className="group flex min-h-32 items-center gap-5 rounded-[30px] border border-white/45 p-5 backdrop-blur-xl transition hover:-translate-y-1" key={habit.name} style={{ backgroundColor: `${colors.cards[index]}cc` }}><button className="grid size-12 shrink-0 place-items-center rounded-full text-lg" style={habit.done ? { backgroundColor: colors.ink, color: "white" } : { border: `2px solid ${colors.ink}22`, color: "transparent" }} type="button">✓</button><div className="flex-1"><p className={`text-lg font-bold ${habit.done ? "opacity-35 line-through" : ""}`}>{habit.name}</p><p className="mt-1 text-sm opacity-40">{habit.detail}</p></div><span className="text-xs font-bold opacity-25">{habit.time}</span></article>)}
         </div>
-        <div className="mt-5 flex flex-col gap-3 rounded-[30px] bg-[#28243f] p-6 text-white sm:flex-row sm:items-center"><div className="flex-1"><p className="text-xs font-bold uppercase tracking-[0.18em] text-[#baf5d3]">Tonight</p><p className="mt-2 text-xl font-semibold">Two taps left. Then rest.</p></div><button className="rounded-full bg-[#baf5d3] px-6 py-4 text-sm font-bold text-[#28243f]" type="button">Open evening check-in</button></div>
+        <div className="mt-5 flex flex-col gap-3 rounded-[30px] p-6 text-white sm:flex-row sm:items-center" style={{ backgroundColor: colors.ink }}><div className="flex-1"><p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: colors.glowA }}>Tonight</p><p className="mt-2 text-xl font-semibold">Two taps left. Then rest.</p></div><button className="rounded-full px-6 py-4 text-sm font-bold" style={{ backgroundColor: colors.glowA, color: colors.ink }} type="button">Open evening check-in</button></div>
       </div>
     </section>
   );
 }
 
 export function DesignLab() {
-  const [direction, setDirection] = useState<Direction>("aurora");
+  const [direction, setDirection] = useState<Direction>("soft");
+  const [softPalette, setSoftPalette] = useState<SoftPalette>("forest");
   return (
     <main className="min-h-screen bg-[#ebe9e3] p-3 text-[#17201c] sm:p-6">
       <header className="mx-auto mb-6 flex max-w-[1800px] flex-col gap-5 rounded-[24px] bg-white/70 p-5 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div><div className="flex items-center gap-3"><Link className="grid size-9 place-items-center rounded-xl bg-[#17201c] text-sm font-bold text-white" href="/">Q</Link><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-stone-400">QuestLog design lab</p><h1 className="mt-1 text-xl font-semibold tracking-[-0.03em]">Choose a new visual direction</h1></div></div></div>
         <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Design directions">{directions.map((item) => <button aria-selected={direction === item.id} className={`shrink-0 rounded-2xl px-4 py-3 text-left transition ${direction === item.id ? "bg-[#17201c] text-white" : "bg-stone-100 text-stone-500 hover:bg-stone-200"}`} key={item.id} onClick={() => setDirection(item.id)} role="tab" type="button"><span className="block text-xs font-bold">{item.label}</span><span className={`mt-1 block text-[10px] ${direction === item.id ? "text-white/45" : "text-stone-400"}`}>{item.note}</span></button>)}</div>
       </header>
-      <div className="mx-auto max-w-[1800px]" role="tabpanel">{direction === "aurora" ? <AuroraDirection /> : direction === "editorial" ? <EditorialDirection /> : <SoftDirection />}</div>
+      {direction === "soft" && <div className="mx-auto mb-5 flex max-w-[1800px] flex-wrap items-center justify-center gap-2" aria-label="Soft Digital palettes">{(Object.entries(softPalettes) as Array<[SoftPalette, (typeof softPalettes)[SoftPalette]]>).map(([id, palette]) => <button aria-pressed={softPalette === id} className={`flex items-center gap-2 rounded-full border px-4 py-2.5 text-xs font-bold transition ${softPalette === id ? "border-[#17201c] bg-white shadow-sm" : "border-transparent bg-white/45 text-stone-500"}`} key={id} onClick={() => setSoftPalette(id)} type="button"><span className="flex -space-x-1"><i className="size-3 rounded-full ring-2 ring-white" style={{ backgroundColor: palette.ink }} /><i className="size-3 rounded-full ring-2 ring-white" style={{ backgroundColor: palette.accent }} /><i className="size-3 rounded-full ring-2 ring-white" style={{ backgroundColor: palette.glowA }} /></span>{palette.label}</button>)}</div>}
+      <div className="mx-auto max-w-[1800px]" role="tabpanel">{direction === "aurora" ? <AuroraDirection /> : direction === "editorial" ? <EditorialDirection /> : <SoftDirection palette={softPalette} />}</div>
       <p className="mx-auto mt-5 max-w-[1800px] text-center text-xs text-stone-400">Concept preview only · your current QuestLog design is unchanged</p>
     </main>
   );
