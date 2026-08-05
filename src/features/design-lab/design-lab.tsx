@@ -4,11 +4,13 @@ import Link from "next/link";
 import { useState } from "react";
 import { ActivityIcon } from "@/components/activity-icon";
 
-type Direction = "orbit" | "aurora" | "editorial" | "soft";
+type Direction = "orbit" | "tidal" | "studio" | "aurora" | "editorial" | "soft";
 type SoftPalette = "forest" | "coastal" | "clay";
 
 const directions: Array<{ id: Direction; label: string; note: string }> = [
   { id: "orbit", label: "Orbital Calm", note: "Flowing editorial system" },
+  { id: "tidal", label: "Tidal Focus", note: "Fluid guided pathway" },
+  { id: "studio", label: "Rhythm Studio", note: "Expressive type system" },
   { id: "aurora", label: "Midnight Aurora", note: "Atmospheric timeline" },
   { id: "editorial", label: "Solar Editorial", note: "Bold structured print" },
   { id: "soft", label: "Soft Digital", note: "Gentle spatial canvas" },
@@ -135,6 +137,37 @@ function OrbitalDirection() {
   );
 }
 
+function TidalDirection() {
+  return (
+    <section className="relative min-h-[790px] overflow-hidden rounded-[38px] bg-[#e8f0ed] text-[#14332e] shadow-[0_35px_100px_rgba(22,55,48,0.16)]">
+      <div className="absolute -left-[12%] top-40 h-[420px] w-[124%] rotate-[-7deg] rounded-[50%] bg-[#b7dcd6]" />
+      <div className="absolute -left-[8%] top-[390px] h-[340px] w-[120%] rotate-[5deg] rounded-[50%] bg-[#347c72]" />
+      <header className="relative z-10 flex items-center justify-between px-7 py-7 sm:px-11"><p className="text-xl font-black tracking-[-0.06em]">quest<span className="text-[#f27657]">~</span>log</p><nav className="hidden gap-7 text-[10px] font-black uppercase tracking-[0.16em] text-[#14332e]/40 sm:flex"><button className="text-[#14332e]" type="button">Today</button><button type="button">Habits</button><button type="button">Quests</button><button type="button">Reflect</button></nav><span className="grid size-10 place-items-center rounded-full border border-[#14332e]/15 text-xs font-black">QL</span></header>
+      <div className="relative z-10 px-7 pb-12 pt-8 sm:px-11 lg:px-16">
+        <div className="flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between"><div><p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#f27657]">Wednesday · 05</p><h1 className="mt-4 text-5xl font-semibold leading-[0.9] tracking-[-0.065em] sm:text-7xl">Flow through<br />your day.</h1></div><p className="max-w-xs border-l border-[#14332e]/15 pl-5 text-sm leading-6 text-[#14332e]/55">Four gentle signals. Follow the current and finish without friction.</p></div>
+        <div className="mt-14 grid gap-0 overflow-hidden rounded-[100px] border border-white/40 bg-white/25 p-3 backdrop-blur-xl md:grid-cols-4">
+          {habits.map((habit, index) => <article className={`relative flex min-h-40 items-center gap-4 px-5 py-5 md:flex-col md:items-start md:justify-between ${index ? "border-t border-[#14332e]/10 md:border-l md:border-t-0" : ""}`} key={habit.name}><div className={`grid size-12 place-items-center rounded-full ${habit.done ? "bg-[#14332e] text-white" : "bg-white/45"}`}><ActivityIcon activity={habit.name} /></div><div><p className={`font-bold ${habit.done ? "opacity-40 line-through" : ""}`}>{habit.name}</p><p className="mt-1 text-xs opacity-45">{habit.time} · {habit.detail}</p></div><span className="ml-auto text-2xl font-light opacity-20 md:absolute md:right-5 md:top-5">0{index + 1}</span></article>)}
+        </div>
+        <div className="mt-12 flex flex-col gap-6 text-white sm:flex-row sm:items-end sm:justify-between"><div><p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/55">Today’s tide</p><p className="mt-2 text-6xl font-semibold tracking-[-0.07em]">63<span className="text-xl">%</span></p></div><div className="max-w-sm sm:text-right"><p className="text-xs uppercase tracking-[0.15em] text-[#c9efe7]">Side quest</p><p className="mt-2 text-xl font-bold">Ship the portfolio homepage</p></div><button className="rounded-full bg-[#f7df8c] px-6 py-4 text-sm font-black text-[#14332e]" type="button">Close the day →</button></div>
+      </div>
+    </section>
+  );
+}
+
+function StudioDirection() {
+  return (
+    <section className="min-h-[790px] overflow-hidden rounded-[38px] bg-[#f4f0e8] text-[#161616] shadow-[0_35px_100px_rgba(35,30,23,0.15)]">
+      <header className="grid border-b-2 border-black sm:grid-cols-[1fr_auto]"><div className="flex items-center justify-between px-6 py-5 sm:px-10"><p className="text-xl font-black tracking-[-0.06em]">QUEST/LOG</p><p className="text-[10px] font-black uppercase tracking-[0.2em]">Issue 05 · Wednesday</p></div><div className="border-t-2 border-black bg-[#c8ff55] px-8 py-5 text-xs font-black sm:border-l-2 sm:border-t-0">63% MOMENTUM</div></header>
+      <div className="grid lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="px-6 py-9 sm:px-10 lg:px-12"><p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#e64d36]">Daily practice / August 05</p><h1 className="mt-5 max-w-4xl text-6xl font-black uppercase leading-[0.82] tracking-[-0.075em] sm:text-8xl">Do less.<br /><span className="font-serif font-normal italic normal-case text-[#e64d36]">Notice more.</span></h1>
+          <div className="mt-12 border-t-2 border-black">{habits.map((habit, index) => <article className="grid grid-cols-[42px_52px_1fr_auto] items-center gap-3 border-b-2 border-black py-4" key={habit.name}><span className="font-mono text-xs">0{index + 1}</span><span className={`grid size-11 place-items-center rounded-full ${habit.done ? "bg-black text-white" : "border-2 border-black"}`}><ActivityIcon activity={habit.name} /></span><div><p className={`text-lg font-black uppercase tracking-[-0.03em] ${habit.done ? "opacity-30 line-through" : ""}`}>{habit.name}</p><p className="text-xs opacity-45">{habit.detail}</p></div><span className="font-mono text-xs opacity-40">{habit.time}</span></article>)}</div>
+        </div>
+        <aside className="border-t-2 border-black bg-[#6858e8] p-7 text-white lg:border-l-2 lg:border-t-0 lg:p-9"><p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/55">One thing beyond routine</p><p className="mt-6 text-4xl font-black uppercase leading-[0.9] tracking-[-0.055em]">Ship the portfolio homepage.</p><div className="mt-12 flex items-center gap-3"><span className="text-5xl font-black">60</span><div className="flex-1"><div className="h-2 bg-white/15"><div className="h-full w-3/5 bg-[#c8ff55]" /></div><p className="mt-2 text-[9px] font-black uppercase tracking-[0.18em] text-white/45">Quest progress</p></div></div><p className="mt-14 border-t border-white/25 pt-6 text-sm leading-6 text-white/65">Your day does not need to be perfect to count.</p><button className="mt-8 w-full border-2 border-white bg-white py-4 text-sm font-black uppercase text-[#161616]" type="button">Finish today →</button></aside>
+      </div>
+    </section>
+  );
+}
+
 export function DesignLab() {
   const [direction, setDirection] = useState<Direction>("orbit");
   const [softPalette, setSoftPalette] = useState<SoftPalette>("forest");
@@ -145,7 +178,7 @@ export function DesignLab() {
         <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Design directions">{directions.map((item) => <button aria-selected={direction === item.id} className={`shrink-0 rounded-2xl px-4 py-3 text-left transition ${direction === item.id ? "bg-[#17201c] text-white" : "bg-stone-100 text-stone-500 hover:bg-stone-200"}`} key={item.id} onClick={() => setDirection(item.id)} role="tab" type="button"><span className="block text-xs font-bold">{item.label}</span><span className={`mt-1 block text-[10px] ${direction === item.id ? "text-white/45" : "text-stone-400"}`}>{item.note}</span></button>)}</div>
       </header>
       {direction === "soft" && <div className="mx-auto mb-5 flex max-w-[1800px] flex-wrap items-center justify-center gap-2" aria-label="Soft Digital palettes">{(Object.entries(softPalettes) as Array<[SoftPalette, (typeof softPalettes)[SoftPalette]]>).map(([id, palette]) => <button aria-pressed={softPalette === id} className={`flex items-center gap-2 rounded-full border px-4 py-2.5 text-xs font-bold transition ${softPalette === id ? "border-[#17201c] bg-white shadow-sm" : "border-transparent bg-white/45 text-stone-500"}`} key={id} onClick={() => setSoftPalette(id)} type="button"><span className="flex -space-x-1"><i className="size-3 rounded-full ring-2 ring-white" style={{ backgroundColor: palette.ink }} /><i className="size-3 rounded-full ring-2 ring-white" style={{ backgroundColor: palette.accent }} /><i className="size-3 rounded-full ring-2 ring-white" style={{ backgroundColor: palette.glowA }} /></span>{palette.label}</button>)}</div>}
-      <div className="mx-auto max-w-[1800px]" role="tabpanel">{direction === "orbit" ? <OrbitalDirection /> : direction === "aurora" ? <AuroraDirection /> : direction === "editorial" ? <EditorialDirection /> : <SoftDirection palette={softPalette} />}</div>
+      <div className="mx-auto max-w-[1800px]" role="tabpanel">{direction === "orbit" ? <OrbitalDirection /> : direction === "tidal" ? <TidalDirection /> : direction === "studio" ? <StudioDirection /> : direction === "aurora" ? <AuroraDirection /> : direction === "editorial" ? <EditorialDirection /> : <SoftDirection palette={softPalette} />}</div>
       <p className="mx-auto mt-5 max-w-[1800px] text-center text-xs text-stone-400">Concept preview only · your current QuestLog design is unchanged</p>
     </main>
   );
