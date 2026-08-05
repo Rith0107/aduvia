@@ -28,9 +28,9 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
           <div className="absolute -right-20 -top-20 size-64 rounded-full bg-[var(--soft-tint-a)] blur-3xl" />
           <div className="relative">
             <span className="mx-auto grid size-20 place-items-center rounded-full bg-[var(--soft-ink)] text-2xl text-white">✓</span>
-            <p className="mt-8 text-[11px] font-black uppercase tracking-[0.22em] text-[var(--soft-accent)]">Day closed</p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-[-0.055em]">You’re done for today.</h1>
-            <p className="mx-auto mt-4 max-w-sm text-sm leading-6 text-[var(--soft-muted)]">{completedCount} habits completed · {efficiency}% routine efficiency. Nothing else needs your attention tonight.</p>
+            <p className="mt-8 text-[11px] font-black uppercase tracking-[0.22em] text-[var(--soft-accent)]">Today is closed</p>
+            <h1 className="mt-3 text-4xl font-semibold tracking-[-0.055em]">Let the day be enough.</h1>
+            <p className="mx-auto mt-4 max-w-sm text-sm leading-6 text-[var(--soft-muted)]">{completedCount} habits completed · {efficiency}% routine efficiency. You can leave the rest here and come back fresh tomorrow.</p>
             <Link className="mt-9 inline-flex min-h-13 items-center justify-center rounded-full bg-[var(--soft-ink)] px-7 text-sm font-bold text-white" href="/">Return to Today</Link>
           </div>
         </section>
@@ -49,16 +49,16 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
         <div className="mx-auto max-w-6xl px-5 pb-12 pt-8 sm:px-9 sm:pt-12">
           <div className="evening-intro">
             <div>
-              <p className="soft-kicker text-[var(--soft-accent)]">60-second check-in</p>
-              <h1>Tap. Finish.<br />Rest.</h1>
+              <p className="soft-kicker text-[var(--soft-accent)]">Your evening reset · under a minute</p>
+              <h1>Leave today<br />lighter.</h1>
             </div>
             <div className="evening-progress-dial" style={{ "--check-progress": `${(completedCount / habits.length) * 360}deg` } as React.CSSProperties}>
               <div><strong>{completedCount}</strong><span>of {habits.length} done</span></div>
             </div>
             <div className="evening-intro-copy">
-              <p>No typing. No judgement.<br />Just tell us what happened.</p>
+              <p>Mark what happened.<br />No explanations. No judgement.</p>
               <div aria-label="Completed habits" aria-valuemax={habits.length} aria-valuemin={0} aria-valuenow={completedCount} className="evening-progress-line" role="progressbar"><span style={{ width: `${(completedCount / habits.length) * 100}%` }} /></div>
-              <small>{allAnswered ? "Ready to close" : `${habits.length - answeredCount} left to answer`}</small>
+              <small>{allAnswered ? "Ready to let go" : `${habits.length - answeredCount} choices left`}</small>
             </div>
           </div>
 
@@ -78,7 +78,7 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
           </section>
 
           <div className="evening-finish-dock">
-            <p><span>{allAnswered ? "Everything is accounted for." : "One tap per habit."}</span><small>{allAnswered ? "You can let today go." : "Then you’re free."}</small></p>
+            <p><span>{allAnswered ? "Every habit has an answer." : "One choice per habit."}</span><small>{allAnswered ? "Nothing else is required tonight." : "No explanations needed."}</small></p>
             <button disabled={!allAnswered} onClick={() => setIsFinished(true)} type="button"><span>Finish my day</span><span aria-hidden="true">→</span></button>
           </div>
         </div>

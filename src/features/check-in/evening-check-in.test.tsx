@@ -18,7 +18,7 @@ describe("EveningCheckIn", () => {
     screen.getAllByRole("button", { name: "✓ Done" }).forEach((button) => fireEvent.click(button));
     expect(finish).toBeEnabled();
     fireEvent.click(finish);
-    expect(screen.getByText("You’re done for today.")).toBeInTheDocument();
+    expect(screen.getByText("Let the day be enough.")).toBeInTheDocument();
   });
 
   it("counts completed habits instead of all answered habits", () => {
