@@ -71,7 +71,7 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
 
   return (
     <main className="quest-canvas min-h-screen p-3 text-[#17201c] sm:p-5">
-      <div className="quest-shell mx-auto grid min-h-[calc(100vh-1.5rem)] max-w-[1440px] overflow-hidden rounded-[28px] border border-[#174f3a]/15 sm:min-h-[calc(100vh-2.5rem)] lg:grid-cols-[220px_1fr]">
+      <div className="quest-shell mx-auto grid min-h-[calc(100vh-1.5rem)] max-w-[1800px] overflow-hidden rounded-[28px] border border-[#174f3a]/15 sm:min-h-[calc(100vh-2.5rem)] lg:grid-cols-[240px_1fr]">
         <aside className="quest-sidebar hidden border-r border-white/10 px-5 py-7 lg:flex lg:flex-col">
           <Link className="flex items-center gap-3 px-2" href="/">
             <span className="grid size-9 place-items-center rounded-xl bg-[#174f3a] text-sm font-semibold text-white">Q</span>

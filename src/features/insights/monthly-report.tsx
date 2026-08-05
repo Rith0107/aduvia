@@ -12,7 +12,6 @@ import {
   Pie,
   PieChart,
   ResponsiveContainer,
-  Tooltip,
   XAxis,
 } from "recharts";
 
@@ -176,7 +175,7 @@ export function MonthlyReport() {
 
   return (
     <main className="quest-canvas min-h-screen p-3 text-[#17201c] sm:p-5">
-      <div className="quest-shell mx-auto grid min-h-[calc(100vh-1.5rem)] max-w-[1440px] overflow-hidden rounded-[28px] border border-[#174f3a]/15 lg:grid-cols-[220px_1fr]">
+      <div className="quest-shell mx-auto grid min-h-[calc(100vh-1.5rem)] max-w-[1800px] overflow-hidden rounded-[28px] border border-[#174f3a]/15 lg:grid-cols-[240px_1fr]">
         <aside className="quest-sidebar hidden border-r border-white/10 px-5 py-7 lg:flex lg:flex-col">
           <Link className="flex items-center gap-3 px-2" href="/"><span className="grid size-9 place-items-center rounded-xl bg-[#d89a42] text-sm font-semibold text-[#143d31]">Q</span><span className="text-lg font-semibold tracking-[-0.03em]">QuestLog</span></Link>
           <nav aria-label="Primary" className="mt-14 space-y-1">{navItems.map((item) => <Link className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${item.label === "Insights" ? "bg-[#e5ece5] text-[#174f3a]" : "text-stone-500"}`} href={item.href} key={item.label}><span className={`size-1.5 rounded-full ${item.label === "Insights" ? "bg-[#174f3a]" : "bg-white/25"}`} />{item.label}</Link>)}</nav>
@@ -192,7 +191,7 @@ export function MonthlyReport() {
             <article className="relative overflow-hidden rounded-[28px] bg-[#143d31] p-6 text-white shadow-[0_22px_55px_rgba(20,61,49,0.2)] sm:p-8">
               <div className="absolute -right-20 -top-20 size-64 rounded-full border-[46px] border-[#d89a42]/10" />
               <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-                <div><p className="text-xs font-semibold uppercase tracking-[0.17em] text-[#d5b77c]">Consistency signal</p><p className="mt-4 text-6xl font-semibold tracking-[-0.065em]">{overallConsistency}%</p><p className="mt-1 text-sm text-white/50">Up 8 points from July</p></div>
+                <div><p className="text-xs font-semibold uppercase tracking-[0.17em] text-[#d5b77c]">Consistency signal</p><p className="mt-4 text-6xl font-semibold tracking-[-0.065em]">{overallConsistency}%</p><p className="mt-1 text-sm text-white/50">Up 8 points from July</p><p className="mt-5 inline-flex rounded-full bg-white/[0.08] px-3 py-2 text-xs font-medium text-[#c7dbd2]">You showed up on 24 days this month</p></div>
                 <div className="grid grid-cols-7 gap-1.5 rounded-2xl bg-white/[0.06] p-4" aria-label="August activity heatmap">{Array.from({ length: 35 }, (_, index) => <span className={`size-3 rounded-[4px] ${index > 30 ? "bg-transparent" : index % 7 === 5 ? "bg-[#d89a42]" : index % 5 === 0 ? "bg-[#9c4b38]/70" : "bg-[#8eb5a6]"}`} key={index} />)}</div>
               </div>
               <div className="relative mt-8 h-52 w-full">
@@ -201,7 +200,6 @@ export function MonthlyReport() {
                     <defs><linearGradient id="consistencyFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="#d89a42" stopOpacity={0.5} /><stop offset="100%" stopColor="#d89a42" stopOpacity={0} /></linearGradient></defs>
                     <CartesianGrid stroke="rgba(255,255,255,0.08)" strokeDasharray="3 6" vertical={false} />
                     <XAxis axisLine={false} dataKey="label" tick={{ fill: "rgba(255,255,255,0.42)", fontSize: 10 }} tickLine={false} />
-                    <Tooltip contentStyle={{ background: "#fffaf0", border: 0, borderRadius: 12, color: "#17201c", fontSize: 12 }} cursor={{ stroke: "rgba(255,255,255,0.2)" }} />
                     <Area dataKey="score" fill="url(#consistencyFill)" stroke="#d89a42" strokeWidth={3} type="monotone" />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -211,7 +209,7 @@ export function MonthlyReport() {
             <article className="rounded-[28px] border border-[#174f3a]/10 bg-[#fffaf0] p-6 sm:p-7">
               <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">Life balance</p><h2 className="mt-2 text-xl font-semibold tracking-[-0.03em]">Where your effort went</h2></div>
               <div className="relative mx-auto mt-3 h-56 max-w-[280px]">
-                <ResponsiveContainer height="100%" width="100%"><PieChart><Pie cx="50%" cy="50%" data={categoryBalance} dataKey="value" innerRadius={62} outerRadius={91} paddingAngle={4} stroke="none">{categoryBalance.map((entry) => <Cell fill={entry.color} key={entry.name} />)}</Pie><Tooltip contentStyle={{ background: "#fffaf0", border: "1px solid rgba(23,79,58,.1)", borderRadius: 12, fontSize: 12 }} /></PieChart></ResponsiveContainer>
+                <ResponsiveContainer height="100%" width="100%"><PieChart><Pie cx="50%" cy="50%" data={categoryBalance} dataKey="value" innerRadius={62} outerRadius={91} paddingAngle={4} stroke="none">{categoryBalance.map((entry) => <Cell fill={entry.color} key={entry.name} />)}</Pie></PieChart></ResponsiveContainer>
                 <div className="pointer-events-none absolute inset-0 grid place-items-center text-center"><div><p className="text-3xl font-semibold">4</p><p className="text-[10px] uppercase tracking-[0.12em] text-stone-400">focus areas</p></div></div>
               </div>
               <div className="grid grid-cols-2 gap-x-4 gap-y-3">{categoryBalance.map((item) => <div className="flex items-center gap-2 text-xs" key={item.name}><span className="size-2.5 rounded-full" style={{ backgroundColor: item.color }} /><span className="text-stone-500">{item.name}</span><span className="ml-auto font-semibold">{item.value}%</span></div>)}</div>
@@ -220,7 +218,7 @@ export function MonthlyReport() {
 
           <section className="mt-4 grid gap-4 lg:grid-cols-[0.72fr_1.28fr]">
             <article className="rounded-[24px] bg-[#dfe8ed] p-6 text-[#284f61]"><p className="text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Best day</p><div className="mt-3 flex items-end justify-between"><div><p className="text-3xl font-semibold tracking-[-0.04em]">Wednesday</p><p className="mt-1 text-sm opacity-60">Your midweek momentum peak.</p></div><span className="text-4xl">↗</span></div></article>
-            <article className="rounded-[24px] bg-[#f3e7ca] p-5 text-[#6e5b3c] sm:p-6"><div className="flex items-center justify-between"><div><p className="text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Weekly rhythm</p><p className="mt-2 text-lg font-semibold">Completion by weekday</p></div><p className="text-xs opacity-60">Last 30 days</p></div><div className="mt-4 h-28"><ResponsiveContainer height="100%" width="100%"><BarChart data={weekdayRhythm}><XAxis axisLine={false} dataKey="day" tick={{ fill: "#876f47", fontSize: 10 }} tickLine={false} /><Tooltip contentStyle={{ background: "#fffaf0", border: 0, borderRadius: 12, fontSize: 12 }} cursor={{ fill: "rgba(135,111,71,.08)" }} /><Bar dataKey="score" fill="#876f47" radius={[7, 7, 2, 2]} /></BarChart></ResponsiveContainer></div></article>
+            <article className="rounded-[24px] bg-[#f3e7ca] p-5 text-[#6e5b3c] sm:p-6"><div className="flex items-center justify-between"><div><p className="text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Weekly rhythm</p><p className="mt-2 text-lg font-semibold">Completion by weekday</p></div><p className="text-xs opacity-60">Last 30 days</p></div><div className="mt-4 h-28"><ResponsiveContainer height="100%" width="100%"><BarChart data={weekdayRhythm}><XAxis axisLine={false} dataKey="day" tick={{ fill: "#876f47", fontSize: 10 }} tickLine={false} /><Bar dataKey="score" fill="#876f47" radius={[7, 7, 2, 2]} /></BarChart></ResponsiveContainer></div></article>
           </section>
 
           <section className="mt-7 rounded-[24px] border border-[#174f3a]/10 bg-[#f8fbf7] p-4 sm:p-6">
