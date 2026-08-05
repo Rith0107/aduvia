@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ChartNoAxesCombined, CircleCheck, Gem, ListChecks } from "lucide-react";
+import { ChartNoAxesCombined, CircleCheck, Gem, ListChecks, MoonStar } from "lucide-react";
 
 const navItems = [
   { label: "Today", href: "/", icon: CircleCheck },
@@ -30,7 +30,10 @@ export function AppShell({ active, children, eyebrow, title, action }: AppShellP
               <Link className={`rounded-full px-5 py-2.5 text-xs font-bold transition ${active === item.label ? "bg-[var(--soft-ink)] text-white shadow-sm" : "text-[var(--soft-muted)] hover:text-[var(--soft-ink)]"}`} href={item.href} key={item.label}>{item.label}</Link>
             ))}
           </nav>
-          <Link className="grid size-10 place-items-center rounded-full border-4 border-white/55 bg-[var(--soft-accent)] text-[10px] font-black text-white shadow-sm" href="/check-in" aria-label="Open evening check-in">QL</Link>
+          <div className="flex items-center gap-2">
+            <Link className="flex min-h-10 items-center gap-2 rounded-full bg-white/45 px-3 text-xs font-bold text-[var(--soft-ink)] shadow-[inset_0_1px_0_rgba(255,255,255,.55)] backdrop-blur-xl sm:px-4" href="/check-in"><MoonStar aria-hidden className="size-4 text-[var(--soft-accent)]" strokeWidth={1.8} /><span className="hidden sm:inline">Evening mode</span></Link>
+            <button aria-label="Open profile" className="grid size-10 place-items-center rounded-full border-4 border-white/55 bg-[var(--soft-accent)] text-[10px] font-black text-white shadow-sm" type="button">QL</button>
+          </div>
         </header>
 
         <div className="mx-auto max-w-[1800px] px-5 pb-24 pt-9 sm:px-9 lg:px-14 lg:pb-14">
