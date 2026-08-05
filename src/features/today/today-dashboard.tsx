@@ -18,7 +18,6 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
   const [habits, setHabits] = useState(initialHabits);
   const [reflection, setReflection] = useState("");
   const completedCount = habits.filter((habit) => habit.status === "complete").length;
-  const completionRate = Math.round((habits.reduce((sum, habit) => sum + habit.completion, 0) / habits.length) * 100);
   const efficiency = useMemo(() => calculateRoutineEfficiency(habits.map(({ completion, priority }) => ({ completion, priority }))), [habits]);
   const questProgress = Math.round((sideQuest.completedMilestones / sideQuest.totalMilestones) * 100);
 
@@ -43,7 +42,7 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
 
       <section className="soft-closing-stage mt-10 grid gap-3 lg:grid-cols-[1.25fr_.75fr]">
         <div className="soft-signal-panel">
-          <div className="soft-signal-dial" style={{ "--signal-progress": `${completionRate * 3.6}deg` } as React.CSSProperties}>
+          <div className="soft-signal-dial" style={{ "--signal-progress": `${efficiency * 3.6}deg` } as React.CSSProperties}>
             <div><strong>{efficiency}%</strong><small>efficiency</small></div>
           </div>
           <div className="soft-signal-copy">
