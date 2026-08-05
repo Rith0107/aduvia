@@ -1,11 +1,12 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ChartNoAxesCombined, CircleCheck, Gem, ListChecks } from "lucide-react";
 
 const navItems = [
-  { label: "Today", href: "/", mark: "○" },
-  { label: "Habits", href: "/habits", mark: "✓" },
-  { label: "Quests", href: "/quests", mark: "◇" },
-  { label: "Insights", href: "/insights", mark: "↗" },
+  { label: "Today", href: "/", icon: CircleCheck },
+  { label: "Habits", href: "/habits", icon: ListChecks },
+  { label: "Quests", href: "/quests", icon: Gem },
+  { label: "Insights", href: "/insights", icon: ChartNoAxesCombined },
 ];
 
 type AppShellProps = {
@@ -44,7 +45,7 @@ export function AppShell({ active, children, eyebrow, title, action }: AppShellP
         </div>
 
         <nav aria-label="Mobile navigation" className="fixed bottom-3 left-3 right-3 z-40 grid grid-cols-4 rounded-[22px] bg-[var(--soft-ink)] p-2 text-white shadow-2xl md:hidden">
-          {navItems.map((item) => <Link className={`flex min-h-12 flex-col items-center justify-center rounded-2xl text-[10px] font-bold ${active === item.label ? "bg-white/15" : "text-white/45"}`} href={item.href} key={item.label}><span className="mb-0.5 text-sm">{item.mark}</span>{item.label}</Link>)}
+          {navItems.map((item) => <Link className={`flex min-h-12 flex-col items-center justify-center rounded-2xl text-[10px] font-bold ${active === item.label ? "bg-white/15" : "text-white/45"}`} href={item.href} key={item.label}><item.icon aria-hidden className="mb-1 size-4" strokeWidth={1.6} />{item.label}</Link>)}
         </nav>
       </div>
     </main>
