@@ -35,7 +35,7 @@ describe("TodayDashboard", () => {
       />,
     );
 
-    const save = screen.getByRole("button", { name: "Save reflection" });
+    const save = screen.getByRole("button", { name: "Save note" });
     expect(save).toBeDisabled();
     fireEvent.change(screen.getByLabelText("One-line reflection"), {
       target: { value: "Deep work went well." },
