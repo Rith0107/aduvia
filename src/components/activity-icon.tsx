@@ -12,7 +12,7 @@ import {
 
 type ActivityIconProps = { activity: string; className?: string };
 
-export function ActivityIcon({ activity, className = "size-5" }: ActivityIconProps) {
+export function ActivityIcon({ activity, className = "size-6" }: ActivityIconProps) {
   const value = activity.toLowerCase();
   const Icon = value.includes("walk") || value.includes("fitness") || value.includes("run")
     ? Footprints

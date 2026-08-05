@@ -11,6 +11,10 @@
   --soft-tint-a: #d7e3dc;
   --soft-tint-b: #ead8cd;
   --soft-tint-c: #dbe2e9;
+  --soft-icon-green: #2f6f5e;
+  --soft-icon-clay: #a35f49;
+  --soft-icon-blue: #456c85;
+  --soft-icon-gold: #9b762f;
 }
 
 @theme inline {
@@ -98,14 +102,21 @@ button {
 
 .soft-flow > article:nth-child(4n + 1) > span:first-child {
   background: color-mix(in srgb, var(--soft-tint-a) 74%, white);
+  color: var(--soft-icon-green);
 }
 
 .soft-flow > article:nth-child(4n + 2) > span:first-child {
   background: color-mix(in srgb, var(--soft-tint-b) 72%, white);
+  color: var(--soft-icon-clay);
 }
 
 .soft-flow > article:nth-child(4n + 3) > span:first-child {
   background: color-mix(in srgb, var(--soft-tint-c) 74%, white);
+  color: var(--soft-icon-blue);
+}
+
+.soft-flow > article:nth-child(4n) > span:first-child {
+  color: var(--soft-icon-gold);
 }
 
 .soft-task-cards > article {
