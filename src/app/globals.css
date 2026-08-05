@@ -67,6 +67,17 @@ button {
   backdrop-filter: blur(18px);
 }
 
+.insights-flow > section:not(:first-child) {
+  border-top: 1px solid rgb(41 50 44 / 9%);
+  border-radius: 0;
+  padding-top: 2rem;
+}
+
+.insights-flow article {
+  border-radius: 0;
+  box-shadow: none;
+}
+
 .quest-canvas {
   background-color: #e5ebe3;
   background-image:

@@ -168,6 +168,7 @@ export function MonthlyReport() {
 
   return (
     <AppShell active="Insights" eyebrow="Monthly review" title={<>Your month,<br />in motion.</>} action={<div className="flex items-center gap-2 rounded-full bg-white/45 p-1 text-xs font-bold"><button className="rounded-full px-3 py-2" type="button">←</button><span className="px-2">August 2026</span><button className="rounded-full px-3 py-2 opacity-30" disabled type="button">→</button></div>}>
+      <div className="insights-flow">
           <section className="mt-12 grid gap-4 xl:grid-cols-[1.35fr_0.75fr]">
             <article className="relative overflow-hidden rounded-[28px] bg-[#143d31] p-6 text-white shadow-[0_22px_55px_rgba(20,61,49,0.2)] sm:p-8">
               <div className="absolute -right-20 -top-20 size-64 rounded-full border-[46px] border-[#d89a42]/10" />
@@ -217,6 +218,7 @@ export function MonthlyReport() {
 
             <div className={`relative overflow-hidden rounded-[28px] bg-[#143d31] p-7 text-white shadow-[0_20px_55px_rgba(20,61,49,0.2)] ${format === "story" ? "mx-auto aspect-[9/16] w-full max-w-[290px]" : "aspect-square"}`}><div className="absolute -right-16 -top-16 size-48 rounded-full bg-[#d89a42]/15" /><p className="relative text-[10px] font-semibold uppercase tracking-[0.18em] text-[#d5b77c]">QuestLog · August</p><p className="relative mt-8 text-6xl font-semibold tracking-[-0.06em]">{overallConsistency}%</p><p className="relative mt-1 text-sm text-white/55">monthly consistency</p><div className="relative mt-9 rounded-2xl bg-[#f3e7ca] p-5 text-[#17201c]"><p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#876f47]">Side quests completed</p>{completedQuests.map((quest) => <p className="mt-3 text-sm font-semibold" key={quest}>✓ {quest}</p>)}</div><p className="absolute bottom-6 left-7 text-[10px] text-white/40">Small steps. A month of proof.</p></div>
           </section>
+      </div>
     </AppShell>
   );
 }

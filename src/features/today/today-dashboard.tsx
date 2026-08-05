@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { AppShell } from "@/components/app-shell";
+import { ActivityIcon } from "@/components/activity-icon";
 import { calculateRoutineEfficiency } from "@/lib/metrics";
 import type { SideQuestSummary, TodayHabit } from "./types";
 
@@ -12,8 +13,6 @@ type TodayDashboardProps = { dateLabel: string; initialHabits: TodayHabit[]; sid
 function nextHabitState(habit: TodayHabit): TodayHabit {
   return habit.status === "complete" ? { ...habit, status: "pending", completion: 0 } : { ...habit, status: "complete", completion: 1 };
 }
-
-const cardTints = ["bg-[var(--soft-tint-a)]", "bg-[var(--soft-tint-b)]", "bg-[var(--soft-tint-c)]", "bg-white/45"];
 
 export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDashboardProps) {
   const [habits, setHabits] = useState(initialHabits);
@@ -28,27 +27,28 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
   }
 
   return (
-    <AppShell active="Today" eyebrow={dateLabel} title={<>A softer way<br />to show up.</>} action={<div className="soft-panel max-w-xs rounded-[26px] p-5"><p className="text-sm leading-6 text-[var(--soft-muted)]">You’ve already done {completedCount === 0 ? "the hard part: starting" : `${completedCount} of ${habits.length}`}. The rest can be light.</p></div>}>
-      <section className="mt-12 grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(300px,.62fr)]">
-        <div className="grid gap-4 sm:grid-cols-2">
-          {habits.map((habit, index) => (
-            <article className={`group flex min-h-36 items-center gap-5 rounded-[30px] border border-white/55 p-5 transition duration-300 hover:-translate-y-1 hover:shadow-lg ${cardTints[index % cardTints.length]}`} key={habit.id}>
+    <AppShell active="Today" eyebrow={dateLabel} title={<>A softer way<br />to show up.</>} action={<div className="max-w-xs border-l border-black/[0.12] pl-5"><p className="text-sm leading-6 text-[var(--soft-muted)]">You’ve already done {completedCount === 0 ? "the hard part: starting" : `${completedCount} of ${habits.length}`}. The rest can be light.</p></div>}>
+      <section className="mt-12 grid gap-10 xl:grid-cols-[minmax(0,1.5fr)_minmax(300px,.62fr)] xl:gap-16">
+        <div className="border-y border-black/[0.08]">
+          {habits.map((habit) => (
+            <article className="group grid min-h-28 grid-cols-[52px_1fr_auto] items-center gap-4 border-b border-black/[0.08] py-5 last:border-b-0 sm:grid-cols-[60px_1fr_auto_auto]" key={habit.id}>
+              <span className="grid size-12 place-items-center rounded-full bg-white/45 text-[var(--soft-ink)]"><ActivityIcon activity={`${habit.name} ${habit.category}`} /></span>
+              <div className="min-w-0"><h2 className={`text-lg font-bold ${habit.status === "complete" ? "text-[var(--soft-muted)] line-through" : ""}`}>{habit.name}</h2><p className="mt-1 text-sm text-[var(--soft-muted)]">{habit.target} · {habit.category}</p></div>
+              {habit.priority === 3 && <span className="hidden text-[10px] font-black uppercase tracking-[0.14em] text-[var(--soft-accent)] sm:block">Today’s anchor</span>}
               <button aria-label={`${habit.status === "complete" ? "Undo" : "Complete"} ${habit.name}`} className={`grid size-13 shrink-0 place-items-center rounded-full border-2 text-lg transition ${habit.status === "complete" ? "border-[var(--soft-ink)] bg-[var(--soft-ink)] text-white" : "border-[color:rgb(41_50_44/15%)] text-transparent hover:border-[var(--soft-ink)]"}`} onClick={() => toggleHabit(habit.id)} type="button">✓</button>
-              <div className="min-w-0 flex-1"><h2 className={`text-lg font-bold ${habit.status === "complete" ? "text-[var(--soft-muted)] line-through" : ""}`}>{habit.name}</h2><p className="mt-1 text-sm text-[var(--soft-muted)]">{habit.target} · {habit.category}</p>{habit.priority === 3 && <span className="mt-3 inline-block text-[10px] font-black uppercase tracking-[0.14em] text-[var(--soft-accent)]">Today’s anchor</span>}</div>
             </article>
           ))}
         </div>
 
         <aside className="flex flex-col gap-4">
-          <section className="relative flex-1 overflow-hidden rounded-[30px] bg-[var(--soft-ink)] p-6 text-white sm:p-7">
-            <div className="absolute -right-16 -top-16 size-48 rounded-full bg-white/[0.04]" />
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/45">Today’s signal</p>
-            <div className="mt-6 flex items-end gap-3"><p className="text-6xl font-semibold tracking-[-0.07em]">{efficiency}%</p><p className="pb-2 text-xs text-white/45">efficiency</p></div>
-            <div className="mt-7 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-[var(--soft-tint-a)] transition-all" style={{ width: `${completionRate}%` }} /></div>
-            <p className="mt-3 text-xs text-white/50">{completedCount} of {habits.length} complete</p>
-            <Link className="mt-8 flex min-h-12 items-center justify-between rounded-full bg-white px-5 text-sm font-bold text-[var(--soft-ink)]" href="/check-in"><span>Close the day</span><span>→</span></Link>
+          <section className="relative flex-1 border-y border-black/[0.1] py-7">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--soft-muted)]">Today’s signal</p>
+            <div className="mt-6 flex items-end gap-3"><p className="text-6xl font-semibold tracking-[-0.07em]">{efficiency}%</p><p className="pb-2 text-xs text-[var(--soft-muted)]">efficiency</p></div>
+            <div className="mt-7 h-2 overflow-hidden rounded-full bg-black/[0.07]"><div className="h-full rounded-full bg-[var(--soft-ink)] transition-all" style={{ width: `${completionRate}%` }} /></div>
+            <p className="mt-3 text-xs text-[var(--soft-muted)]">{completedCount} of {habits.length} complete</p>
+            <Link className="mt-8 flex min-h-12 items-center justify-between border-t border-black/[0.1] pt-5 text-sm font-bold" href="/check-in"><span>Close the day</span><span>→</span></Link>
           </section>
-          <section className="rounded-[30px] bg-white/42 p-6">
+          <section className="border-t border-black/[0.09] px-1 pt-6">
             <div className="flex items-center justify-between"><p className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--soft-accent)]">Monthly quest</p><span className="text-xs font-bold">{questProgress}%</span></div>
             <p className="mt-3 text-lg font-bold">{sideQuest.title}</p>
             <div className="mt-5 h-1.5 rounded-full bg-black/[0.06]"><div className="h-full rounded-full bg-[var(--soft-accent)]" style={{ width: `${questProgress}%` }} /></div>
@@ -56,7 +56,7 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
         </aside>
       </section>
 
-      <section className="mt-4 flex flex-col gap-4 rounded-[30px] bg-white/35 p-5 sm:flex-row sm:items-center sm:p-6">
+      <section className="mt-10 flex flex-col gap-4 border-t border-black/[0.09] py-7 sm:flex-row sm:items-center">
         <div className="sm:w-52"><p className="font-bold">One quiet note</p><p className="mt-1 text-xs leading-5 text-[var(--soft-muted)]">Optional. Keep it short.</p></div>
         <label className="sr-only" htmlFor="daily-reflection">One-line reflection</label>
         <input className="min-h-13 min-w-0 flex-1 rounded-full border border-white/65 bg-white/55 px-5 text-sm outline-none placeholder:text-[var(--soft-muted)] focus:border-[var(--soft-ink)]" id="daily-reflection" maxLength={180} onChange={(event) => setReflection(event.target.value)} placeholder="What felt good today?" value={reflection} />

@@ -3,16 +3,10 @@
 import { FormEvent, useMemo, useState } from "react";
 
 import { AppShell } from "@/components/app-shell";
+import { ActivityIcon } from "@/components/activity-icon";
 import type { HabitFrequency, HabitSummary } from "./types";
 
 type HabitsDashboardProps = { initialHabits: HabitSummary[] };
-
-const accentStyles = {
-  green: "bg-[var(--soft-tint-a)]",
-  amber: "bg-[var(--soft-tint-b)]",
-  rose: "bg-[var(--soft-tint-b)]",
-  blue: "bg-[var(--soft-tint-c)]",
-};
 
 export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
   const [habits, setHabits] = useState(initialHabits);
@@ -64,13 +58,13 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
 
   return (
     <AppShell active="Habits" eyebrow="Build your rhythm" title={<>Habits that feel<br />like your own.</>} action={<button className="rounded-full bg-[var(--soft-ink)] px-6 py-4 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5" onClick={() => setIsCreating(true)} type="button">+ New habit</button>}>
-          <section className="mt-12 grid gap-4 sm:grid-cols-[.7fr_1fr_1fr]">
-            <div className="rounded-[30px] bg-[var(--soft-ink)] p-6 text-white"><p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Active</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{habits.filter((habit) => habit.state === "active").length}</p></div>
-            <div className="rounded-[30px] bg-[var(--soft-tint-b)] p-6"><p className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--soft-muted)]">Best streak</p><p className="mt-4 text-4xl font-semibold tracking-[-0.05em]">{Math.max(...habits.map((habit) => habit.streak))} days</p></div>
-            <div className="rounded-[30px] bg-[var(--soft-tint-a)] p-6"><p className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--soft-muted)]">Consistency</p><p className="mt-4 text-4xl font-semibold tracking-[-0.05em]">{averageConsistency}%</p></div>
+          <section className="mt-12 grid border-y border-black/[0.09] sm:grid-cols-[.7fr_1fr_1fr]">
+            <div className="py-6 sm:border-r sm:border-black/[0.09] sm:pr-6"><p className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--soft-muted)]">Active</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{habits.filter((habit) => habit.state === "active").length}</p></div>
+            <div className="border-t border-black/[0.09] py-6 sm:border-r sm:border-t-0 sm:px-6"><p className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--soft-muted)]">Best streak</p><p className="mt-4 text-4xl font-semibold tracking-[-0.05em]">{Math.max(...habits.map((habit) => habit.streak))} days</p></div>
+            <div className="border-t border-black/[0.09] py-6 sm:border-t-0 sm:pl-6"><p className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--soft-muted)]">Consistency</p><p className="mt-4 text-4xl font-semibold tracking-[-0.05em]">{averageConsistency}%</p></div>
           </section>
 
-          <section className="mt-5 rounded-[32px] bg-white/30 p-5 sm:p-7">
+          <section className="mt-10 border-t border-black/[0.09] pt-7">
             <div className="flex flex-col gap-4 pb-5 sm:flex-row sm:items-center sm:justify-between">
               <div><h2 className="text-xl font-semibold tracking-[-0.025em]">Habit library</h2><p className="mt-1 text-sm text-stone-500">Small systems that shape your days.</p></div>
               <div className="flex rounded-full bg-white/45 p-1">
@@ -80,10 +74,10 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
               </div>
             </div>
 
-            <div className="grid gap-3">
+            <div className="border-y border-black/[0.08]">
               {visibleHabits.map((habit) => (
-                <article className={`grid gap-4 rounded-[25px] p-4 sm:grid-cols-[minmax(0,1.4fr)_150px_100px_90px] sm:items-center ${accentStyles[habit.color]}`} key={habit.id}>
-                  <div className="flex items-center gap-3"><span className="grid size-11 shrink-0 place-items-center rounded-full bg-white/55 text-sm font-bold">{habit.name.charAt(0)}</span><div><h3 className="font-bold">{habit.name}</h3><p className="text-sm text-[var(--soft-muted)]">{habit.category} · {habit.frequency}</p></div></div>
+                <article className="grid gap-4 border-b border-black/[0.08] py-5 last:border-b-0 sm:grid-cols-[minmax(0,1.4fr)_150px_100px_90px] sm:items-center" key={habit.id}>
+                  <div className="flex items-center gap-4"><span className="grid size-12 shrink-0 place-items-center rounded-full bg-white/45"><ActivityIcon activity={`${habit.name} ${habit.category}`} /></span><div><h3 className="font-bold">{habit.name}</h3><p className="text-sm text-[var(--soft-muted)]">{habit.category} · {habit.frequency}</p></div></div>
                   <div><p className="text-xs text-stone-400">Consistency</p><div className="mt-1.5 flex items-center gap-2"><div className="h-1.5 flex-1 overflow-hidden rounded-full bg-stone-200"><div className="h-full rounded-full bg-[#174f3a]" style={{ width: `${habit.consistency}%` }} /></div><span className="text-xs font-semibold">{habit.consistency}%</span></div></div>
                   <div><p className="text-xs text-stone-400">Streak</p><p className="mt-1 text-sm font-semibold">{habit.streak} days</p></div>
                   <button className={`rounded-full px-3 py-2 text-xs font-bold transition ${habit.state === "active" ? "bg-white/55" : "bg-[var(--soft-ink)] text-white"}`} onClick={() => toggleState(habit.id)} type="button">{habit.state === "active" ? "Pause" : "Resume"}</button>

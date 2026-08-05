@@ -3,16 +3,10 @@
 import { FormEvent, useMemo, useState } from "react";
 
 import { AppShell } from "@/components/app-shell";
+import { ActivityIcon } from "@/components/activity-icon";
 import type { QuestStatus, QuestSummary } from "./types";
 
 type QuestsDashboardProps = { initialQuests: QuestSummary[] };
-
-const accentStyles = {
-  green: "bg-[var(--soft-tint-a)]",
-  amber: "bg-[var(--soft-tint-b)]",
-  rose: "bg-[var(--soft-tint-b)]",
-  blue: "bg-[var(--soft-tint-c)]",
-};
 
 const statusLabels: Record<QuestStatus, string> = {
   "not-started": "Not started",
@@ -70,26 +64,26 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
 
   return (
     <AppShell active="Quests" eyebrow="August · 27 days left" title={<>A few things worth<br />finishing.</>} action={<button className="rounded-full bg-[var(--soft-ink)] px-6 py-4 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5" onClick={() => setIsCreating(true)} type="button">+ New quest</button>}>
-          <section className="mt-12 grid gap-4 sm:grid-cols-[1fr_1fr_1.4fr]">
-            <div className="rounded-[30px] bg-[var(--soft-tint-a)] p-6"><p className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--soft-muted)]">Committed</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{quests.length}</p></div>
-            <div className="rounded-[30px] bg-[var(--soft-tint-b)] p-6"><p className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--soft-muted)]">Completed</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{completed}</p></div>
-            <div className="rounded-[30px] bg-[var(--soft-ink)] p-6 text-white"><div className="flex items-start justify-between"><p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">Month progress</p><p className="text-4xl font-semibold tracking-[-0.05em]">{overallProgress}%</p></div><div className="mt-8 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-[var(--soft-tint-a)]" style={{ width: `${overallProgress}%` }} /></div></div>
+          <section className="mt-12 grid border-y border-black/[0.09] sm:grid-cols-[1fr_1fr_1.4fr]">
+            <div className="py-6 sm:border-r sm:border-black/[0.09] sm:pr-6"><p className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--soft-muted)]">Committed</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{quests.length}</p></div>
+            <div className="border-t border-black/[0.09] py-6 sm:border-r sm:border-t-0 sm:px-6"><p className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--soft-muted)]">Completed</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{completed}</p></div>
+            <div className="border-t border-black/[0.09] py-6 sm:border-t-0 sm:pl-6"><div className="flex items-start justify-between"><p className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--soft-muted)]">Month progress</p><p className="text-4xl font-semibold tracking-[-0.05em]">{overallProgress}%</p></div><div className="mt-8 h-2 overflow-hidden rounded-full bg-black/[0.07]"><div className="h-full rounded-full bg-[var(--soft-ink)]" style={{ width: `${overallProgress}%` }} /></div></div>
           </section>
 
-          <section className="mt-5 rounded-[32px] bg-white/30 p-5 sm:p-7">
+          <section className="mt-10 border-t border-black/[0.09] pt-7">
             <div className="flex flex-col gap-4 pb-5 sm:flex-row sm:items-center sm:justify-between">
               <div><h2 className="text-xl font-semibold tracking-[-0.025em]">Monthly board</h2><p className="mt-1 text-sm text-stone-500">Meaningful goals beyond the daily routine.</p></div>
               <div className="flex max-w-full gap-1 overflow-x-auto rounded-full bg-white/45 p-1">{(["all", "in-progress", "not-started", "blocked", "completed"] as const).map((option) => <button className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition ${filter === option ? "bg-[var(--soft-ink)] text-white" : "text-[var(--soft-muted)]"}`} key={option} onClick={() => setFilter(option)} type="button">{option === "all" ? "All" : statusLabels[option]}</button>)}</div>
             </div>
 
-            <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <div className="mt-5 border-y border-black/[0.08]">
               {visibleQuests.map((quest) => {
                 const isComplete = quest.status === "completed";
                 return (
-                  <article className={`rounded-[28px] border border-white/55 p-6 ${isComplete ? "bg-[var(--soft-tint-a)]" : accentStyles[quest.color]}`} key={quest.id}>
-                    <div className="flex items-start justify-between gap-4"><span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.09em] ${accentStyles[quest.color]}`}>{quest.category}</span><span className="text-xs font-medium text-stone-400">{quest.dueLabel}</span></div>
-                    <h3 className="mt-4 min-h-14 text-lg font-semibold leading-6 tracking-[-0.02em]">{quest.title}</h3>
-                    <div className="mt-6 flex items-center justify-between pt-4"><span className={`rounded-full px-3 py-1.5 text-xs font-bold ${isComplete ? "bg-[var(--soft-ink)] text-white" : "bg-white/45 text-[var(--soft-muted)]"}`}>{statusLabels[quest.status]}</span><button className={`rounded-full px-4 py-2.5 text-xs font-bold transition ${isComplete ? "bg-white/55 text-[var(--soft-muted)]" : "bg-[var(--soft-ink)] text-white"}`} onClick={() => toggleQuestCompletion(quest.id)} type="button">{isComplete ? "Mark incomplete" : "Mark complete"}</button></div>
+                  <article className="grid gap-5 border-b border-black/[0.08] py-6 last:border-b-0 md:grid-cols-[56px_minmax(0,1fr)_auto] md:items-center" key={quest.id}>
+                    <span className="grid size-13 place-items-center rounded-full bg-white/45"><ActivityIcon activity={`${quest.title} ${quest.category}`} /></span>
+                    <div><div className="flex flex-wrap items-center gap-3"><span className="text-[10px] font-black uppercase tracking-[0.13em] text-[var(--soft-accent)]">{quest.category}</span><span className="text-xs text-[var(--soft-muted)]">{quest.dueLabel}</span></div><h3 className={`mt-2 text-xl font-bold tracking-[-0.025em] ${isComplete ? "text-[var(--soft-muted)] line-through" : ""}`}>{quest.title}</h3><p className="mt-1 text-xs text-[var(--soft-muted)]">{statusLabels[quest.status]}</p></div>
+                    <button className={`min-h-12 rounded-full px-5 text-xs font-bold transition ${isComplete ? "bg-white/55 text-[var(--soft-muted)]" : "bg-[var(--soft-ink)] text-white"}`} onClick={() => toggleQuestCompletion(quest.id)} type="button">{isComplete ? "Mark incomplete" : "Mark complete"}</button>
                   </article>
                 );
               })}
