@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
+import { Flame, Gauge, ListChecks } from "lucide-react";
 
 import { AppShell } from "@/components/app-shell";
 import { ActivityIcon } from "@/components/activity-icon";
@@ -59,9 +60,9 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
   return (
     <AppShell active="Habits" eyebrow="Build your rhythm" title={<>Habits that feel<br />like your own.</>} action={<button className="rounded-full bg-[var(--soft-ink)] px-6 py-4 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5" onClick={() => setIsCreating(true)} type="button">+ New habit</button>}>
           <section className="mt-12 grid border-y border-black/[0.09] sm:grid-cols-[.7fr_1fr_1fr]">
-            <div className="py-6 sm:border-r sm:border-black/[0.09] sm:pr-6"><p className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--soft-muted)]">Active</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{habits.filter((habit) => habit.state === "active").length}</p></div>
-            <div className="border-t border-black/[0.09] py-6 sm:border-r sm:border-t-0 sm:px-6"><p className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--soft-muted)]">Best streak</p><p className="mt-4 text-4xl font-semibold tracking-[-0.05em]">{Math.max(...habits.map((habit) => habit.streak))} days</p></div>
-            <div className="border-t border-black/[0.09] py-6 sm:border-t-0 sm:pl-6"><p className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--soft-muted)]">Consistency</p><p className="mt-4 text-4xl font-semibold tracking-[-0.05em]">{averageConsistency}%</p></div>
+            <div className="py-6 sm:border-r sm:border-black/[0.09] sm:pr-6"><p className="metric-label"><ListChecks aria-hidden className="text-[var(--soft-icon-green)]" />Active</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{habits.filter((habit) => habit.state === "active").length}</p></div>
+            <div className="border-t border-black/[0.09] py-6 sm:border-r sm:border-t-0 sm:px-6"><p className="metric-label"><Flame aria-hidden className="text-[var(--soft-icon-clay)]" />Best streak</p><p className="mt-4 text-4xl font-semibold tracking-[-0.05em]">{Math.max(...habits.map((habit) => habit.streak))} days</p></div>
+            <div className="border-t border-black/[0.09] py-6 sm:border-t-0 sm:pl-6"><p className="metric-label"><Gauge aria-hidden className="text-[var(--soft-icon-blue)]" />Consistency</p><p className="mt-4 text-4xl font-semibold tracking-[-0.05em]">{averageConsistency}%</p></div>
           </section>
 
           <section className="mt-10 border-t border-black/[0.09] pt-7">
