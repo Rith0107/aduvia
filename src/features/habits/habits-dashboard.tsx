@@ -74,7 +74,7 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
               </div>
             </div>
 
-            <div className="border-y border-black/[0.08]">
+            <div className="soft-flow border-y border-black/[0.08]">
               {visibleHabits.map((habit) => (
                 <article className="grid gap-4 border-b border-black/[0.08] py-5 last:border-b-0 sm:grid-cols-[minmax(0,1.4fr)_150px_100px_90px] sm:items-center" key={habit.id}>
                   <div className="flex items-center gap-4"><span className="grid size-12 shrink-0 place-items-center rounded-full bg-white/45"><ActivityIcon activity={`${habit.name} ${habit.category}`} /></span><div><h3 className="font-bold">{habit.name}</h3><p className="text-sm text-[var(--soft-muted)]">{habit.category} · {habit.frequency}</p></div></div>

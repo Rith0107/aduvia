@@ -29,7 +29,7 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
   return (
     <AppShell active="Today" eyebrow={dateLabel} title={<>A softer way<br />to show up.</>} action={<div className="max-w-xs border-l border-black/[0.12] pl-5"><p className="text-sm leading-6 text-[var(--soft-muted)]">You’ve already done {completedCount === 0 ? "the hard part: starting" : `${completedCount} of ${habits.length}`}. The rest can be light.</p></div>}>
       <section className="mt-12 grid gap-10 xl:grid-cols-[minmax(0,1.5fr)_minmax(300px,.62fr)] xl:gap-16">
-        <div className="border-y border-black/[0.08]">
+        <div className="soft-flow border-y border-black/[0.08]">
           {habits.map((habit) => (
             <article className="group grid min-h-28 grid-cols-[52px_1fr_auto] items-center gap-4 border-b border-black/[0.08] py-5 last:border-b-0 sm:grid-cols-[60px_1fr_auto_auto]" key={habit.id}>
               <span className="grid size-12 place-items-center rounded-full bg-white/45 text-[var(--soft-ink)]"><ActivityIcon activity={`${habit.name} ${habit.category}`} /></span>

@@ -76,7 +76,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
               <div className="flex max-w-full gap-1 overflow-x-auto rounded-full bg-white/45 p-1">{(["all", "in-progress", "not-started", "blocked", "completed"] as const).map((option) => <button className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition ${filter === option ? "bg-[var(--soft-ink)] text-white" : "text-[var(--soft-muted)]"}`} key={option} onClick={() => setFilter(option)} type="button">{option === "all" ? "All" : statusLabels[option]}</button>)}</div>
             </div>
 
-            <div className="mt-5 border-y border-black/[0.08]">
+            <div className="soft-flow mt-5 border-y border-black/[0.08]">
               {visibleQuests.map((quest) => {
                 const isComplete = quest.status === "completed";
                 return (
