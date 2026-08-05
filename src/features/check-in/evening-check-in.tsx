@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import { calculateRoutineEfficiency } from "@/lib/metrics";
 import type { TodayHabit } from "@/features/today/types";
+import { ActivityIcon } from "@/components/activity-icon";
 
 type EveningCheckInProps = { initialHabits: TodayHabit[] };
 
@@ -40,34 +41,46 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
   return (
     <main className="soft-canvas min-h-screen text-[var(--soft-ink)]">
       <div className="soft-shell min-h-screen overflow-hidden">
-        <header className="mx-auto flex max-w-5xl items-center justify-between px-5 py-6 sm:px-9">
+        <header className="premium-toolbar mx-auto flex max-w-[1500px] items-center justify-between px-5 py-6 sm:px-9">
           <Link className="text-xl font-black tracking-[-0.055em]" href="/">quest<span className="text-[var(--soft-accent)]">/</span>log</Link>
-          <span className="rounded-full bg-white/45 px-4 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-[var(--soft-muted)]">Evening mode</span>
+          <span className="evening-mode-pill"><span aria-hidden="true">☾</span> Evening mode</span>
         </header>
 
-        <div className="mx-auto max-w-3xl px-5 pb-10 pt-8 sm:px-9 sm:pt-12">
-          <div className="text-center">
-            <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[var(--soft-accent)]">60-second check-in</p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-[-0.055em] sm:text-6xl">Tap. Finish. Rest.</h1>
-            <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-[var(--soft-muted)]">No typing and no scoring yourself. Just tell us what happened.</p>
+        <div className="mx-auto max-w-6xl px-5 pb-12 pt-8 sm:px-9 sm:pt-12">
+          <div className="evening-intro">
+            <div>
+              <p className="soft-kicker text-[var(--soft-accent)]">60-second check-in</p>
+              <h1>Tap. Finish.<br />Rest.</h1>
+            </div>
+            <div className="evening-progress-dial" style={{ "--check-progress": `${(answeredCount / habits.length) * 360}deg` } as React.CSSProperties}>
+              <div><strong>{answeredCount}</strong><span>of {habits.length}</span></div>
+            </div>
+            <div className="evening-intro-copy">
+              <p>No typing. No judgement.<br />Just tell us what happened.</p>
+              <div className="evening-progress-line"><span style={{ width: `${(answeredCount / habits.length) * 100}%` }} /></div>
+              <small>{allAnswered ? "Ready to close" : `${habits.length - answeredCount} left to answer`}</small>
+            </div>
           </div>
 
-          <div className="mx-auto mt-9 flex max-w-sm items-center gap-3"><div className="h-1.5 flex-1 overflow-hidden rounded-full bg-black/[0.06]"><div className="h-full rounded-full bg-[var(--soft-accent)] transition-all" style={{ width: `${(answeredCount / habits.length) * 100}%` }} /></div><span className="text-xs font-bold text-[var(--soft-muted)]">{answeredCount}/{habits.length}</span></div>
-
-          <section className="mt-8 space-y-3">
+          <section className="evening-habit-grid mt-8">
             {habits.map((habit, index) => (
-              <article className={`grid gap-4 rounded-[28px] border border-white/55 p-5 transition sm:grid-cols-[1fr_270px] sm:items-center ${habit.status === "complete" ? "bg-[var(--soft-tint-a)]" : habit.status === "skipped" ? "bg-[var(--soft-tint-b)]" : index % 2 ? "bg-white/30" : "bg-[var(--soft-tint-c)]/55"}`} key={habit.id}>
-                <div><h2 className="text-lg font-bold">{habit.name}</h2><p className="mt-1 text-sm text-[var(--soft-muted)]">{habit.target}</p></div>
-                <div className="grid grid-cols-2 gap-2">
-                  <button aria-pressed={habit.status === "complete"} className={`min-h-14 rounded-full text-sm font-bold transition ${habit.status === "complete" ? "bg-[var(--soft-ink)] text-white" : "bg-white/55 hover:bg-white"}`} onClick={() => setHabitStatus(habit.id, true)} type="button">✓ Done</button>
-                  <button aria-pressed={habit.status === "skipped"} className={`min-h-14 rounded-full text-sm font-bold transition ${habit.status === "skipped" ? "bg-[var(--soft-accent)] text-white" : "bg-white/35 text-[var(--soft-muted)] hover:bg-white/65"}`} onClick={() => setHabitStatus(habit.id, false)} type="button">Not today</button>
+              <article className={`evening-habit-card ${habit.status}`} key={habit.id} style={{ "--row-index": index } as React.CSSProperties}>
+                <div className="evening-habit-identity">
+                  <ActivityIcon activity={`${habit.name} ${habit.category}`} className="evening-habit-icon" />
+                  <div><p className="soft-kicker text-[var(--soft-muted)]">{habit.category}</p><h2>{habit.name}</h2><p>{habit.target}</p></div>
+                </div>
+                <div className="evening-choice" role="group" aria-label={`Check in ${habit.name}`}>
+                  <button aria-label="✓ Done" aria-pressed={habit.status === "complete"} onClick={() => setHabitStatus(habit.id, true)} type="button"><span aria-hidden="true">✓</span> Done</button>
+                  <button aria-pressed={habit.status === "skipped"} onClick={() => setHabitStatus(habit.id, false)} type="button"><span aria-hidden="true">—</span> Not today</button>
                 </div>
               </article>
             ))}
           </section>
 
-          <button className="mt-6 min-h-16 w-full rounded-full bg-[var(--soft-ink)] text-base font-bold text-white shadow-xl transition hover:-translate-y-0.5 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-20 disabled:shadow-none" disabled={!allAnswered} onClick={() => setIsFinished(true)} type="button">Finish my day</button>
-          {!allAnswered && <p className="mt-3 text-center text-xs text-[var(--soft-muted)]">One tap per habit. Then you’re free.</p>}
+          <div className="evening-finish-dock">
+            <p><span>{allAnswered ? "Everything is accounted for." : "One tap per habit."}</span><small>{allAnswered ? "You can let today go." : "Then you’re free."}</small></p>
+            <button disabled={!allAnswered} onClick={() => setIsFinished(true)} type="button"><span>Finish my day</span><span aria-hidden="true">→</span></button>
+          </div>
         </div>
       </div>
     </main>
