@@ -74,9 +74,9 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
               </div>
             </div>
 
-            <div className="soft-flow border-y border-black/[0.08]">
+            <div className="soft-flow soft-task-cards grid gap-3">
               {visibleHabits.map((habit) => (
-                <article className="grid gap-4 border-b border-black/[0.08] py-5 last:border-b-0 sm:grid-cols-[minmax(0,1.4fr)_150px_100px_90px] sm:items-center" key={habit.id}>
+                <article className="grid min-h-32 gap-4 border border-white/50 p-5 sm:grid-cols-[minmax(0,1.4fr)_170px_110px_100px] sm:items-center sm:p-6" key={habit.id}>
                   <div className="flex items-center gap-4"><span className="grid size-12 shrink-0 place-items-center rounded-full bg-white/45"><ActivityIcon activity={`${habit.name} ${habit.category}`} /></span><div><h3 className="font-bold">{habit.name}</h3><p className="text-sm text-[var(--soft-muted)]">{habit.category} · {habit.frequency}</p></div></div>
                   <div><p className="text-xs text-stone-400">Consistency</p><div className="mt-1.5 flex items-center gap-2"><div className="h-1.5 flex-1 overflow-hidden rounded-full bg-stone-200"><div className="h-full rounded-full bg-[#174f3a]" style={{ width: `${habit.consistency}%` }} /></div><span className="text-xs font-semibold">{habit.consistency}%</span></div></div>
                   <div><p className="text-xs text-stone-400">Streak</p><p className="mt-1 text-sm font-semibold">{habit.streak} days</p></div>
