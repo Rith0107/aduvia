@@ -70,9 +70,9 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
   }
 
   return (
-    <main className="min-h-screen bg-[#f3f1eb] p-3 text-[#17201c] sm:p-5">
-      <div className="mx-auto grid min-h-[calc(100vh-1.5rem)] max-w-[1440px] overflow-hidden rounded-[28px] border border-black/[0.06] bg-[#faf9f5] shadow-[0_30px_80px_rgba(31,38,34,0.08)] sm:min-h-[calc(100vh-2.5rem)] lg:grid-cols-[220px_1fr]">
-        <aside className="hidden border-r border-black/[0.07] px-5 py-7 lg:flex lg:flex-col">
+    <main className="quest-canvas min-h-screen p-3 text-[#17201c] sm:p-5">
+      <div className="quest-shell mx-auto grid min-h-[calc(100vh-1.5rem)] max-w-[1440px] overflow-hidden rounded-[28px] border border-[#174f3a]/15 sm:min-h-[calc(100vh-2.5rem)] lg:grid-cols-[220px_1fr]">
+        <aside className="quest-sidebar hidden border-r border-white/10 px-5 py-7 lg:flex lg:flex-col">
           <Link className="flex items-center gap-3 px-2" href="/">
             <span className="grid size-9 place-items-center rounded-xl bg-[#174f3a] text-sm font-semibold text-white">Q</span>
             <span className="text-lg font-semibold tracking-[-0.03em]">QuestLog</span>
@@ -85,7 +85,7 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
               </Link>
             ))}
           </nav>
-          <div className="mt-auto rounded-2xl bg-[#dfe8ed] p-4 text-[#3d6678]">
+          <div className="mt-auto rounded-2xl border border-white/10 bg-white/10 p-4 text-[#dfe8ed]">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] opacity-60">Consistency</p>
             <p className="mt-2 text-3xl font-semibold tracking-[-0.04em]">{averageConsistency}%</p>
             <p className="mt-1 text-xs opacity-70">Across all habits</p>

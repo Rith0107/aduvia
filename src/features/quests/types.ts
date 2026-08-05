@@ -5,8 +5,6 @@ export type QuestSummary = {
   title: string;
   category: string;
   status: QuestStatus;
-  completedMilestones: number;
-  totalMilestones: number;
   dueLabel: string;
   effortHours: number;
   color: "green" | "amber" | "rose" | "blue";

@@ -80,9 +80,9 @@ export function TodayDashboard({
   }
 
   return (
-    <main className="min-h-screen bg-[#f3f1eb] p-3 text-[#17201c] sm:p-5">
-      <div className="mx-auto grid min-h-[calc(100vh-1.5rem)] max-w-[1440px] overflow-hidden rounded-[28px] border border-black/[0.06] bg-[#faf9f5] shadow-[0_30px_80px_rgba(31,38,34,0.08)] sm:min-h-[calc(100vh-2.5rem)] lg:grid-cols-[220px_1fr]">
-        <aside className="hidden border-r border-black/[0.07] px-5 py-7 lg:flex lg:flex-col">
+    <main className="quest-canvas min-h-screen p-3 text-[#17201c] sm:p-5">
+      <div className="quest-shell mx-auto grid min-h-[calc(100vh-1.5rem)] max-w-[1440px] overflow-hidden rounded-[28px] border border-[#174f3a]/15 sm:min-h-[calc(100vh-2.5rem)] lg:grid-cols-[220px_1fr]">
+        <aside className="quest-sidebar hidden border-r border-white/10 px-5 py-7 lg:flex lg:flex-col">
           <div className="flex items-center gap-3 px-2">
             <div className="grid size-9 place-items-center rounded-xl bg-[#174f3a] text-sm font-semibold text-white">
               Q
@@ -107,8 +107,8 @@ export function TodayDashboard({
             ))}
           </nav>
 
-          <div className="mt-auto rounded-2xl bg-[#f0eee7] p-4">
-            <p className="text-xs font-medium uppercase tracking-[0.16em] text-stone-400">August focus</p>
+          <div className="mt-auto rounded-2xl border border-white/10 bg-white/10 p-4">
+            <p className="text-xs font-medium uppercase tracking-[0.16em] text-white/45">August focus</p>
             <p className="mt-2 text-sm font-semibold leading-5">Consistency over intensity.</p>
             <div className="mt-4 flex gap-1">
               {[1, 1, 1, 0, 1, 1, 0].map((active, index) => (

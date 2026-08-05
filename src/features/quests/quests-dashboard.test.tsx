@@ -18,13 +18,13 @@ describe("QuestsDashboard", () => {
     expect(screen.queryByText("Build portfolio homepage")).not.toBeInTheDocument();
   });
 
-  it("advances a milestone", () => {
+  it("marks a quest complete", () => {
     render(<QuestsDashboard initialQuests={sampleQuests} />);
     const portfolio = screen.getByText("Build portfolio homepage").closest("article");
     expect(portfolio).not.toBeNull();
-    fireEvent.click(portfolio!.querySelector("button")!);
-    expect(portfolio).toHaveTextContent("4 / 5");
-    expect(portfolio).toHaveTextContent("80%");
+    fireEvent.click(screen.getAllByRole("button", { name: "Mark complete" })[0]);
+    expect(portfolio).toHaveTextContent("Completed");
+    expect(portfolio).toHaveTextContent("Mark incomplete");
   });
 
   it("creates a quest", () => {
