@@ -102,7 +102,7 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
             <button aria-label="Close create habit" className="creation-close" onClick={() => setIsCreating(false)} type="button">×</button>
             <aside className="creation-aside creation-aside-habit">
               <p className="soft-kicker">New rhythm</p>
-              <div className="creation-preview"><ActivityIcon activity={name || "habit goal"} className="size-9" /></div>
+              <div className="creation-preview"><ActivityIcon activity={name || "calendar schedule"} className="size-9" /></div>
               <div><h2>Make it easy<br />to return.</h2><p>A useful habit is specific enough to start and gentle enough to repeat.</p></div>
               <span className="creation-step">01 · Habit details</span>
             </aside>

@@ -3,6 +3,7 @@ import {
   BedDouble,
   Bike,
   BookOpen,
+  CalendarDays,
   CircleDollarSign,
   Code2,
   Dumbbell,
@@ -40,6 +41,8 @@ export function ActivityIcon({ activity, className = "size-6" }: ActivityIconPro
   }
   const Icon = value.includes("deep work") || value.includes("focus")
     ? Focus
+    : value.includes("calendar") || value.includes("schedule")
+      ? CalendarDays
     : value.includes("portfolio") || value.includes("homepage") || value.includes("website")
       ? PanelsTopLeft
       : value.includes("react") || value.includes("code") || value.includes("program")
