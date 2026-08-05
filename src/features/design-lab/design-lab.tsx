@@ -89,7 +89,7 @@ function EditorialDirection() {
 function SoftDirection({ palette }: { palette: SoftPalette }) {
   const colors = softPalettes[palette];
   return (
-    <section className="relative min-h-[760px] overflow-hidden rounded-[42px] shadow-[0_35px_90px_rgba(50,65,55,0.18)]" style={{ backgroundColor: colors.base, color: colors.ink }}>
+    <section className="relative min-h-[760px] overflow-hidden border-y border-black/[0.06]" style={{ backgroundColor: colors.base, color: colors.ink }}>
       <div className="absolute -left-32 top-24 size-96 rounded-full opacity-80 blur-3xl" style={{ backgroundColor: colors.glowA }} /><div className="absolute -right-40 top-0 size-[500px] rounded-full opacity-65 blur-3xl" style={{ backgroundColor: colors.glowB }} />
       <header className="relative flex items-center justify-between px-7 py-7 sm:px-12"><p className="text-xl font-black tracking-[-0.04em]">quest<span style={{ color: colors.accent }}>/</span>log</p><nav className="hidden rounded-full bg-white/35 p-1 backdrop-blur-md sm:flex">{["Today", "Habits", "Quests", "Reflect"].map((item, index) => <button className="rounded-full px-5 py-2 text-xs font-bold" key={item} style={index === 0 ? { backgroundColor: colors.ink, color: "white" } : { color: `${colors.ink}88` }} type="button">{item}</button>)}</nav><span className="size-10 rounded-full border-4 border-white/50" style={{ backgroundColor: colors.accent }} /></header>
       <div className="relative mx-auto max-w-6xl px-6 pb-12 pt-8 sm:px-12">
@@ -179,7 +179,7 @@ export function DesignLab() {
       </header>
       {direction === "soft" && <div className="mx-auto mb-5 flex max-w-[1800px] flex-wrap items-center justify-center gap-2" aria-label="Soft Digital palettes">{(Object.entries(softPalettes) as Array<[SoftPalette, (typeof softPalettes)[SoftPalette]]>).map(([id, palette]) => <button aria-pressed={softPalette === id} className={`flex items-center gap-2 rounded-full border px-4 py-2.5 text-xs font-bold transition ${softPalette === id ? "border-[#17201c] bg-white shadow-sm" : "border-transparent bg-white/45 text-stone-500"}`} key={id} onClick={() => setSoftPalette(id)} type="button"><span className="flex -space-x-1"><i className="size-3 rounded-full ring-2 ring-white" style={{ backgroundColor: palette.ink }} /><i className="size-3 rounded-full ring-2 ring-white" style={{ backgroundColor: palette.accent }} /><i className="size-3 rounded-full ring-2 ring-white" style={{ backgroundColor: palette.glowA }} /></span>{palette.label}</button>)}</div>}
       <div className="mx-auto max-w-[1800px]" role="tabpanel">{direction === "orbit" ? <OrbitalDirection /> : direction === "tidal" ? <TidalDirection /> : direction === "studio" ? <StudioDirection /> : direction === "aurora" ? <AuroraDirection /> : direction === "editorial" ? <EditorialDirection /> : <SoftDirection palette={softPalette} />}</div>
-      <p className="mx-auto mt-5 max-w-[1800px] text-center text-xs text-stone-400">Concept preview only · your current QuestLog design is unchanged</p>
+      <p className="mx-auto mt-5 max-w-[1800px] text-center text-xs text-stone-400">Concept preview only · Soft Digital now uses a full-bleed canvas with no outer base card</p>
     </main>
   );
 }
