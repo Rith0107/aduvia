@@ -12,13 +12,14 @@ afterEach(cleanup);
 describe("DesignLab", () => {
   it("switches between genuinely different concepts", () => {
     render(<DesignLab />);
-    expect(screen.getByText(/A softer way/)).toBeInTheDocument();
+    expect(screen.getByText(/Small moves/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("tab", { name: /Solar Editorial/ }));
     expect(screen.getByText(/Today is/)).toBeInTheDocument();
   });
 
   it("compares grounded palettes within Soft Digital", () => {
     render(<DesignLab />);
+    fireEvent.click(screen.getByRole("tab", { name: /Soft Digital/ }));
     const coastal = screen.getByRole("button", { name: /Coastal Quiet/ });
     fireEvent.click(coastal);
     expect(coastal).toHaveAttribute("aria-pressed", "true");

@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { ActivityIcon } from "@/components/activity-icon";
 
-type Direction = "aurora" | "editorial" | "soft";
+type Direction = "orbit" | "aurora" | "editorial" | "soft";
 type SoftPalette = "forest" | "coastal" | "clay";
 
 const directions: Array<{ id: Direction; label: string; note: string }> = [
+  { id: "orbit", label: "Orbital Calm", note: "Flowing editorial system" },
   { id: "aurora", label: "Midnight Aurora", note: "Atmospheric timeline" },
   { id: "editorial", label: "Solar Editorial", note: "Bold structured print" },
   { id: "soft", label: "Soft Digital", note: "Gentle spatial canvas" },
@@ -99,8 +101,42 @@ function SoftDirection({ palette }: { palette: SoftPalette }) {
   );
 }
 
+function OrbitalDirection() {
+  return (
+    <section className="relative min-h-[790px] overflow-hidden rounded-[38px] bg-[#f2f0e9] text-[#171b19] shadow-[0_35px_100px_rgba(31,38,34,0.16)]">
+      <div className="absolute -right-36 -top-48 size-[620px] rounded-full border-[100px] border-[#d6e5db] opacity-90" />
+      <div className="absolute right-20 top-14 size-56 rounded-full bg-[#ff754f] opacity-90 mix-blend-multiply" />
+      <header className="relative z-10 flex items-center justify-between border-b border-black/10 px-7 py-5 sm:px-10">
+        <p className="text-xl font-black tracking-[-0.06em]">quest<span className="text-[#ff754f]">/</span>log</p>
+        <p className="hidden text-[10px] font-black uppercase tracking-[0.22em] text-black/35 sm:block">Wednesday · August 05</p>
+        <button className="flex items-center gap-2 text-xs font-bold" type="button"><span className="size-2 rounded-full bg-[#ff754f]" />Evening mode</button>
+      </header>
+      <div className="relative z-10 grid lg:grid-cols-[92px_minmax(0,1fr)_330px]">
+        <nav className="hidden border-r border-black/10 py-8 lg:flex lg:flex-col lg:items-center lg:gap-5" aria-label="Orbital concept navigation">
+          {["⌂", "✓", "◇", "↗"].map((icon, index) => <button aria-label={`Concept navigation ${index + 1}`} className={`grid size-11 place-items-center rounded-full text-base ${index === 0 ? "bg-[#171b19] text-white" : "text-black/30 hover:bg-black/5 hover:text-black"}`} key={icon} type="button">{icon}</button>)}
+          <span className="mt-auto [writing-mode:vertical-rl] text-[9px] font-black uppercase tracking-[0.28em] text-black/25">Consistency over intensity</span>
+        </nav>
+        <div className="px-6 py-10 sm:px-10 lg:px-12 lg:py-12">
+          <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#ff754f]">Your rhythm today</p>
+          <h1 className="mt-4 max-w-3xl text-5xl font-semibold leading-[0.88] tracking-[-0.07em] sm:text-7xl xl:text-[92px]">Small moves.<br /><span className="font-serif italic text-black/35">Real momentum.</span></h1>
+          <div className="relative mt-12 max-w-4xl border-y border-black/10">
+            <div className="absolute bottom-10 left-[25px] top-10 w-px bg-black/10" />
+            {habits.map((habit, index) => <article className="group relative grid grid-cols-[52px_1fr_auto] items-center gap-4 border-b border-black/10 py-5 last:border-b-0" key={habit.name}><span className={`relative z-10 grid size-[52px] place-items-center rounded-full border ${habit.done ? "border-[#171b19] bg-[#171b19] text-white" : "border-black/15 bg-[#f2f0e9]"}`}><ActivityIcon activity={habit.name} /></span><div><p className={`text-lg font-bold tracking-[-0.02em] ${habit.done ? "text-black/30 line-through" : ""}`}>{habit.name}</p><p className="mt-1 text-xs text-black/35">{habit.detail}</p></div><div className="text-right"><p className="font-mono text-xs text-black/30">{habit.time}</p><p className="mt-1 text-[9px] font-black uppercase tracking-[0.14em] text-[#ff754f]">0{index + 1}</p></div></article>)}
+          </div>
+        </div>
+        <aside className="relative border-t border-black/10 bg-[#d6e5db]/65 p-7 backdrop-blur-xl lg:border-l lg:border-t-0 lg:p-8">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35">Today’s orbit</p>
+          <div className="relative mx-auto mt-8 aspect-square max-w-[230px]"><svg className="size-full -rotate-90" viewBox="0 0 120 120"><circle cx="60" cy="60" fill="none" r="50" stroke="rgba(23,27,25,.09)" strokeWidth="3" /><circle cx="60" cy="60" fill="none" pathLength="100" r="50" stroke="#ff754f" strokeDasharray="63 100" strokeLinecap="round" strokeWidth="5" /></svg><div className="absolute inset-0 grid place-items-center text-center"><div><p className="text-6xl font-semibold tracking-[-0.07em]">63</p><p className="text-[9px] font-black uppercase tracking-[0.2em] text-black/35">momentum</p></div></div></div>
+          <div className="mt-8 border-t border-black/10 pt-6"><p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#ff754f]">Side quest</p><p className="mt-3 text-xl font-bold leading-6">Ship the portfolio homepage</p><p className="mt-3 text-xs text-black/40">One clear finish line · August</p></div>
+          <button className="mt-9 flex w-full items-center justify-between border-t border-black/15 pt-5 text-sm font-black" type="button"><span>Close the day</span><span className="grid size-10 place-items-center rounded-full bg-[#171b19] text-white">→</span></button>
+        </aside>
+      </div>
+    </section>
+  );
+}
+
 export function DesignLab() {
-  const [direction, setDirection] = useState<Direction>("soft");
+  const [direction, setDirection] = useState<Direction>("orbit");
   const [softPalette, setSoftPalette] = useState<SoftPalette>("forest");
   return (
     <main className="min-h-screen bg-[#ebe9e3] p-3 text-[#17201c] sm:p-6">
@@ -109,7 +145,7 @@ export function DesignLab() {
         <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Design directions">{directions.map((item) => <button aria-selected={direction === item.id} className={`shrink-0 rounded-2xl px-4 py-3 text-left transition ${direction === item.id ? "bg-[#17201c] text-white" : "bg-stone-100 text-stone-500 hover:bg-stone-200"}`} key={item.id} onClick={() => setDirection(item.id)} role="tab" type="button"><span className="block text-xs font-bold">{item.label}</span><span className={`mt-1 block text-[10px] ${direction === item.id ? "text-white/45" : "text-stone-400"}`}>{item.note}</span></button>)}</div>
       </header>
       {direction === "soft" && <div className="mx-auto mb-5 flex max-w-[1800px] flex-wrap items-center justify-center gap-2" aria-label="Soft Digital palettes">{(Object.entries(softPalettes) as Array<[SoftPalette, (typeof softPalettes)[SoftPalette]]>).map(([id, palette]) => <button aria-pressed={softPalette === id} className={`flex items-center gap-2 rounded-full border px-4 py-2.5 text-xs font-bold transition ${softPalette === id ? "border-[#17201c] bg-white shadow-sm" : "border-transparent bg-white/45 text-stone-500"}`} key={id} onClick={() => setSoftPalette(id)} type="button"><span className="flex -space-x-1"><i className="size-3 rounded-full ring-2 ring-white" style={{ backgroundColor: palette.ink }} /><i className="size-3 rounded-full ring-2 ring-white" style={{ backgroundColor: palette.accent }} /><i className="size-3 rounded-full ring-2 ring-white" style={{ backgroundColor: palette.glowA }} /></span>{palette.label}</button>)}</div>}
-      <div className="mx-auto max-w-[1800px]" role="tabpanel">{direction === "aurora" ? <AuroraDirection /> : direction === "editorial" ? <EditorialDirection /> : <SoftDirection palette={softPalette} />}</div>
+      <div className="mx-auto max-w-[1800px]" role="tabpanel">{direction === "orbit" ? <OrbitalDirection /> : direction === "aurora" ? <AuroraDirection /> : direction === "editorial" ? <EditorialDirection /> : <SoftDirection palette={softPalette} />}</div>
       <p className="mx-auto mt-5 max-w-[1800px] text-center text-xs text-stone-400">Concept preview only · your current QuestLog design is unchanged</p>
     </main>
   );
