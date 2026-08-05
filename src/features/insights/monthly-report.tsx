@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
+import { AppShell } from "@/components/app-shell";
 import {
   Area,
   AreaChart,
@@ -24,13 +24,6 @@ type ReportHabit = {
   color: string;
   days: CellState[];
 };
-
-const navItems = [
-  { label: "Today", href: "/" },
-  { label: "Habits", href: "/habits" },
-  { label: "Quests", href: "/quests" },
-  { label: "Insights", href: "/insights" },
-];
 
 const completedQuests = ["Created a monthly budget", "Shipped my portfolio homepage"];
 
@@ -174,20 +167,8 @@ export function MonthlyReport() {
   }
 
   return (
-    <main className="quest-canvas min-h-screen p-3 text-[#17201c] sm:p-5">
-      <div className="quest-shell mx-auto grid min-h-[calc(100vh-1.5rem)] max-w-[1800px] overflow-hidden rounded-[28px] border border-[#174f3a]/15 lg:grid-cols-[240px_1fr]">
-        <aside className="quest-sidebar hidden border-r border-white/10 px-5 py-7 lg:flex lg:flex-col">
-          <Link className="flex items-center gap-3 px-2" href="/"><span className="grid size-9 place-items-center rounded-xl bg-[#d89a42] text-sm font-semibold text-[#143d31]">Q</span><span className="text-lg font-semibold tracking-[-0.03em]">QuestLog</span></Link>
-          <nav aria-label="Primary" className="mt-14 space-y-1">{navItems.map((item) => <Link className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${item.label === "Insights" ? "bg-[#e5ece5] text-[#174f3a]" : "text-stone-500"}`} href={item.href} key={item.label}><span className={`size-1.5 rounded-full ${item.label === "Insights" ? "bg-[#174f3a]" : "bg-white/25"}`} />{item.label}</Link>)}</nav>
-          <div className="mt-auto rounded-2xl border border-white/10 bg-white/10 p-4 text-[#dfe8ed]"><p className="text-xs font-semibold uppercase tracking-[0.14em] opacity-60">Month score</p><p className="mt-2 text-3xl font-semibold">{overallConsistency}%</p><p className="mt-1 text-xs opacity-70">Overall consistency</p></div>
-        </aside>
-
-        <div className="min-w-0 px-4 py-6 sm:px-8 sm:py-8 xl:px-10">
-          <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><div><Link className="flex items-center gap-2 lg:hidden" href="/"><span className="grid size-7 place-items-center rounded-lg bg-[#174f3a] text-xs font-semibold text-white">Q</span><span className="text-sm font-semibold">QuestLog</span></Link><p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-stone-400 lg:mt-0">Monthly review</p><h1 className="mt-2 text-3xl font-semibold tracking-[-0.045em] sm:text-[40px]">Your month, in motion<span className="text-[#d89a42]">.</span></h1></div><div className="flex items-center gap-2 rounded-xl bg-[#e5ece5] p-1 text-xs font-semibold text-[#174f3a]"><button className="rounded-lg px-3 py-2" type="button">←</button><span className="px-2">August 2026</span><button className="rounded-lg px-3 py-2 opacity-30" disabled type="button">→</button></div></header>
-
-          <nav aria-label="Mobile navigation" className="mt-6 flex gap-2 overflow-x-auto pb-1 lg:hidden">{navItems.map((item) => <Link className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium ${item.label === "Insights" ? "bg-[#174f3a] text-white" : "bg-white/70 text-stone-500"}`} href={item.href} key={item.label}>{item.label}</Link>)}</nav>
-
-          <section className="mt-7 grid gap-4 xl:grid-cols-[1.35fr_0.75fr]">
+    <AppShell active="Insights" eyebrow="Monthly review" title={<>Your month,<br />in motion.</>} action={<div className="flex items-center gap-2 rounded-full bg-white/45 p-1 text-xs font-bold"><button className="rounded-full px-3 py-2" type="button">←</button><span className="px-2">August 2026</span><button className="rounded-full px-3 py-2 opacity-30" disabled type="button">→</button></div>}>
+          <section className="mt-12 grid gap-4 xl:grid-cols-[1.35fr_0.75fr]">
             <article className="relative overflow-hidden rounded-[28px] bg-[#143d31] p-6 text-white shadow-[0_22px_55px_rgba(20,61,49,0.2)] sm:p-8">
               <div className="absolute -right-20 -top-20 size-64 rounded-full border-[46px] border-[#d89a42]/10" />
               <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
@@ -236,8 +217,6 @@ export function MonthlyReport() {
 
             <div className={`relative overflow-hidden rounded-[28px] bg-[#143d31] p-7 text-white shadow-[0_20px_55px_rgba(20,61,49,0.2)] ${format === "story" ? "mx-auto aspect-[9/16] w-full max-w-[290px]" : "aspect-square"}`}><div className="absolute -right-16 -top-16 size-48 rounded-full bg-[#d89a42]/15" /><p className="relative text-[10px] font-semibold uppercase tracking-[0.18em] text-[#d5b77c]">QuestLog · August</p><p className="relative mt-8 text-6xl font-semibold tracking-[-0.06em]">{overallConsistency}%</p><p className="relative mt-1 text-sm text-white/55">monthly consistency</p><div className="relative mt-9 rounded-2xl bg-[#f3e7ca] p-5 text-[#17201c]"><p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#876f47]">Side quests completed</p>{completedQuests.map((quest) => <p className="mt-3 text-sm font-semibold" key={quest}>✓ {quest}</p>)}</div><p className="absolute bottom-6 left-7 text-[10px] text-white/40">Small steps. A month of proof.</p></div>
           </section>
-        </div>
-      </div>
-    </main>
+    </AppShell>
   );
 }
