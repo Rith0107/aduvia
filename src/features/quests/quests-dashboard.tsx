@@ -90,14 +90,22 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
             </div>
           </section>
       {isCreating && (
-        <div aria-modal="true" className="fixed inset-0 z-50 grid place-items-center bg-[var(--soft-ink)]/30 p-5 backdrop-blur-md" role="dialog">
-          <form className="w-full max-w-lg overflow-hidden rounded-[34px] bg-[var(--soft-surface)] shadow-2xl" onSubmit={createQuest}>
-            <div className="p-6 sm:p-8"><div className="flex items-start justify-between"><div><p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--soft-accent)]">August quest</p><h2 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">One clear finish line</h2><p className="mt-2 text-sm text-[var(--soft-muted)]">An outcome, not an ongoing habit.</p></div><button aria-label="Close create quest" className="grid size-10 place-items-center rounded-full bg-white/55" onClick={() => setIsCreating(false)} type="button">×</button></div></div>
-            <div className="p-6 sm:p-7">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-stone-400">Examples</p><div className="mt-3 flex flex-wrap gap-2">{["Finish a course", "Publish my portfolio", "Read one book"].map((preset) => <button className="rounded-full bg-[#f3e7ca] px-3 py-2 text-xs font-semibold text-[#6e5b3c]" key={preset} onClick={() => setTitle(preset)} type="button">{preset}</button>)}</div>
-            <label className="mt-7 block text-sm font-semibold" htmlFor="quest-title">Quest title</label><input autoFocus className="mt-2 min-h-12 w-full rounded-xl border border-black/10 bg-white px-4 outline-none focus:border-[#174f3a]/50 focus:ring-2 focus:ring-[#174f3a]/10" id="quest-title" onChange={(event) => setTitle(event.target.value)} placeholder="e.g. Ship my portfolio" value={title} />
-            <p className="mt-5 rounded-xl bg-[#f3e7ca] p-4 text-sm leading-6 text-[#6e5b3c]">Keep it concrete: a quest has one clear finish line. Mark it complete when the outcome is achieved.</p>
-            <div className="mt-7 flex gap-3"><button className="min-h-13 flex-1 rounded-full bg-white/55 text-sm font-bold" onClick={() => setIsCreating(false)} type="button">Cancel</button><button className="min-h-13 flex-1 rounded-full bg-[var(--soft-ink)] text-sm font-bold text-white disabled:opacity-30" disabled={!title.trim()} type="submit">Create quest</button></div>
+        <div aria-modal="true" className="creation-overlay" role="dialog">
+          <form className="creation-sheet" onSubmit={createQuest}>
+            <button aria-label="Close create quest" className="creation-close" onClick={() => setIsCreating(false)} type="button">×</button>
+            <aside className="creation-aside creation-aside-quest">
+              <p className="soft-kicker">August quest</p>
+              <div className="creation-preview"><ActivityIcon activity={title || "goal target"} className="size-9" /></div>
+              <div><h2>Choose one<br />clear finish.</h2><p>A quest is an outcome you can point to—not another routine to maintain.</p></div>
+              <span className="creation-step">01 · Define the outcome</span>
+            </aside>
+            <div className="creation-form">
+              <div><p className="soft-kicker text-[var(--soft-accent)]">Create a quest</p><h3>What would feel meaningful?</h3><p>Name the result, not the effort it takes to get there.</p></div>
+              <label className="creation-field-label" htmlFor="quest-title">Quest title</label>
+              <input autoFocus className="creation-field" id="quest-title" onChange={(event) => setTitle(event.target.value)} placeholder="e.g. Publish my portfolio" value={title} />
+              <div><p className="creation-field-label">A little inspiration</p><div className="creation-presets creation-presets-quest">{["Finish a course", "Publish my portfolio", "Read one book"].map((preset) => <button aria-pressed={title === preset} key={preset} onClick={() => setTitle(preset)} type="button"><ActivityIcon activity={preset} className="size-4" />{preset}</button>)}</div></div>
+              <div className="creation-guidance"><span aria-hidden>◇</span><p><strong>One finish line.</strong> When the outcome exists, the quest is complete.</p></div>
+              <div className="creation-actions"><button onClick={() => setIsCreating(false)} type="button">Cancel</button><button disabled={!title.trim()} type="submit"><span>Create quest</span><span aria-hidden>→</span></button></div>
             </div>
           </form>
         </div>

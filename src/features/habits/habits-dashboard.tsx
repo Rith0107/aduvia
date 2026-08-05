@@ -88,17 +88,22 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
           </section>
 
       {isCreating && (
-        <div aria-modal="true" className="fixed inset-0 z-50 grid place-items-center bg-[var(--soft-ink)]/30 p-5 backdrop-blur-md" role="dialog">
-          <form className="w-full max-w-lg overflow-hidden rounded-[34px] bg-[var(--soft-surface)] shadow-2xl" onSubmit={createHabit}>
-            <div className="p-6 sm:p-8"><div className="flex items-start justify-between"><div><p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--soft-accent)]">New rhythm</p><h2 className="mt-2 text-3xl font-semibold tracking-[-0.04em]">Create a habit</h2><p className="mt-2 text-sm text-[var(--soft-muted)]">Start small. Refine it later.</p></div><button aria-label="Close create habit" className="grid size-10 place-items-center rounded-full bg-white/55" onClick={() => setIsCreating(false)} type="button">×</button></div></div>
-            <div className="p-6 sm:p-7">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-stone-400">Quick starts</p>
-            <div className="mt-3 flex flex-wrap gap-2">{["Drink water", "Read 20 pages", "Walk 30 minutes", "Meditate"].map((preset) => <button className="rounded-full border border-[#174f3a]/10 bg-[#e5ece5] px-3 py-2 text-xs font-semibold text-[#174f3a] transition hover:bg-[#d8e6da]" key={preset} onClick={() => setName(preset)} type="button">{preset}</button>)}</div>
-            <label className="mt-7 block text-sm font-semibold" htmlFor="habit-name">Habit name</label>
-            <input autoFocus className="mt-2 min-h-12 w-full rounded-xl border border-black/10 bg-white px-4 outline-none focus:border-[#174f3a]/50 focus:ring-2 focus:ring-[#174f3a]/10" id="habit-name" onChange={(event) => setName(event.target.value)} placeholder="e.g. Stretch for 10 minutes" value={name} />
-            <label className="mt-5 block text-sm font-semibold" htmlFor="habit-frequency">Frequency</label>
-            <select className="mt-2 min-h-12 w-full rounded-xl border border-black/10 bg-white px-4 outline-none" id="habit-frequency" onChange={(event) => setFrequency(event.target.value as HabitFrequency)} value={frequency}><option>Daily</option><option>Weekdays</option><option>3× weekly</option><option>Custom</option></select>
-            <div className="mt-7 flex gap-3"><button className="min-h-13 flex-1 rounded-full bg-white/55 text-sm font-bold" onClick={() => setIsCreating(false)} type="button">Cancel</button><button className="min-h-13 flex-1 rounded-full bg-[var(--soft-ink)] text-sm font-bold text-white disabled:opacity-30" disabled={!name.trim()} type="submit">Create habit</button></div>
+        <div aria-modal="true" className="creation-overlay" role="dialog">
+          <form className="creation-sheet" onSubmit={createHabit}>
+            <button aria-label="Close create habit" className="creation-close" onClick={() => setIsCreating(false)} type="button">×</button>
+            <aside className="creation-aside creation-aside-habit">
+              <p className="soft-kicker">New rhythm</p>
+              <div className="creation-preview"><ActivityIcon activity={name || "habit goal"} className="size-9" /></div>
+              <div><h2>Make it easy<br />to return.</h2><p>A useful habit is specific enough to start and gentle enough to repeat.</p></div>
+              <span className="creation-step">01 · Habit details</span>
+            </aside>
+            <div className="creation-form">
+              <div><p className="soft-kicker text-[var(--soft-accent)]">Create a habit</p><h3>What will you repeat?</h3><p>Choose a small action. You can refine it whenever you need.</p></div>
+              <label className="creation-field-label" htmlFor="habit-name">Habit name</label>
+              <input autoFocus className="creation-field" id="habit-name" onChange={(event) => setName(event.target.value)} placeholder="e.g. Stretch for 10 minutes" value={name} />
+              <div><p className="creation-field-label">Quick starts</p><div className="creation-presets">{["Drink water", "Read 20 pages", "Walk 30 minutes", "Meditate"].map((preset) => <button aria-pressed={name === preset} key={preset} onClick={() => setName(preset)} type="button"><ActivityIcon activity={preset} className="size-4" />{preset}</button>)}</div></div>
+              <fieldset><legend className="creation-field-label">Frequency</legend><div className="creation-options">{(["Daily", "Weekdays", "3× weekly", "Custom"] as HabitFrequency[]).map((option) => <button aria-pressed={frequency === option} key={option} onClick={() => setFrequency(option)} type="button">{option}</button>)}</div></fieldset>
+              <div className="creation-actions"><button onClick={() => setIsCreating(false)} type="button">Cancel</button><button disabled={!name.trim()} type="submit"><span>Create habit</span><span aria-hidden>→</span></button></div>
             </div>
           </form>
         </div>
