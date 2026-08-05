@@ -21,7 +21,7 @@ export function AppShell({ active, children, eyebrow, title, action }: AppShellP
   return (
     <main className="soft-canvas min-h-screen text-[var(--soft-ink)]">
       <div className="soft-shell min-h-screen overflow-hidden">
-        <header className="mx-auto flex max-w-[1800px] items-center justify-between px-5 py-6 sm:px-9 lg:px-14">
+        <header className="premium-toolbar sticky top-0 z-40 mx-auto flex max-w-[1800px] items-center justify-between px-5 py-5 sm:px-9 lg:px-14">
           <Link className="text-xl font-black tracking-[-0.055em]" href="/">
             quest<span className="text-[var(--soft-accent)]">/</span>log
           </Link>

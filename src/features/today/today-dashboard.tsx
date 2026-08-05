@@ -35,7 +35,7 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
               <span className="grid size-11 place-items-center"><ActivityIcon activity={`${habit.name} ${habit.category}`} className="size-7" /></span>
               <div className="min-w-0"><h2 className={`text-lg font-bold ${habit.status === "complete" ? "text-[var(--soft-muted)] line-through" : ""}`}>{habit.name}</h2><p className="mt-1 text-sm text-[var(--soft-muted)]">{habit.target} · {habit.category}</p></div>
               {habit.priority === 3 && <span className="absolute right-5 top-5 text-[10px] font-black uppercase tracking-[0.14em] text-[var(--soft-accent)]">Today’s anchor</span>}
-              <button aria-label={`${habit.status === "complete" ? "Undo" : "Complete"} ${habit.name}`} className={`grid size-13 shrink-0 place-items-center rounded-full border-2 text-lg transition ${habit.status === "complete" ? "border-[var(--soft-ink)] bg-[var(--soft-ink)] text-white" : "border-[color:rgb(41_50_44/15%)] text-transparent hover:border-[var(--soft-ink)]"}`} onClick={() => toggleHabit(habit.id)} type="button">✓</button>
+              <button aria-label={`${habit.status === "complete" ? "Undo" : "Complete"} ${habit.name}`} className={`completion-control grid size-13 shrink-0 place-items-center rounded-full border-2 text-lg ${habit.status === "complete" ? "border-[var(--soft-ink)] bg-[var(--soft-ink)] text-white" : "border-[color:rgb(41_50_44/15%)] text-transparent hover:border-[var(--soft-ink)]"}`} onClick={() => toggleHabit(habit.id)} type="button">✓</button>
             </article>
           ))}
         </div>
