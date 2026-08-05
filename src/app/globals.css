@@ -264,7 +264,11 @@ h3 {
   background: linear-gradient(145deg, rgb(239 221 210 / 88%), rgb(242 235 226 / 78%));
   padding: clamp(1.5rem, 3vw, 2.5rem);
 }
-.soft-quest-percentage { font-size: .75rem; font-weight: 850; }
+.soft-quest-status { border: 1px solid rgb(165 91 66 / 16%); border-radius: 999px; padding: .45rem .7rem; color: var(--soft-accent); font-size: .58rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+.soft-quest-feature { position: relative; z-index: 1; }
+.soft-quest-percentage { font-size: clamp(3.75rem, 7vw, 6.5rem); font-weight: 600; letter-spacing: -.075em; line-height: .78; }
+.soft-quest-percentage span { margin-left: .08em; color: var(--soft-accent); font-size: .35em; letter-spacing: -.03em; }
+.soft-quest-feature h2 { max-width: 23rem; margin-top: .55rem; font-size: clamp(1.65rem, 3vw, 2.7rem); font-weight: 650; letter-spacing: -.05em; line-height: 1.02; }
 .soft-orbit-mark { position: absolute; top: 20%; right: -9%; width: 13rem; aspect-ratio: 1; border: 1px solid rgb(165 91 66 / 16%); border-radius: 50%; }
 .soft-orbit-mark::before { content: ""; position: absolute; inset: 18%; border: 1px solid rgb(165 91 66 / 14%); border-radius: inherit; }
 .soft-orbit-mark span { position: absolute; inset: -1px; border-radius: inherit; transition: transform .5s cubic-bezier(.2,.8,.2,1); }

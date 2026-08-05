@@ -55,10 +55,14 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
         </div>
 
         <div className="soft-quest-signal">
-          <div className="flex items-center justify-between"><p className="soft-kicker text-[var(--soft-accent)]">In your orbit</p><span className="soft-quest-percentage">{questProgress}%</span></div>
+          <div className="flex items-center justify-between"><p className="soft-kicker text-[var(--soft-accent)]">In your orbit</p><span className="soft-quest-status">On course</span></div>
           <div className="soft-orbit-mark" aria-hidden="true"><span style={{ transform: `rotate(${questProgress * 3.6}deg)` }} /></div>
-          <div><p className="text-xs text-[var(--soft-muted)]">Monthly quest</p><h2 className="mt-2 text-xl font-bold">{sideQuest.title}</h2></div>
-          <div className="soft-quest-track"><span style={{ width: `${questProgress}%` }} /></div>
+          <div className="soft-quest-feature">
+            <p className="soft-quest-percentage">{questProgress}<span>%</span></p>
+            <p className="mt-5 text-xs text-[var(--soft-muted)]">Current monthly quest</p>
+            <h2>{sideQuest.title}</h2>
+          </div>
+          <div><div className="soft-quest-track"><span style={{ width: `${questProgress}%` }} /></div><p className="mt-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--soft-muted)]">Progress this month</p></div>
         </div>
 
         <div className="soft-note-ribbon lg:col-span-2">
