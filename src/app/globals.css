@@ -101,17 +101,14 @@ button {
 }
 
 .soft-flow > article:nth-child(4n + 1) > span:first-child {
-  background: color-mix(in srgb, var(--soft-tint-a) 74%, white);
   color: var(--soft-icon-green);
 }
 
 .soft-flow > article:nth-child(4n + 2) > span:first-child {
-  background: color-mix(in srgb, var(--soft-tint-b) 72%, white);
   color: var(--soft-icon-clay);
 }
 
 .soft-flow > article:nth-child(4n + 3) > span:first-child {
-  background: color-mix(in srgb, var(--soft-tint-c) 74%, white);
   color: var(--soft-icon-blue);
 }
 

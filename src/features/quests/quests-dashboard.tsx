@@ -81,7 +81,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
                 const isComplete = quest.status === "completed";
                 return (
                   <article className="grid min-h-40 gap-5 border border-white/50 p-5 md:grid-cols-[56px_minmax(0,1fr)_auto] md:items-center md:p-6" key={quest.id}>
-                    <span className="grid size-14 place-items-center rounded-full bg-white/45"><ActivityIcon activity={`${quest.title} ${quest.category}`} /></span>
+                    <span className="grid size-11 place-items-center"><ActivityIcon activity={`${quest.title} ${quest.category}`} className="size-7" /></span>
                     <div><div className="flex flex-wrap items-center gap-3"><span className="text-[10px] font-black uppercase tracking-[0.13em] text-[var(--soft-accent)]">{quest.category}</span><span className="text-xs text-[var(--soft-muted)]">{quest.dueLabel}</span></div><h3 className={`mt-2 text-xl font-bold tracking-[-0.025em] ${isComplete ? "text-[var(--soft-muted)] line-through" : ""}`}>{quest.title}</h3><p className="mt-1 text-xs text-[var(--soft-muted)]">{statusLabels[quest.status]}</p></div>
                     <button className={`min-h-12 rounded-full px-5 text-xs font-bold transition ${isComplete ? "bg-white/55 text-[var(--soft-muted)]" : "bg-[var(--soft-ink)] text-white"}`} onClick={() => toggleQuestCompletion(quest.id)} type="button">{isComplete ? "Mark incomplete" : "Mark complete"}</button>
                   </article>

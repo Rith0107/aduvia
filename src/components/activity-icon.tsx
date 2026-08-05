@@ -32,5 +32,5 @@ export function ActivityIcon({ activity, className = "size-6" }: ActivityIconPro
                   ? WalletCards
                   : Lightbulb;
 
-  return <Icon aria-hidden className={className} strokeWidth={1.5} />;
+  return <Icon aria-hidden className={className} strokeWidth={2} />;
 }
