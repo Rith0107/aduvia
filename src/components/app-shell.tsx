@@ -18,9 +18,9 @@ type AppShellProps = {
 
 export function AppShell({ active, children, eyebrow, title, action }: AppShellProps) {
   return (
-    <main className="soft-canvas min-h-screen p-3 text-[var(--soft-ink)] sm:p-5">
-      <div className="soft-shell mx-auto min-h-[calc(100vh-1.5rem)] max-w-[1800px] overflow-hidden sm:min-h-[calc(100vh-2.5rem)]">
-        <header className="flex items-center justify-between px-5 py-5 sm:px-9 lg:px-12">
+    <main className="soft-canvas min-h-screen text-[var(--soft-ink)]">
+      <div className="soft-shell min-h-screen overflow-hidden">
+        <header className="mx-auto flex max-w-[1800px] items-center justify-between px-5 py-6 sm:px-9 lg:px-14">
           <Link className="text-xl font-black tracking-[-0.055em]" href="/">
             quest<span className="text-[var(--soft-accent)]">/</span>log
           </Link>
@@ -32,7 +32,7 @@ export function AppShell({ active, children, eyebrow, title, action }: AppShellP
           <Link className="grid size-10 place-items-center rounded-full border-4 border-white/55 bg-[var(--soft-accent)] text-[10px] font-black text-white shadow-sm" href="/check-in" aria-label="Open evening check-in">QL</Link>
         </header>
 
-        <div className="px-5 pb-24 pt-8 sm:px-9 lg:px-12 lg:pb-12">
+        <div className="mx-auto max-w-[1800px] px-5 pb-24 pt-9 sm:px-9 lg:px-14 lg:pb-14">
           <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[var(--soft-accent)]">{eyebrow}</p>

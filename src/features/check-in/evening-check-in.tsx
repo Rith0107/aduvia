@@ -22,8 +22,8 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
 
   if (isFinished) {
     return (
-      <main className="soft-canvas grid min-h-screen place-items-center p-5 text-[var(--soft-ink)]">
-        <section className="soft-shell relative w-full max-w-xl overflow-hidden p-8 text-center sm:p-14">
+      <main className="soft-canvas grid min-h-screen place-items-center text-[var(--soft-ink)]">
+        <section className="relative w-full max-w-xl overflow-hidden p-8 text-center sm:p-14">
           <div className="absolute -right-20 -top-20 size-64 rounded-full bg-[var(--soft-tint-a)] blur-3xl" />
           <div className="relative">
             <span className="mx-auto grid size-20 place-items-center rounded-full bg-[var(--soft-ink)] text-2xl text-white">✓</span>
@@ -38,9 +38,9 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
   }
 
   return (
-    <main className="soft-canvas min-h-screen p-3 text-[var(--soft-ink)] sm:p-5">
-      <div className="soft-shell mx-auto min-h-[calc(100vh-1.5rem)] max-w-5xl overflow-hidden sm:min-h-[calc(100vh-2.5rem)]">
-        <header className="flex items-center justify-between px-5 py-5 sm:px-9">
+    <main className="soft-canvas min-h-screen text-[var(--soft-ink)]">
+      <div className="soft-shell min-h-screen overflow-hidden">
+        <header className="mx-auto flex max-w-5xl items-center justify-between px-5 py-6 sm:px-9">
           <Link className="text-xl font-black tracking-[-0.055em]" href="/">quest<span className="text-[var(--soft-accent)]">/</span>log</Link>
           <span className="rounded-full bg-white/45 px-4 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-[var(--soft-muted)]">Evening mode</span>
         </header>
