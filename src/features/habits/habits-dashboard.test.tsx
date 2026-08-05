@@ -38,4 +38,20 @@ describe("HabitsDashboard", () => {
     expect(screen.getByText("Practice guitar")).toBeInTheDocument();
     expect(screen.getByText(/Mon · Wed/)).toBeInTheDocument();
   });
+
+  it("requires exactly three selected days for a three-times-weekly habit", () => {
+    render(<HabitsDashboard initialHabits={sampleHabitSummaries} />);
+    fireEvent.click(screen.getByRole("button", { name: "+ New habit" }));
+    fireEvent.change(screen.getByLabelText("Habit name"), { target: { value: "Practice guitar" } });
+    fireEvent.click(screen.getByRole("button", { name: "3× weekly" }));
+    const create = screen.getByRole("button", { name: "Create habit" });
+    fireEvent.click(screen.getByRole("button", { name: "Monday" }));
+    fireEvent.click(screen.getByRole("button", { name: "Wednesday" }));
+    expect(create).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "Friday" }));
+    expect(create).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Sunday" })).toBeDisabled();
+    fireEvent.click(create);
+    expect(screen.getByText(/3× · Mon · Wed · Fri/)).toBeInTheDocument();
+  });
 });

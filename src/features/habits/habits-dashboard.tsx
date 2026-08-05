@@ -52,7 +52,7 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
         name: name.trim(),
         category: "Personal",
         frequency,
-        scheduledDays: frequency === "Custom" ? selectedDays : undefined,
+        scheduledDays: frequency === "Custom" || frequency === "3× weekly" ? selectedDays : undefined,
         consistency: 0,
         streak: 0,
         state: "active",
@@ -87,7 +87,7 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
             <div className="soft-flow soft-task-cards grid gap-3">
               {visibleHabits.map((habit) => (
                 <article className="grid min-h-32 gap-4 border border-white/50 p-5 sm:grid-cols-[minmax(0,1.4fr)_170px_110px_100px] sm:items-center sm:p-6" key={habit.id}>
-                  <div className="flex items-center gap-4"><span className="grid size-11 shrink-0 place-items-center"><ActivityIcon activity={`${habit.name} ${habit.category}`} className="size-7" /></span><div><h3 className="font-bold">{habit.name}</h3><p className="text-sm text-[var(--soft-muted)]">{habit.category} · {habit.frequency === "Custom" && habit.scheduledDays?.length ? habit.scheduledDays.join(" · ") : habit.frequency}</p></div></div>
+                  <div className="flex items-center gap-4"><span className="grid size-11 shrink-0 place-items-center"><ActivityIcon activity={`${habit.name} ${habit.category}`} className="size-7" /></span><div><h3 className="font-bold">{habit.name}</h3><p className="text-sm text-[var(--soft-muted)]">{habit.category} · {habit.scheduledDays?.length ? `${habit.frequency === "3× weekly" ? "3× · " : ""}${habit.scheduledDays.join(" · ")}` : habit.frequency}</p></div></div>
                   <div><p className="text-xs text-stone-400">Consistency</p><div className="mt-1.5 flex items-center gap-2"><div className="h-1.5 flex-1 overflow-hidden rounded-full bg-stone-200"><div className="h-full rounded-full bg-[#174f3a]" style={{ width: `${habit.consistency}%` }} /></div><span className="text-xs font-semibold">{habit.consistency}%</span></div></div>
                   <div><p className="text-xs text-stone-400">Streak</p><p className="mt-1 text-sm font-semibold">{habit.streak} days</p></div>
                   <button className={`rounded-full px-3 py-2 text-xs font-bold transition ${habit.state === "active" ? "bg-white/55" : "bg-[var(--soft-ink)] text-white"}`} onClick={() => toggleState(habit.id)} type="button">{habit.state === "active" ? "Pause" : "Resume"}</button>
@@ -111,9 +111,9 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
               <label className="creation-field-label" htmlFor="habit-name">Habit name</label>
               <input autoFocus className="creation-field" id="habit-name" onChange={(event) => setName(event.target.value)} placeholder="e.g. Stretch for 10 minutes" value={name} />
               <div><p className="creation-field-label">Quick starts</p><div className="creation-presets">{["Drink water", "Read 20 pages", "Walk 30 minutes", "Meditate"].map((preset) => <button aria-pressed={name === preset} key={preset} onClick={() => setName(preset)} type="button"><ActivityIcon activity={preset} className="size-4" />{preset}</button>)}</div></div>
-              <fieldset><legend className="creation-field-label">Frequency</legend><div className="creation-options">{(["Daily", "Weekdays", "3× weekly", "Custom"] as HabitFrequency[]).map((option) => <button aria-pressed={frequency === option} key={option} onClick={() => setFrequency(option)} type="button">{option}</button>)}</div></fieldset>
-              {frequency === "Custom" && <fieldset className="creation-days"><legend className="creation-field-label">Choose your days</legend><div>{days.map((day) => <button aria-label={day.label} aria-pressed={selectedDays.includes(day.short)} key={day.short} onClick={() => setSelectedDays((current) => current.includes(day.short) ? current.filter((item) => item !== day.short) : [...current, day.short])} type="button">{day.short.slice(0, 1)}</button>)}</div><p>{selectedDays.length ? selectedDays.join(" · ") : "Select at least one day"}</p></fieldset>}
-              <div className="creation-actions"><button onClick={() => setIsCreating(false)} type="button">Cancel</button><button disabled={!name.trim() || (frequency === "Custom" && selectedDays.length === 0)} type="submit"><span>Create habit</span><span aria-hidden>→</span></button></div>
+              <fieldset><legend className="creation-field-label">Frequency</legend><div className="creation-options">{(["Daily", "Weekdays", "3× weekly", "Custom"] as HabitFrequency[]).map((option) => <button aria-pressed={frequency === option} key={option} onClick={() => { setFrequency(option); if (option === "3× weekly") setSelectedDays((current) => current.slice(0, 3)); }} type="button">{option}</button>)}</div></fieldset>
+              {(frequency === "Custom" || frequency === "3× weekly") && <fieldset className="creation-days"><legend className="creation-field-label">{frequency === "3× weekly" ? "Choose three days" : "Choose your days"}</legend><div>{days.map((day) => <button aria-label={day.label} aria-pressed={selectedDays.includes(day.short)} disabled={frequency === "3× weekly" && selectedDays.length === 3 && !selectedDays.includes(day.short)} key={day.short} onClick={() => setSelectedDays((current) => current.includes(day.short) ? current.filter((item) => item !== day.short) : [...current, day.short])} type="button">{day.short.slice(0, 1)}</button>)}</div><p>{frequency === "3× weekly" ? `${selectedDays.length} of 3 selected` : selectedDays.length ? selectedDays.join(" · ") : "Select at least one day"}</p></fieldset>}
+              <div className="creation-actions"><button onClick={() => setIsCreating(false)} type="button">Cancel</button><button disabled={!name.trim() || (frequency === "Custom" && selectedDays.length === 0) || (frequency === "3× weekly" && selectedDays.length !== 3)} type="submit"><span>Create habit</span><span aria-hidden>→</span></button></div>
             </div>
           </form>
         </div>
