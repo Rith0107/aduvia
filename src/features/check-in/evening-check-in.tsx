@@ -67,11 +67,11 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
               <article className={`evening-habit-card ${habit.status}`} key={habit.id} style={{ "--row-index": index } as React.CSSProperties}>
                 <div className="evening-habit-identity">
                   <ActivityIcon activity={`${habit.name} ${habit.category}`} className="evening-habit-icon" />
-                  <div><p className="soft-kicker text-[var(--soft-muted)]">{habit.category}</p><h2>{habit.name}</h2><p>{habit.target}</p></div>
+                  <div><div className="evening-habit-meta"><p className="soft-kicker text-[var(--soft-muted)]">{habit.category}</p>{habit.status !== "pending" && <span className="evening-result">{habit.status === "complete" ? "Completed" : "Incomplete"}</span>}</div><h2>{habit.name}</h2><p>{habit.target}</p></div>
                 </div>
                 <div className="evening-choice" role="group" aria-label={`Check in ${habit.name}`}>
                   <button aria-label="✓ Done" aria-pressed={habit.status === "complete"} onClick={() => setHabitStatus(habit.id, true)} type="button"><span aria-hidden="true">✓</span> Done</button>
-                  <button aria-pressed={habit.status === "skipped"} onClick={() => setHabitStatus(habit.id, false)} type="button"><span aria-hidden="true">—</span> Not today</button>
+                  <button aria-pressed={habit.status === "skipped"} onClick={() => setHabitStatus(habit.id, false)} type="button"><span aria-hidden="true">—</span> {habit.status === "skipped" ? "Incomplete" : "Not today"}</button>
                 </div>
               </article>
             ))}
