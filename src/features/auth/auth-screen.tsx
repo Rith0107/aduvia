@@ -27,7 +27,9 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const strength = passwordStrength(password);
@@ -46,6 +48,10 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
     }
     if (isSignup && commonPasswords.has(password.toLowerCase())) {
       setMessage("That password is too common. Try a longer, more personal phrase.");
+      return;
+    }
+    if (isSignup && password !== confirmPassword) {
+      setMessage("Those passwords do not match yet.");
       return;
     }
 
@@ -102,7 +108,7 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
             <h2 className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{isSignup ? "Create your space." : "Continue your story."}</h2>
             <p className="mt-4 text-sm leading-6 text-stone-500">{isSignup ? "A private home for your routines, monthly quests, and progress." : "Your routines and quests are waiting exactly where you left them."}</p>
 
-            <form className="mt-10 space-y-5" onSubmit={submit}>
+            <form className={isSignup ? "mt-8 space-y-4" : "mt-10 space-y-5"} onSubmit={submit}>
               {isSignup && <label className="block"><span className="text-xs font-semibold text-[#46534c]">Your name</span><div className="mt-2 flex items-center rounded-[18px] border border-[#6b9b86]/16 bg-[#dfece5]/72 px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,.65)] transition focus-within:border-[#2f6f5e]/45 focus-within:bg-[#e8f2ed]"><span className="mr-3 grid size-8 place-items-center rounded-full bg-[#2f6f5e] text-xs font-bold text-white">Aa</span><input autoComplete="name" className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[#789086]/55" onChange={(event) => setName(event.target.value)} placeholder="How should we greet you?" required value={name} /></div></label>}
 
               <label className="block"><span className="text-xs font-semibold text-[#46534c]">Email address</span><div className="mt-2 flex items-center rounded-[18px] border border-[#6b9b86]/16 bg-[#dfece5]/72 px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,.65)] transition focus-within:border-[#2f6f5e]/45 focus-within:bg-[#e8f2ed]"><span className="mr-3 grid size-8 place-items-center rounded-full bg-[#2f6f5e] text-white"><Mail size={16} strokeWidth={1.9} /></span><input autoComplete="email" className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[#789086]/55" onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" required type="email" value={email} /></div></label>
@@ -110,6 +116,8 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
               <label className="block"><span className="flex items-center justify-between text-xs font-semibold text-[#46534c]"><span>Password</span><span className="font-medium text-[#2f6f5e]">{isSignup ? "12+ characters" : "Your password"}</span></span><div className="mt-2 flex items-center rounded-[18px] border border-[#6b9b86]/16 bg-[#dfece5]/72 px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,.65)] transition focus-within:border-[#2f6f5e]/45 focus-within:bg-[#e8f2ed]"><span className="mr-3 grid size-8 place-items-center rounded-full bg-[#2f6f5e] text-white"><LockKeyhole size={16} strokeWidth={1.9} /></span><input autoComplete={isSignup ? "new-password" : "current-password"} className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[#789086]/55" minLength={isSignup ? 12 : 1} onChange={(event) => setPassword(event.target.value)} placeholder={isSignup ? "Try a memorable phrase" : "Enter your password"} required type={showPassword ? "text" : "password"} value={password} /><button aria-label={showPassword ? "Hide password" : "Show password"} className="ml-3 text-[#2f6f5e]/65 hover:text-[#1f4f40]" onClick={() => setShowPassword((current) => !current)} type="button">{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button></div></label>
 
               {isSignup && <div aria-label={`Password strength: ${strength.label}`} className="flex items-center gap-3"><div className="grid flex-1 grid-cols-4 gap-1.5">{Array.from({ length: 4 }, (_, index) => <span className={`h-1.5 rounded-full transition-colors ${index < strength.score ? strength.score >= 4 ? "bg-[#2f6f5e]" : "bg-[#d89a42]" : "bg-[#24302a]/10"}`} key={index} />)}</div><span className="w-16 text-right text-[10px] font-semibold uppercase tracking-[0.1em] text-[#6f7e76]">{strength.label}</span></div>}
+
+              {isSignup && <label className="block"><span className="flex items-center justify-between text-xs font-semibold text-[#46534c]"><span>Retype password</span>{confirmPassword && <span className={`font-medium ${password === confirmPassword ? "text-[#2f6f5e]" : "text-[#a35f49]"}`}>{password === confirmPassword ? "Passwords match" : "Not matching"}</span>}</span><div className={`mt-2 flex items-center rounded-[18px] border bg-[#dfece5]/72 px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,.65)] transition focus-within:bg-[#e8f2ed] ${confirmPassword && password !== confirmPassword ? "border-[#a35f49]/45" : "border-[#6b9b86]/16 focus-within:border-[#2f6f5e]/45"}`}><span className="mr-3 grid size-8 place-items-center rounded-full bg-[#2f6f5e] text-white"><LockKeyhole size={16} strokeWidth={1.9} /></span><input aria-describedby="password-match-status" autoComplete="new-password" className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[#789086]/55" minLength={12} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Type the same phrase again" required type={showConfirmPassword ? "text" : "password"} value={confirmPassword} /><button aria-label={showConfirmPassword ? "Hide retyped password" : "Show retyped password"} className="ml-3 text-[#2f6f5e]/65 hover:text-[#1f4f40]" onClick={() => setShowConfirmPassword((current) => !current)} type="button">{showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button></div><span className="sr-only" id="password-match-status">{confirmPassword ? password === confirmPassword ? "Passwords match" : "Passwords do not match" : ""}</span></label>}
 
               {isSignup && <div className="flex items-center gap-2 text-xs text-stone-400"><span className="grid size-5 place-items-center rounded-full bg-[#dce8e1] text-[#2f6f5e]"><Check size={12} strokeWidth={2.5} /></span>Your private notes never appear in shared reports.</div>}
 

@@ -30,4 +30,14 @@ describe("AuthScreen", () => {
     fireEvent.change(screen.getByPlaceholderText("Try a memorable phrase"), { target: { value: "a quiet morning ritual 2026" } });
     expect(screen.getByLabelText("Password strength: Strong")).toBeInTheDocument();
   });
+
+  it("requires the retyped password to match", () => {
+    render(<AuthScreen mode="signup" />);
+    fireEvent.change(screen.getByPlaceholderText("How should we greet you?"), { target: { value: "Rithwik" } });
+    fireEvent.change(screen.getByPlaceholderText("you@example.com"), { target: { value: "rithwik@example.com" } });
+    fireEvent.change(screen.getByPlaceholderText("Try a memorable phrase"), { target: { value: "a quiet morning ritual" } });
+    fireEvent.change(screen.getByPlaceholderText("Type the same phrase again"), { target: { value: "a different morning ritual" } });
+    fireEvent.submit(screen.getByRole("button", { name: "Create my account" }).closest("form")!);
+    expect(screen.getByRole("status")).toHaveTextContent("Those passwords do not match yet.");
+  });
 });
