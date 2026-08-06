@@ -19,7 +19,6 @@ describe("DesignLab", () => {
 
   it("compares grounded palettes within Soft Digital", () => {
     render(<DesignLab />);
-    fireEvent.click(screen.getByRole("tab", { name: /Soft Digital/ }));
     const coastal = screen.getByRole("button", { name: /Coastal Quiet/ });
     fireEvent.click(coastal);
     expect(coastal).toHaveAttribute("aria-pressed", "true");
