@@ -42,7 +42,7 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
   return (
     <main className="soft-canvas min-h-screen text-[var(--soft-ink)]">
       <div className="soft-shell min-h-screen overflow-hidden">
-        <div className="mx-auto max-w-[1400px] px-5 pb-12 pt-5 sm:px-9 sm:pt-7">
+        <div className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col justify-center px-5 py-6 sm:px-9 sm:py-8">
           <header className="mb-5 flex items-center justify-between px-1 sm:mb-6">
             <BrandLogo />
             <span className="evening-mode-pill"><span aria-hidden="true">☾</span> Evening mode</span>
