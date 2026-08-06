@@ -26,6 +26,15 @@ describe("HabitsDashboard", () => {
     expect(screen.getByText("Drink water")).toBeInTheDocument();
   });
 
+  it("allows a new habit to become the anchor", () => {
+    render(<HabitsDashboard initialHabits={sampleHabitSummaries} />);
+    fireEvent.click(screen.getByRole("button", { name: "+ New habit" }));
+    fireEvent.change(screen.getByLabelText("Habit name"), { target: { value: "Drink water" } });
+    fireEvent.click(screen.getByRole("button", { name: /Make this my anchor/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Create habit" }));
+    expect(screen.getAllByText("Anchor")).toHaveLength(1);
+  });
+
   it("requires and saves selected days for a custom schedule", () => {
     render(<HabitsDashboard initialHabits={sampleHabitSummaries} />);
     fireEvent.click(screen.getByRole("button", { name: "+ New habit" }));

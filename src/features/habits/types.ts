@@ -8,6 +8,7 @@ export type HabitSummary = {
   category: string;
   frequency: HabitFrequency;
   scheduledDays?: HabitDay[];
+  isAnchor?: boolean;
   consistency: number;
   streak: number;
   state: HabitState;
