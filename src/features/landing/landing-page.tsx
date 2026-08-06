@@ -8,7 +8,7 @@ export function LandingPage() {
       <header className="sticky top-0 z-50 border-b border-[#173f32]/8 bg-[#f3f3ec]/78 backdrop-blur-2xl">
         <div className="mx-auto flex max-w-[1500px] items-center justify-between px-5 py-4 sm:px-9 lg:px-14">
           <BrandLogo />
-          <nav aria-label="Landing page" className="hidden items-center gap-8 text-xs font-semibold text-[#5d6b64] md:flex"><a href="#why">Why QuestLog</a><a href="#how">How it works</a><a href="#month">Your month</a></nav>
+          <nav aria-label="Landing page" className="hidden items-center gap-8 text-xs font-semibold text-[#5d6b64] md:flex"><a href="#why">Why Aduvia</a><a href="#how">How it works</a><a href="#month">Your month</a></nav>
           <div className="flex items-center gap-2"><Link className="hidden rounded-full px-4 py-2.5 text-xs font-bold text-[#32463d] transition hover:bg-white/55 sm:block" href="/login">Log in</Link><Link className="rounded-full bg-[#173f32] px-5 py-3 text-xs font-bold text-white shadow-[0_10px_24px_rgba(23,63,50,.18)] transition hover:-translate-y-0.5" href="/signup">Start your story</Link></div>
         </div>
       </header>
@@ -18,7 +18,7 @@ export function LandingPage() {
         <div className="relative">
           <p className="inline-flex items-center gap-2 rounded-full bg-[#efddd4] px-4 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#9a5d49]"><Sparkles size={13} />Progress without pressure</p>
           <h1 className="mt-8 max-w-2xl text-6xl font-semibold leading-[.9] tracking-[-0.075em] sm:text-7xl xl:text-[96px]">Make your days visible.</h1>
-          <p className="mt-8 max-w-xl text-lg leading-8 text-[#6b7771]">QuestLog brings daily habits and meaningful monthly side quests into one calm place—so you can build consistency without turning life into a scoreboard.</p>
+          <p className="mt-8 max-w-xl text-lg leading-8 text-[#6b7771]">Aduvia brings daily habits and meaningful monthly side quests into one calm place—so you can build consistency without turning life into a scoreboard.</p>
           <div className="mt-10 flex flex-wrap items-center gap-4"><Link className="group inline-flex items-center gap-5 rounded-full bg-[#173f32] py-2 pl-6 pr-2 text-sm font-bold text-white shadow-[0_18px_38px_rgba(23,63,50,.22)]" href="/signup">Begin for free<span className="grid size-11 place-items-center rounded-full bg-[#dfa145] text-[#173f32] transition group-hover:translate-x-0.5"><ArrowRight size={18} /></span></Link><Link className="text-sm font-semibold text-[#52635a] underline decoration-[#c47b60]/50 underline-offset-8" href="/login">I already have an account</Link></div>
           <div className="mt-10 flex items-center gap-5 text-xs text-[#78837d]"><div className="flex -space-x-2">{["#2f6f5e", "#a35f49", "#456c85"].map((color) => <span className="size-8 rounded-full border-2 border-[#eceee8]" key={color} style={{ backgroundColor: color }} />)}</div><span>No streak anxiety.<br />Just honest progress.</span></div>
         </div>
@@ -35,7 +35,7 @@ export function LandingPage() {
 
       <section className="border-y border-[#173f32]/8 bg-[#173f32] text-white" id="why">
         <div className="mx-auto grid max-w-[1500px] gap-14 px-5 py-24 sm:px-9 lg:grid-cols-[.8fr_1.2fr] lg:px-14 lg:py-32">
-          <div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#e2b96c]">Why QuestLog</p><h2 className="mt-5 text-5xl font-semibold leading-[.96] tracking-[-0.06em] sm:text-6xl">Most trackers count streaks.<br />We help you understand your life.</h2></div>
+          <div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#e2b96c]">Why Aduvia</p><h2 className="mt-5 text-5xl font-semibold leading-[.96] tracking-[-0.06em] sm:text-6xl">Most trackers count streaks.<br />We help you understand your life.</h2></div>
           <div className="divide-y divide-white/10 border-y border-white/10">{[[CalendarCheck2, "Daily rhythm", "Log what happened in seconds, even when you are tired."], [Sparkles, "Monthly side quests", "Keep meaningful one-off goals beside the routines that support them."], [ChartNoAxesCombined, "Insight, not judgement", "See patterns, balance, and momentum without treating one missed day as failure."]].map(([Icon, title, copy], index) => { const FeatureIcon = Icon as typeof CalendarCheck2; return <div className="grid gap-4 py-7 sm:grid-cols-[60px_1fr_auto] sm:items-center" key={String(title)}><span className="grid size-11 place-items-center rounded-full bg-white/8 text-[#e2b96c]"><FeatureIcon size={20} strokeWidth={1.7} /></span><div><h3 className="text-xl font-semibold">{title as string}</h3><p className="mt-2 text-sm leading-6 text-white/45">{copy as string}</p></div><span className="text-xs text-white/25">0{index + 1}</span></div>; })}</div>
         </div>
       </section>
@@ -52,7 +52,7 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="bg-[#dfeae4] px-5 py-24 text-center"><BrandLogo className="justify-center" href="/" /><h2 className="mx-auto mt-8 max-w-3xl text-5xl font-semibold tracking-[-0.06em] sm:text-6xl">Your next month will happen anyway.<br />Make it visible.</h2><Link className="mt-10 inline-flex items-center gap-3 rounded-full bg-[#173f32] px-7 py-4 text-sm font-bold text-white" href="/signup">Create your QuestLog <ArrowRight size={17} /></Link></section>
+      <section className="bg-[#dfeae4] px-5 py-24 text-center"><BrandLogo className="justify-center" href="/" /><h2 className="mx-auto mt-8 max-w-3xl text-5xl font-semibold tracking-[-0.06em] sm:text-6xl">Your next month will happen anyway.<br />Make it visible.</h2><Link className="mt-10 inline-flex items-center gap-3 rounded-full bg-[#173f32] px-7 py-4 text-sm font-bold text-white" href="/signup">Create your Aduvia <ArrowRight size={17} /></Link></section>
 
       <footer className="bg-[#173f32] text-white"><div className="mx-auto flex max-w-[1500px] flex-col gap-5 px-5 py-8 text-xs text-white/40 sm:flex-row sm:items-center sm:justify-between sm:px-9 lg:px-14"><BrandLogo inverse /><p>Build gently. Finish meaningfully.</p><div className="flex gap-5"><Link href="/login">Log in</Link><Link href="/signup">Sign up</Link></div></div></footer>
     </main>

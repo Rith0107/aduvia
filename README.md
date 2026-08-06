@@ -1,6 +1,8 @@
-# QuestLog
+# Aduvia
 
-QuestLog is a daily-routine and monthly side-quest tracker. It combines fast habit check-ins, meaningful personal goals, and analytics that help users understand consistency, efficiency, and momentum.
+Aduvia is a daily-routine and monthly side-quest tracker. It combines fast habit check-ins, meaningful personal goals, and analytics that help users understand consistency, efficiency, and momentum.
+
+The name blends the Telugu word **adugu** (అడుగు, “step”) with **via** (“path”): a path shaped one step at a time.
 
 ## Project status
 

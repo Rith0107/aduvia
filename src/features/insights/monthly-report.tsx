@@ -123,7 +123,7 @@ async function renderShareCard(format: ShareFormat, consistency: number) {
   const margin = 90;
   context.fillStyle = "#d5b77c";
   context.font = "600 28px system-ui";
-  context.fillText("QUESTLOG · AUGUST 2026", margin, format === "story" ? 190 : 130);
+  context.fillText("ADUVIA · AUGUST 2026", margin, format === "story" ? 190 : 130);
   context.fillStyle = "#fffaf0";
   context.font = `700 ${format === "story" ? 118 : 104}px system-ui`;
   context.fillText(`${consistency}%`, margin, format === "story" ? 440 : 330);
@@ -178,7 +178,7 @@ export function MonthlyReport() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `questlog-august-${format}.png`;
+    link.download = `aduvia-august-${format}.png`;
     link.click();
     URL.revokeObjectURL(url);
     setShareMessage("Image downloaded. Share it anywhere you like.");
@@ -186,9 +186,9 @@ export function MonthlyReport() {
 
   async function shareCard() {
     const blob = await renderShareCard(format, overallConsistency);
-    const file = new File([blob], `questlog-august-${format}.png`, { type: "image/png" });
+    const file = new File([blob], `aduvia-august-${format}.png`, { type: "image/png" });
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
-      await navigator.share({ files: [file], title: "My QuestLog monthly report" });
+      await navigator.share({ files: [file], title: "My Aduvia monthly report" });
       setShareMessage("Share sheet opened.");
       return;
     }
@@ -271,7 +271,7 @@ export function MonthlyReport() {
                 <div className={`relative overflow-hidden bg-[#123f32] text-white shadow-[0_30px_70px_rgba(20,61,49,.28)] transition-all duration-500 ${format === "story" ? "aspect-[9/16] w-full max-w-[310px] rounded-[34px] p-7" : "aspect-square w-full max-w-[560px] rounded-[38px] p-8 sm:p-10"}`}>
                   <div className="absolute -right-24 -top-24 size-64 rounded-full border-[42px] border-[#d89a42]/18" />
                   <div className="absolute -bottom-32 -left-28 size-72 rounded-full bg-[#7fa696]/10 blur-2xl" />
-                  <div className="relative flex items-center justify-between"><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#f0c77a]">QuestLog · August</p><span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[9px] uppercase tracking-[0.13em] text-white/55">Monthly proof</span></div>
+                  <div className="relative flex items-center justify-between"><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#f0c77a]">Aduvia · August</p><span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[9px] uppercase tracking-[0.13em] text-white/55">Monthly proof</span></div>
 
                   <div className="relative mt-8 flex items-center gap-5">
                     <div className="grid size-32 shrink-0 place-items-center rounded-full p-[9px]" style={{ background: `conic-gradient(#d89a42 ${overallConsistency * 3.6}deg, rgba(255,255,255,.1) 0deg)` }}><div className="grid size-full place-items-center rounded-full bg-[#123f32] text-center"><div><p className="text-4xl font-semibold tracking-[-0.06em]">{overallConsistency}%</p><p className="mt-1 text-[8px] uppercase tracking-[0.16em] text-white/45">consistent</p></div></div></div>
@@ -279,7 +279,7 @@ export function MonthlyReport() {
                   </div>
 
                   <div className="relative mt-9 border-t border-white/10 pt-6"><div className="flex items-end justify-between"><div><p className="text-[9px] font-semibold uppercase tracking-[0.17em] text-[#f0c77a]">Side quests cleared</p><p className="mt-1 text-2xl font-semibold">{completedQuests.length} wins</p></div><span className="text-xs text-white/35">August 2026</span></div><div className="mt-5 space-y-3">{completedQuests.map((quest, index) => <div className="flex items-center gap-3 border-b border-white/10 pb-3" key={quest}><span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#f0c77a] text-[#123f32]"><Check size={15} strokeWidth={2.4} /></span><div><p className="text-[9px] uppercase tracking-[0.13em] text-white/35">Quest 0{index + 1}</p><p className="mt-0.5 text-sm font-semibold">{quest}</p></div></div>)}</div></div>
-                  <div className="absolute bottom-7 left-8 right-8 flex items-center justify-between text-[9px] uppercase tracking-[0.14em] text-white/30"><span>Small steps, visible proof.</span><span>quest/log</span></div>
+                  <div className="absolute bottom-7 left-8 right-8 flex items-center justify-between text-[9px] uppercase tracking-[0.14em] text-white/30"><span>Small steps, visible proof.</span><span>aduvia</span></div>
                 </div>
               </div>
             </div>

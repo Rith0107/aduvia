@@ -1,18 +1,20 @@
-# Product Requirements Document: QuestLog
+# Product Requirements Document: Aduvia
 
 **Status:** Draft v0.1  
 **Product:** Personal routine and monthly goal tracker  
 **Initial platform:** Responsive web application
 
+**Name meaning:** Aduvia combines Telugu *adugu* (అడుగు, “step”) with *via* (“path”).
+
 ## Product summary
 
-QuestLog helps people complete daily routines, pursue meaningful monthly “side quests,” and understand their progress through useful metrics and visual reports. It should feel like a lightweight personal operating system, not merely a checklist.
+Aduvia helps people complete daily routines, pursue meaningful monthly “side quests,” and understand their progress through useful metrics and visual reports. It should feel like a lightweight personal operating system, not merely a checklist.
 
 The core loop is: **Plan → Act → Check in → Review → Adjust**.
 
 ## Problem
 
-Many habit trackers overemphasize streaks and binary completion. They disconnect recurring habits from one-time personal goals, treat low- and high-priority work equally, and present charts without actionable interpretation. QuestLog should represent progress honestly through consistency, priority, effort, and reflection.
+Many habit trackers overemphasize streaks and binary completion. They disconnect recurring habits from one-time personal goals, treat low- and high-priority work equally, and present charts without actionable interpretation. Aduvia should represent progress honestly through consistency, priority, effort, and reflection.
 
 ## Product principles
 
@@ -128,4 +130,3 @@ Detailed schema design will follow the stack and persistence decisions.
 - Offline behavior and synchronization
 - Analytics charting library
 - Testing strategy and CI provider
-

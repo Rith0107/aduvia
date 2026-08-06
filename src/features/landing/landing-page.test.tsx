@@ -12,7 +12,7 @@ describe("LandingPage", () => {
     render(<LandingPage />);
     expect(screen.getByRole("heading", { level: 1, name: "Make your days visible." })).toBeInTheDocument();
     expect(screen.getAllByRole("link", { name: "Log in" })[0]).toHaveAttribute("href", "/login");
-    expect(screen.getAllByRole("link", { name: /Start your story|Begin for free|Create your QuestLog/ })[0]).toHaveAttribute("href", "/signup");
+    expect(screen.getAllByRole("link", { name: /Start your story|Begin for free|Create your Aduvia/ })[0]).toHaveAttribute("href", "/signup");
   });
 
   it("explains the product's three-part workflow", () => {

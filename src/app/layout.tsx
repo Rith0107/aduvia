@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "QuestLog",
+  title: "Aduvia",
   description: "Build routines. Finish meaningful side quests.",
 };
 

@@ -5,7 +5,7 @@
 
 ## Context
 
-QuestLog needs a responsive web experience, secure user-specific persistence, interactive charts, and a codebase that can grow from an MVP without splitting frontend and backend prematurely.
+Aduvia needs a responsive web experience, secure user-specific persistence, interactive charts, and a codebase that can grow from an MVP without splitting frontend and backend prematurely.
 
 ## Decision
 
