@@ -73,6 +73,14 @@ h3 {
   background-attachment: fixed;
 }
 
+.auth-canvas {
+  background:
+    radial-gradient(circle at 7% 12%, rgb(205 224 215 / 82%), transparent 34%),
+    radial-gradient(circle at 94% 8%, rgb(236 216 204 / 88%), transparent 36%),
+    linear-gradient(145deg, #e7ebe5, #eee9e1 60%, #dde4e2);
+  background-attachment: fixed;
+}
+
 .soft-shell {
   position: relative;
   background: rgb(246 246 241 / 24%);
