@@ -75,9 +75,10 @@ h3 {
 
 .auth-canvas {
   background:
-    radial-gradient(circle at 7% 12%, rgb(205 224 215 / 82%), transparent 34%),
-    radial-gradient(circle at 94% 8%, rgb(236 216 204 / 88%), transparent 36%),
-    linear-gradient(145deg, #e7ebe5, #eee9e1 60%, #dde4e2);
+    radial-gradient(circle at 7% 12%, rgb(177 211 195 / 92%), transparent 34%),
+    radial-gradient(circle at 94% 8%, rgb(232 190 169 / 88%), transparent 36%),
+    radial-gradient(circle at 74% 92%, rgb(184 205 218 / 78%), transparent 31%),
+    linear-gradient(145deg, #dce8e0, #eee4d9 60%, #d5e1e1);
   background-attachment: fixed;
 }
 
