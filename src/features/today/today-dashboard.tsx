@@ -30,7 +30,7 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
       <section className="mt-12">
         <div className="soft-flow soft-task-cards grid gap-3 sm:grid-cols-2">
           {habits.map((habit) => (
-            <article className="group relative grid min-h-40 grid-cols-[58px_1fr_auto] items-center gap-5 border border-white/50 p-6 sm:min-h-44 sm:grid-cols-[68px_1fr_auto] sm:gap-6 sm:p-7 xl:min-h-52 xl:grid-cols-[78px_1fr_auto] xl:px-9" key={habit.id}>
+            <article className="group relative grid min-h-40 grid-cols-[58px_1fr_auto] items-center gap-5 border border-white/50 p-6 sm:min-h-44 sm:grid-cols-[68px_1fr_auto] sm:gap-6 sm:p-7 xl:min-h-52 xl:grid-cols-[78px_1fr_auto] xl:pl-14 xl:pr-9 2xl:pl-16" key={habit.id}>
               <span className="grid size-12 place-items-center sm:size-14 xl:size-16"><ActivityIcon activity={`${habit.name} ${habit.category}`} className="size-8 sm:size-9 xl:size-10" /></span>
               <div className="min-w-0"><h2 className={`text-2xl font-bold tracking-[-0.035em] sm:text-3xl xl:text-4xl ${habit.status === "complete" ? "text-[#53635b] line-through decoration-[#53635b]/65" : ""}`}>{habit.name}</h2><p className="mt-2 text-sm font-medium text-[var(--soft-muted)] sm:text-base xl:text-lg">{habit.category} · {habit.target}</p></div>
               {habit.priority === 3 && <span className="absolute right-5 top-5 text-[10px] font-black uppercase tracking-[0.14em] text-[var(--soft-accent)]">Today’s anchor</span>}
