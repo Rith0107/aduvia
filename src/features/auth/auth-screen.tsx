@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Check, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
+import { BrandLogo } from "@/components/brand-logo";
 
 type AuthMode = "login" | "signup";
 
@@ -66,7 +67,7 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
       if (isSignup && !result.data.session) {
         setMessage("Check your inbox to confirm your account.");
       } else {
-        router.push("/");
+        router.push("/today");
       }
     } catch (error) {
       setMessage(error instanceof Error && !error.message.includes("environment variables") ? error.message : "Authentication is ready once Supabase keys are added.");
@@ -81,7 +82,7 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
         <section className="relative hidden overflow-hidden bg-[#153f32] p-12 text-white lg:flex lg:flex-col xl:p-16">
           <div className="absolute -right-28 -top-28 size-96 rounded-full border-[72px] border-[#d89a42]/12" />
           <div className="absolute -bottom-24 -left-16 size-80 rounded-full bg-[#7fa696]/12 blur-3xl" />
-          <Link className="relative text-2xl font-black tracking-[-0.06em]" href="/">quest<span className="text-[#d89a42]">/</span>log</Link>
+          <BrandLogo className="relative" inverse />
 
           <div className="relative my-auto max-w-xl py-16">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#e2b96c]">{isSignup ? "Your first chapter" : "Welcome back to your rhythm"}</p>
@@ -102,7 +103,7 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
           <div className="pointer-events-none absolute -left-24 bottom-[7%] size-72 rounded-full bg-[#b9d5c8]/45 blur-3xl" />
           <div className="pointer-events-none absolute right-[12%] top-[19%] size-24 rounded-full border-[18px] border-[#d8a54e]/10" />
           <div className="relative w-full max-w-[470px]">
-            <div className="flex items-center justify-between lg:hidden"><Link className="text-xl font-black tracking-[-0.06em]" href="/">quest<span className="text-[#a86f5b]">/</span>log</Link><span className="rounded-full bg-[#dce8e1] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#2f6f5e]">Your quiet space</span></div>
+            <div className="flex items-center justify-between lg:hidden"><BrandLogo /><span className="rounded-full bg-[#dce8e1] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#2f6f5e]">Your quiet space</span></div>
 
             <p className="mt-14 inline-flex rounded-full bg-[#f0ddd4] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9a5c48] lg:mt-0">{isSignup ? "Begin your rhythm" : "Welcome back"}</p>
             <h2 className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{isSignup ? "Create your space." : "Continue your story."}</h2>

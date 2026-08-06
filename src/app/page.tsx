@@ -1,18 +1,5 @@
-import { sampleHabits, sampleSideQuest } from "@/features/today/sample-data";
-import { TodayDashboard } from "@/features/today/today-dashboard";
+import { LandingPage } from "@/features/landing/landing-page";
 
-export default function Home() {
-  const dateLabel = new Intl.DateTimeFormat("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  }).format(new Date());
-
-  return (
-    <TodayDashboard
-      dateLabel={dateLabel}
-      initialHabits={sampleHabits}
-      sideQuest={sampleSideQuest}
-    />
-  );
+export default function HomePage() {
+  return <LandingPage />;
 }

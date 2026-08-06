@@ -82,6 +82,17 @@ h3 {
   background-attachment: fixed;
 }
 
+.landing-canvas {
+  background:
+    radial-gradient(circle at 8% 7%, rgb(193 219 206 / 72%), transparent 31%),
+    radial-gradient(circle at 94% 5%, rgb(235 208 193 / 76%), transparent 32%),
+    linear-gradient(145deg, #eef1eb, #f3eee7 58%, #e2e9e6);
+}
+
+.landing-canvas a {
+  text-decoration-thickness: from-font;
+}
+
 .soft-shell {
   position: relative;
   background: rgb(246 246 241 / 24%);
