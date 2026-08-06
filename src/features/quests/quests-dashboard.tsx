@@ -10,7 +10,17 @@ import type { QuestStatus, QuestSummary } from "./types";
 
 type QuestsDashboardProps = { initialQuests: QuestSummary[] };
 
-const questCategories = ["Career", "Learning", "Personal", "Creative", "Finance", "Wellness"] as const;
+type QuestCategory = "Career" | "Learning" | "Personal" | "Creative" | "Finance" | "Wellness";
+
+function inferQuestCategory(title: string): QuestCategory {
+  const value = title.toLowerCase();
+  if (/budget|saving|save |invest|money|finance|debt|expense|income/.test(value)) return "Finance";
+  if (/course|learn|study|read|book|class|language|certif|exam/.test(value)) return "Learning";
+  if (/portfolio|job|career|resume|cv|interview|client|business|launch|ship|work/.test(value)) return "Career";
+  if (/write|paint|draw|music|photo|film|design|creative|story|publish/.test(value)) return "Creative";
+  if (/fitness|workout|run|hike|walk|health|sleep|meditat|yoga|wellness/.test(value)) return "Wellness";
+  return "Personal";
+}
 
 const statusLabels: Record<QuestStatus, string> = {
   "not-started": "Not started",
@@ -25,7 +35,6 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
   const [filter, setFilter] = useState<"all" | QuestStatus>("all");
   const [isCreating, setIsCreating] = useState(false);
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState<(typeof questCategories)[number]>("Personal");
 
   const visibleQuests = useMemo(
     () => quests.filter((quest) => filter === "all" || quest.status === filter),
@@ -62,12 +71,6 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
     );
   }
 
-  function updateQuestCategory(id: string, category: string) {
-    setQuests((current) =>
-      current.map((quest) => quest.id === id ? { ...quest, category } : quest),
-    );
-  }
-
   function createQuest(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!title.trim()) return;
@@ -76,7 +79,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
       {
         id: `quest-${current.length + 1}`,
         title: title.trim(),
-        category,
+        category: inferQuestCategory(title),
         status: "not-started",
         dueLabel: "Aug 31",
         effortHours: 6,
@@ -84,7 +87,6 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
       },
     ]);
     setTitle("");
-    setCategory("Personal");
     setFilter("all");
     setIsCreating(false);
   }
@@ -107,10 +109,10 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
               {visibleQuests.map((quest) => {
                 const isComplete = quest.status === "completed";
                 return (
-                  <article className="grid min-h-40 gap-5 border border-white/50 p-5 md:grid-cols-[56px_minmax(0,1fr)_190px_auto] md:items-center md:p-6" key={quest.id}>
+                  <article className="grid min-h-40 gap-5 border border-white/50 p-5 md:grid-cols-[56px_minmax(0,1fr)_170px_auto] md:items-center md:p-6" key={quest.id}>
                     <span className="grid size-11 place-items-center"><ActivityIcon activity={`${quest.title} ${quest.category}`} className="size-7" /></span>
                     <div><div className="flex flex-wrap items-center gap-3"><span className="text-[10px] font-black uppercase tracking-[0.13em] text-[var(--soft-accent)]">{quest.category}</span><span className="text-xs text-[var(--soft-muted)]">{quest.dueLabel}</span></div><h3 className={`mt-2 text-xl font-bold tracking-[-0.025em] ${isComplete ? "text-[var(--soft-muted)] line-through" : ""}`}>{quest.title}</h3><p className="mt-1 text-xs text-[var(--soft-muted)]">{statusLabels[quest.status]}</p></div>
-                    <div className="grid grid-cols-2 gap-2 md:grid-cols-1"><label className="grid gap-1.5 text-[9px] font-black uppercase tracking-[0.13em] text-[var(--soft-muted)]">Category<select aria-label={`Category for ${quest.title}`} className="min-h-10 cursor-pointer rounded-full border border-black/[0.08] bg-white/55 px-3 text-xs font-bold normal-case tracking-normal text-[var(--soft-ink)] outline-none transition focus:border-[#174f3a]/40 focus:ring-4 focus:ring-[#174f3a]/10" onChange={(event) => updateQuestCategory(quest.id, event.target.value)} value={quest.category}>{questCategories.map((item) => <option key={item} value={item}>{item}</option>)}</select></label><label className="grid gap-1.5 text-[9px] font-black uppercase tracking-[0.13em] text-[var(--soft-muted)]">Status<select aria-label={`Status for ${quest.title}`} className="min-h-10 cursor-pointer rounded-full border border-black/[0.08] bg-white/55 px-3 text-xs font-bold normal-case tracking-normal text-[var(--soft-ink)] outline-none transition focus:border-[#174f3a]/40 focus:ring-4 focus:ring-[#174f3a]/10" onChange={(event) => updateQuestStatus(quest.id, event.target.value as QuestStatus)} value={quest.status}>{(Object.keys(statusLabels) as QuestStatus[]).map((status) => <option key={status} value={status}>{statusLabels[status]}</option>)}</select></label></div>
+                    <label className="grid gap-1.5 text-[9px] font-black uppercase tracking-[0.13em] text-[var(--soft-muted)]">Status<select aria-label={`Status for ${quest.title}`} className="min-h-11 cursor-pointer rounded-full border border-black/[0.08] bg-white/55 px-4 text-xs font-bold normal-case tracking-normal text-[var(--soft-ink)] outline-none transition focus:border-[#174f3a]/40 focus:ring-4 focus:ring-[#174f3a]/10" onChange={(event) => updateQuestStatus(quest.id, event.target.value as QuestStatus)} value={quest.status}>{(Object.keys(statusLabels) as QuestStatus[]).map((status) => <option key={status} value={status}>{statusLabels[status]}</option>)}</select></label>
                     <button className={`min-h-12 rounded-full px-5 text-xs font-bold transition ${isComplete ? "bg-white/55 text-[var(--soft-muted)]" : "bg-[var(--soft-ink)] text-white"}`} onClick={() => toggleQuestCompletion(quest.id)} type="button">{isComplete ? "Mark incomplete" : "Mark complete"}</button>
                   </article>
                 );
@@ -131,8 +133,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
               <div><p className="soft-kicker text-[var(--soft-accent)]">Create a quest</p><h3>What would feel meaningful?</h3><p>Name the result, not the effort it takes to get there.</p></div>
               <label className="creation-field-label" htmlFor="quest-title">Quest title</label>
               <input autoFocus className="creation-field" id="quest-title" onChange={(event) => setTitle(event.target.value)} placeholder="e.g. Publish my portfolio" value={title} />
-              <label className="creation-field-label" htmlFor="quest-category">Category</label>
-              <select className="creation-field" id="quest-category" onChange={(event) => setCategory(event.target.value as (typeof questCategories)[number])} value={category}>{questCategories.map((item) => <option key={item} value={item}>{item}</option>)}</select>
+              {title.trim() && <div className="flex items-center justify-between rounded-[16px] bg-[#e7eee9] px-4 py-3 text-xs"><span className="font-semibold text-[var(--soft-muted)]">Category detected automatically</span><span className="rounded-full bg-white/70 px-3 py-1.5 font-black text-[#2f6f5e]">{inferQuestCategory(title)}</span></div>}
               <div><p className="creation-field-label">A little inspiration</p><div className="creation-presets creation-presets-quest">{["Finish a course", "Publish my portfolio", "Read one book"].map((preset) => <button aria-pressed={title === preset} key={preset} onClick={() => setTitle(preset)} type="button"><ActivityIcon activity={preset} className="size-4" />{preset}</button>)}</div></div>
               <div className="creation-guidance"><span aria-hidden>◇</span><p><strong>One finish line.</strong> When the outcome exists, the quest is complete.</p></div>
               <div className="creation-actions"><button onClick={() => setIsCreating(false)} type="button">Cancel</button><button disabled={!title.trim()} type="submit"><span>Create quest</span><span aria-hidden>→</span></button></div>
