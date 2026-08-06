@@ -81,6 +81,12 @@ function RhythmActiveBar({ height = 0, payload, width = 0, x = 0, y = 0 }: { hei
   );
 }
 
+function DailyConsistencyTooltip({ active, payload }: { active?: boolean; payload?: Array<{ payload: { day: number; score: number } }> }) {
+  if (!active || !payload?.[0]) return null;
+  const point = payload[0].payload;
+  return <div className="rounded-full border border-white/80 bg-[#fffdf8]/95 px-4 py-2 text-xs font-bold text-[#173f32] shadow-[0_12px_32px_-12px_rgba(23,63,50,.4)] backdrop-blur-xl">Aug {point.day} · {point.score}%</div>;
+}
+
 function buildDays(seed: number, weekdaysOnly = false): CellState[] {
   return Array.from({ length: 31 }, (_, index) => {
     const day = index + 1;
@@ -161,6 +167,14 @@ export function MonthlyReport() {
     () => Math.round(habits.reduce((sum, habit) => sum + habitConsistency(habit), 0) / habits.length),
     [habits],
   );
+  const dailyConsistency = useMemo(
+    () => Array.from({ length: 31 }, (_, dayIndex) => {
+      const scheduled = habits.filter((habit) => habit.days[dayIndex] !== "off");
+      const completed = scheduled.filter((habit) => habit.days[dayIndex] === "done").length;
+      return { day: dayIndex + 1, score: scheduled.length ? Math.round((completed / scheduled.length) * 100) : 0 };
+    }),
+    [habits],
+  );
 
   function toggleCell(habitId: string, dayIndex: number) {
     setHabits((current) =>
@@ -237,6 +251,11 @@ export function MonthlyReport() {
 
           <section className="mt-7 rounded-[44px] border border-white/70 bg-[#f8fbf7]/80 p-4 shadow-[0_26px_70px_-48px_rgba(34,61,49,.42)] sm:p-7">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-xl font-semibold">Daily consistency map</h2><p className="mt-1 text-sm text-stone-500">Tap a scheduled day to correct its completion.</p></div><div className="flex gap-3 text-xs text-stone-500"><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[#174f3a]" />Done</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[#f4dfd9]" />Missed</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-stone-200" />Not scheduled</span></div></div>
+            <div aria-label="Daily consistency across August" className="relative mt-7 overflow-hidden rounded-[32px] bg-[#173f32] px-4 pb-3 pt-6 text-white sm:px-7">
+              <div className="flex items-end justify-between gap-4"><div><p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#d5b77c]">31-day pulse</p><p className="mt-1 text-lg font-semibold">Every day of August</p></div><p className="rounded-full bg-white/[0.07] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/45">Hover the curve</p></div>
+              <div className="mt-3 h-64 w-full"><ResponsiveContainer height="100%" width="100%"><AreaChart data={dailyConsistency} margin={{ bottom: 0, left: 2, right: 2, top: 20 }}><defs><linearGradient id="dailyConsistencyFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="#d89a42" stopOpacity={0.48} /><stop offset="100%" stopColor="#d89a42" stopOpacity={0.03} /></linearGradient></defs><CartesianGrid stroke="rgba(255,255,255,.08)" strokeDasharray="3 7" vertical={false} /><XAxis axisLine={false} dataKey="day" interval={4} tick={{ fill: "rgba(255,255,255,.42)", fontSize: 10 }} tickFormatter={(day) => `${day}`} tickLine={false} /><Tooltip content={<DailyConsistencyTooltip />} cursor={{ stroke: "rgba(216,154,66,.32)", strokeWidth: 2 }} /><Area activeDot={{ fill: "#d89a42", r: 5, stroke: "#fffaf0", strokeWidth: 3 }} dataKey="score" fill="url(#dailyConsistencyFill)" stroke="#d89a42" strokeWidth={3} type="monotone" /></AreaChart></ResponsiveContainer></div>
+              <div className="pointer-events-none absolute bottom-8 left-7 text-[9px] font-semibold uppercase tracking-[0.12em] text-white/25">Day of month</div>
+            </div>
             <div className="mt-6 overflow-x-auto rounded-2xl border border-black/[0.06] bg-[#fffdf8]">
               <table className="min-w-[1500px] border-separate border-spacing-0 text-xs">
                 <thead><tr><th className="sticky left-0 z-10 w-44 border-b border-r border-black/[0.07] bg-[#eee9dc] px-4 py-3 text-left font-semibold">Habit</th>{Array.from({ length: 31 }, (_, index) => <th className={`w-10 border-b border-black/[0.06] py-3 text-center font-medium ${index + 1 === 5 ? "bg-[#f3e7ca] text-[#876f47]" : "text-stone-400"}`} key={index}>{index + 1}</th>)}<th className="sticky right-0 z-10 w-20 border-b border-l border-black/[0.07] bg-[#eee9dc] px-2 font-semibold">Score</th></tr></thead>

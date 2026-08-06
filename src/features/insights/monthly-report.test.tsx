@@ -12,6 +12,7 @@ afterEach(cleanup);
 describe("MonthlyReport", () => {
   it("allows correction of a scheduled day", () => {
     render(<MonthlyReport />);
+    expect(screen.getByLabelText("Daily consistency across August")).toBeInTheDocument();
     const cell = screen.getByRole("button", { name: "Morning walk, August 1: done" });
     fireEvent.click(cell);
     expect(screen.getByRole("button", { name: "Morning walk, August 1: missed" })).toBeInTheDocument();
