@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
-import { ChartNoAxesColumnIncreasing, CircleCheckBig, Flag } from "lucide-react";
+import { ChartNoAxesColumnIncreasing, Check, ChevronDown, CircleCheckBig, Flag } from "lucide-react";
 import { createPortal } from "react-dom";
 
 import { AppShell } from "@/components/app-shell";
@@ -30,11 +30,20 @@ const statusLabels: Record<QuestStatus, string> = {
   completed: "Completed",
 };
 
+const statusColors: Record<QuestStatus, string> = {
+  "not-started": "bg-stone-400",
+  "in-progress": "bg-[#2f7660]",
+  paused: "bg-[#d29a42]",
+  blocked: "bg-[#b46e57]",
+  completed: "bg-[#173f32]",
+};
+
 export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
   const [quests, setQuests] = useState(initialQuests);
   const [filter, setFilter] = useState<"all" | QuestStatus>("all");
   const [isCreating, setIsCreating] = useState(false);
   const [title, setTitle] = useState("");
+  const [openStatusId, setOpenStatusId] = useState<string | null>(null);
 
   const visibleQuests = useMemo(
     () => quests.filter((quest) => filter === "all" || quest.status === filter),
@@ -69,6 +78,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
           : quest,
       ),
     );
+    setOpenStatusId(null);
   }
 
   function createQuest(event: FormEvent<HTMLFormElement>) {
@@ -109,10 +119,10 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
               {visibleQuests.map((quest) => {
                 const isComplete = quest.status === "completed";
                 return (
-                  <article className="grid min-h-40 gap-5 border border-white/50 p-5 md:grid-cols-[56px_minmax(0,1fr)_170px_auto] md:items-center md:p-6" key={quest.id}>
+                  <article className={`grid min-h-40 gap-5 border border-white/50 p-5 md:grid-cols-[56px_minmax(0,1fr)_170px_auto] md:items-center md:p-6 ${openStatusId === quest.id ? "!z-30 !overflow-visible" : ""}`} key={quest.id}>
                     <span className="grid size-11 place-items-center"><ActivityIcon activity={`${quest.title} ${quest.category}`} className="size-7" /></span>
                     <div><div className="flex flex-wrap items-center gap-3"><span className="text-[10px] font-black uppercase tracking-[0.13em] text-[var(--soft-accent)]">{quest.category}</span><span className="text-xs text-[var(--soft-muted)]">{quest.dueLabel}</span></div><h3 className={`mt-2 text-xl font-bold tracking-[-0.025em] ${isComplete ? "text-[var(--soft-muted)] line-through" : ""}`}>{quest.title}</h3><p className="mt-1 text-xs text-[var(--soft-muted)]">{statusLabels[quest.status]}</p></div>
-                    <label className="grid gap-1.5 text-[9px] font-black uppercase tracking-[0.13em] text-[var(--soft-muted)]">Status<select aria-label={`Status for ${quest.title}`} className="min-h-11 cursor-pointer rounded-full border border-black/[0.08] bg-white/55 px-4 text-xs font-bold normal-case tracking-normal text-[var(--soft-ink)] outline-none transition focus:border-[#174f3a]/40 focus:ring-4 focus:ring-[#174f3a]/10" onChange={(event) => updateQuestStatus(quest.id, event.target.value as QuestStatus)} value={quest.status}>{(Object.keys(statusLabels) as QuestStatus[]).map((status) => <option key={status} value={status}>{statusLabels[status]}</option>)}</select></label>
+                    <div className="relative grid gap-1.5 text-[9px] font-black uppercase tracking-[0.13em] text-[var(--soft-muted)]"><span>Status</span><button aria-expanded={openStatusId === quest.id} aria-haspopup="menu" aria-label={`Change status for ${quest.title}`} className="flex min-h-11 items-center gap-2 rounded-full border border-black/[0.08] bg-white/60 px-4 text-left text-xs font-bold normal-case tracking-normal text-[var(--soft-ink)] shadow-[inset_0_1px_0_rgba(255,255,255,.8)] transition hover:bg-white/80 focus:outline-none focus:ring-4 focus:ring-[#174f3a]/10" onClick={() => setOpenStatusId((current) => current === quest.id ? null : quest.id)} type="button"><span className={`size-2 rounded-full ${statusColors[quest.status]}`} /><span className="flex-1">{statusLabels[quest.status]}</span><ChevronDown className={`size-3.5 transition ${openStatusId === quest.id ? "rotate-180" : ""}`} /></button>{openStatusId === quest.id && <div aria-label={`Status options for ${quest.title}`} className="absolute right-0 top-[calc(100%+8px)] z-50 w-full min-w-48 rounded-[20px] border border-white/80 bg-[#f8f6f0]/95 p-2 normal-case tracking-normal text-[var(--soft-ink)] shadow-[0_22px_60px_-18px_rgba(24,43,35,.45)] backdrop-blur-2xl" role="menu">{(Object.keys(statusLabels) as QuestStatus[]).map((status) => <button className={`flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-xs font-bold transition hover:bg-[#e7eee9] ${quest.status === status ? "bg-[#e1ebe5]" : ""}`} key={status} onClick={() => updateQuestStatus(quest.id, status)} role="menuitem" type="button"><span className={`size-2 rounded-full ${statusColors[status]}`} /><span className="flex-1">{statusLabels[status]}</span>{quest.status === status && <Check className="size-3.5 text-[#2f7660]" strokeWidth={2.5} />}</button>)}</div>}</div>
                     <button className={`min-h-12 rounded-full px-5 text-xs font-bold transition ${isComplete ? "bg-white/55 text-[var(--soft-muted)]" : "bg-[var(--soft-ink)] text-white"}`} onClick={() => toggleQuestCompletion(quest.id)} type="button">{isComplete ? "Mark incomplete" : "Mark complete"}</button>
                   </article>
                 );

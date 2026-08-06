@@ -29,9 +29,8 @@ describe("QuestsDashboard", () => {
 
   it("updates a quest to paused", () => {
     render(<QuestsDashboard initialQuests={sampleQuests} />);
-    const status = screen.getByLabelText("Status for Build portfolio homepage");
-    fireEvent.change(status, { target: { value: "paused" } });
-    expect(status).toHaveValue("paused");
+    fireEvent.click(screen.getByRole("button", { name: "Change status for Build portfolio homepage" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Paused" }));
     expect(screen.getByText("Build portfolio homepage").closest("article")).toHaveTextContent("Paused");
   });
 
