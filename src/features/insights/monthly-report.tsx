@@ -53,6 +53,18 @@ const weekdayRhythm = [
   { day: "S", name: "Sunday", score: 62 },
 ];
 
+function TrendActiveDot({ cx = 0, cy = 0, payload }: { cx?: number; cy?: number; payload?: (typeof consistencyTrend)[number] }) {
+  if (!payload) return null;
+
+  return (
+    <g aria-label={`Week of ${payload.label}: ${payload.score}% consistency`}>
+      <rect fill="#f8f2e7" height="34" rx="17" stroke="rgba(255,255,255,.75)" width="118" x={cx - 59} y={cy - 48} />
+      <text fill="#173d31" fontSize="12" fontWeight="700" textAnchor="middle" x={cx} y={cy - 27}>{payload.label} · {payload.score}%</text>
+      <circle cx={cx} cy={cy} fill="#d89a42" r="6" stroke="#fffaf0" strokeWidth="3" />
+    </g>
+  );
+}
+
 function buildDays(seed: number, weekdaysOnly = false): CellState[] {
   return Array.from({ length: 31 }, (_, index) => {
     const day = index + 1;
@@ -128,7 +140,6 @@ export function MonthlyReport() {
   const [habits, setHabits] = useState(initialHabits);
   const [format, setFormat] = useState<ShareFormat>("square");
   const [shareMessage, setShareMessage] = useState("");
-  const [activeTrend, setActiveTrend] = useState<(typeof consistencyTrend)[number] | null>(null);
   const [activeCategory, setActiveCategory] = useState<(typeof categoryBalance)[number] | null>(null);
   const [activeWeekday, setActiveWeekday] = useState<(typeof weekdayRhythm)[number] | null>(null);
 
@@ -180,15 +191,15 @@ export function MonthlyReport() {
                 <div><p className="text-xs font-semibold uppercase tracking-[0.17em] text-[#d5b77c]">Consistency signal</p><p className="mt-4 text-6xl font-semibold tracking-[-0.065em]">{overallConsistency}%</p><p className="mt-1 text-sm text-white/50">Up 8 points from July</p><p className="mt-5 inline-flex rounded-full bg-white/[0.08] px-3 py-2 text-xs font-medium text-[#c7dbd2]">You showed up on 24 days this month</p></div>
                 <div className="grid grid-cols-7 gap-1.5 rounded-2xl bg-white/[0.06] p-4" aria-label="August activity heatmap">{Array.from({ length: 35 }, (_, index) => { const state = index % 7 === 5 ? "partial day" : index % 5 === 0 ? "low activity" : "completed day"; return <span aria-label={index > 30 ? undefined : `August ${index + 1}: ${state}`} className={`size-3 rounded-[4px] ${index > 30 ? "bg-transparent" : index % 7 === 5 ? "bg-[#d89a42]" : index % 5 === 0 ? "bg-[#9c4b38]/70" : "bg-[#8eb5a6]"}`} key={index} title={index > 30 ? undefined : `August ${index + 1} · ${state}`} />; })}</div>
               </div>
-              <div className="relative mt-7 flex items-center justify-between gap-3"><p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/45">Weekly consistency trend</p><p aria-live="polite" className="min-w-36 rounded-full bg-white/10 px-3 py-2 text-right text-xs font-semibold text-[#f3c878]">{activeTrend ? `${activeTrend.label} · ${activeTrend.score}%` : "Hover for details"}</p></div>
+              <div className="relative mt-7 flex items-center justify-between gap-3"><p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/45">Weekly consistency trend</p><p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white/35">Hover the line</p></div>
               <div className="relative mt-8 h-52 w-full">
                 <ResponsiveContainer height="100%" width="100%">
-                  <AreaChart data={consistencyTrend} margin={{ left: 0, right: 8, top: 8, bottom: 0 }} onMouseLeave={() => setActiveTrend(null)} onMouseMove={(state) => { const index = Number(state.activeTooltipIndex); if (Number.isInteger(index) && consistencyTrend[index]) setActiveTrend(consistencyTrend[index]); }}>
+                  <AreaChart data={consistencyTrend} margin={{ left: 0, right: 8, top: 52, bottom: 0 }}>
                     <defs><linearGradient id="consistencyFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="#d89a42" stopOpacity={0.5} /><stop offset="100%" stopColor="#d89a42" stopOpacity={0} /></linearGradient></defs>
                     <CartesianGrid stroke="rgba(255,255,255,0.08)" strokeDasharray="3 6" vertical={false} />
                     <XAxis axisLine={false} dataKey="label" tick={{ fill: "rgba(255,255,255,0.42)", fontSize: 10 }} tickLine={false} />
                     <Tooltip content={() => null} cursor={{ stroke: "rgba(216,154,66,.3)", strokeWidth: 2 }} />
-                    <Area dataKey="score" fill="url(#consistencyFill)" stroke="#d89a42" strokeWidth={3} type="monotone" />
+                    <Area activeDot={<TrendActiveDot />} dataKey="score" fill="url(#consistencyFill)" stroke="#d89a42" strokeWidth={3} type="monotone" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
