@@ -42,12 +42,11 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
   return (
     <main className="soft-canvas min-h-screen text-[var(--soft-ink)]">
       <div className="soft-shell min-h-screen overflow-hidden">
-        <header className="premium-toolbar flex w-full items-center justify-between px-5 py-5 sm:px-9">
-          <BrandLogo />
-          <span className="evening-mode-pill"><span aria-hidden="true">☾</span> Evening mode</span>
-        </header>
-
-        <div className="mx-auto max-w-[1400px] px-5 pb-12 pt-3 sm:px-9 sm:pt-4">
+        <div className="mx-auto max-w-[1400px] px-5 pb-12 pt-5 sm:px-9 sm:pt-7">
+          <header className="mb-5 flex items-center justify-between px-1 sm:mb-6">
+            <BrandLogo />
+            <span className="evening-mode-pill"><span aria-hidden="true">☾</span> Evening mode</span>
+          </header>
           <div className="evening-intro">
             <div>
               <p className="soft-kicker text-[var(--soft-accent)]">Your evening reset · under a minute</p>
