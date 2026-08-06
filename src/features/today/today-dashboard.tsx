@@ -30,9 +30,9 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
       <section className="mt-12">
         <div className="soft-flow soft-task-cards grid gap-3 sm:grid-cols-2">
           {habits.map((habit) => (
-            <article className="group relative grid min-h-36 grid-cols-[52px_1fr_auto] items-center gap-4 border border-white/50 p-5 sm:grid-cols-[60px_1fr_auto]" key={habit.id}>
-              <span className="grid size-11 place-items-center"><ActivityIcon activity={`${habit.name} ${habit.category}`} className="size-7" /></span>
-              <div className="min-w-0"><h2 className={`text-lg font-bold ${habit.status === "complete" ? "text-[var(--soft-muted)] line-through" : ""}`}>{habit.name}</h2><p className="mt-1 text-sm text-[var(--soft-muted)]">{habit.target} · {habit.category}</p></div>
+            <article className="group relative grid min-h-40 grid-cols-[58px_1fr_auto] items-center gap-5 border border-white/50 p-6 sm:min-h-44 sm:grid-cols-[68px_1fr_auto] sm:gap-6 sm:p-7 xl:min-h-52 xl:grid-cols-[78px_1fr_auto] xl:px-9" key={habit.id}>
+              <span className="grid size-12 place-items-center sm:size-14 xl:size-16"><ActivityIcon activity={`${habit.name} ${habit.category}`} className="size-8 sm:size-9 xl:size-10" /></span>
+              <div className="min-w-0"><h2 className={`text-2xl font-bold tracking-[-0.035em] sm:text-3xl xl:text-4xl ${habit.status === "complete" ? "text-[#53635b] line-through decoration-[#53635b]/65" : ""}`}>{habit.name}</h2><p className="mt-2 text-sm font-medium text-[var(--soft-muted)] sm:text-base xl:text-lg">{habit.category} · {habit.target}</p></div>
               {habit.priority === 3 && <span className="absolute right-5 top-5 text-[10px] font-black uppercase tracking-[0.14em] text-[var(--soft-accent)]">Today’s anchor</span>}
               <button aria-label={`${habit.status === "complete" ? "Undo" : "Complete"} ${habit.name}`} className={`completion-control grid size-13 shrink-0 place-items-center rounded-full border-2 text-lg ${habit.status === "complete" ? "border-[var(--soft-ink)] bg-[var(--soft-ink)] text-white" : "border-[color:rgb(41_50_44/15%)] text-transparent hover:border-[var(--soft-ink)]"}`} onClick={() => toggleHabit(habit.id)} type="button">✓</button>
             </article>
