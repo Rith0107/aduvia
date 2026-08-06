@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { Flame, Gauge, ListChecks } from "lucide-react";
 
 import { AppShell } from "@/components/app-shell";
@@ -96,7 +97,7 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
             </div>
           </section>
 
-      {isCreating && (
+      {isCreating && createPortal(
         <div aria-modal="true" className="creation-overlay" role="dialog">
           <form className="creation-sheet" onSubmit={createHabit}>
             <button aria-label="Close create habit" className="creation-close" onClick={() => setIsCreating(false)} type="button">×</button>
@@ -116,7 +117,8 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
               <div className="creation-actions"><button onClick={() => setIsCreating(false)} type="button">Cancel</button><button disabled={!name.trim() || (frequency === "Custom" && selectedDays.length === 0) || (frequency === "3× weekly" && selectedDays.length !== 3)} type="submit"><span>Create habit</span><span aria-hidden>→</span></button></div>
             </div>
           </form>
-        </div>
+        </div>,
+        document.body,
       )}
     </AppShell>
   );

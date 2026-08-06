@@ -2,6 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { ChartNoAxesColumnIncreasing, CircleCheckBig, Flag } from "lucide-react";
+import { createPortal } from "react-dom";
 
 import { AppShell } from "@/components/app-shell";
 import { ActivityIcon } from "@/components/activity-icon";
@@ -90,7 +91,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
               })}
             </div>
           </section>
-      {isCreating && (
+      {isCreating && createPortal(
         <div aria-modal="true" className="creation-overlay" role="dialog">
           <form className="creation-sheet" onSubmit={createQuest}>
             <button aria-label="Close create quest" className="creation-close" onClick={() => setIsCreating(false)} type="button">×</button>
@@ -109,7 +110,8 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
               <div className="creation-actions"><button onClick={() => setIsCreating(false)} type="button">Cancel</button><button disabled={!title.trim()} type="submit"><span>Create quest</span><span aria-hidden>→</span></button></div>
             </div>
           </form>
-        </div>
+        </div>,
+        document.body,
       )}
     </AppShell>
   );
