@@ -17,10 +17,17 @@ describe("AuthScreen", () => {
 
   it("reveals the password and links back to login", () => {
     render(<AuthScreen mode="signup" />);
-    const password = screen.getByPlaceholderText("At least 8 characters");
+    const password = screen.getByPlaceholderText("Try a memorable phrase");
     expect(password).toHaveAttribute("type", "password");
+    expect(password).toHaveAttribute("minlength", "12");
     fireEvent.click(screen.getByRole("button", { name: "Show password" }));
     expect(password).toHaveAttribute("type", "text");
     expect(screen.getByRole("link", { name: "Log in" })).toHaveAttribute("href", "/login");
+  });
+
+  it("shows password strength as the passphrase grows", () => {
+    render(<AuthScreen mode="signup" />);
+    fireEvent.change(screen.getByPlaceholderText("Try a memorable phrase"), { target: { value: "a quiet morning ritual 2026" } });
+    expect(screen.getByLabelText("Password strength: Strong")).toBeInTheDocument();
   });
 });

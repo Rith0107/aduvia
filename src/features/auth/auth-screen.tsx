@@ -8,6 +8,19 @@ import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
 type AuthMode = "login" | "signup";
 
+const commonPasswords = new Set(["password", "password123", "12345678", "qwerty123", "letmein123", "admin123"]);
+
+function passwordStrength(password: string) {
+  if (!password) return { label: "Start typing", score: 0 };
+  let score = password.length >= 12 ? 2 : password.length >= 8 ? 1 : 0;
+  if (password.length >= 16) score += 1;
+  if (/[^a-zA-Z]/.test(password)) score += 1;
+  if (score >= 4) return { label: "Strong", score: 4 };
+  if (score >= 3) return { label: "Good", score: 3 };
+  if (score >= 2) return { label: "Growing", score: 2 };
+  return { label: "Too short", score: 1 };
+}
+
 export function AuthScreen({ mode }: { mode: AuthMode }) {
   const router = useRouter();
   const isSignup = mode === "signup";
@@ -17,6 +30,7 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const strength = passwordStrength(password);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -26,8 +40,12 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
       setMessage("Tell us what we should call you.");
       return;
     }
-    if (password.length < 8) {
-      setMessage("Use at least 8 characters for your password.");
+    if (isSignup && password.length < 12) {
+      setMessage("Use at least 12 characters. A short phrase works well.");
+      return;
+    }
+    if (isSignup && commonPasswords.has(password.toLowerCase())) {
+      setMessage("That password is too common. Try a longer, more personal phrase.");
       return;
     }
 
@@ -89,7 +107,9 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
 
               <label className="block"><span className="text-xs font-semibold text-[#46534c]">Email address</span><div className="mt-2 flex items-center rounded-[18px] border border-[#6b9b86]/16 bg-[#dfece5]/72 px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,.65)] transition focus-within:border-[#2f6f5e]/45 focus-within:bg-[#e8f2ed]"><span className="mr-3 grid size-8 place-items-center rounded-full bg-[#2f6f5e] text-white"><Mail size={16} strokeWidth={1.9} /></span><input autoComplete="email" className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[#789086]/55" onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" required type="email" value={email} /></div></label>
 
-              <label className="block"><span className="flex items-center justify-between text-xs font-semibold text-[#46534c]"><span>Password</span><span className="font-medium text-[#2f6f5e]">8+ characters</span></span><div className="mt-2 flex items-center rounded-[18px] border border-[#6b9b86]/16 bg-[#dfece5]/72 px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,.65)] transition focus-within:border-[#2f6f5e]/45 focus-within:bg-[#e8f2ed]"><span className="mr-3 grid size-8 place-items-center rounded-full bg-[#2f6f5e] text-white"><LockKeyhole size={16} strokeWidth={1.9} /></span><input autoComplete={isSignup ? "new-password" : "current-password"} className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[#789086]/55" minLength={8} onChange={(event) => setPassword(event.target.value)} placeholder="At least 8 characters" required type={showPassword ? "text" : "password"} value={password} /><button aria-label={showPassword ? "Hide password" : "Show password"} className="ml-3 text-[#2f6f5e]/65 hover:text-[#1f4f40]" onClick={() => setShowPassword((current) => !current)} type="button">{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button></div></label>
+              <label className="block"><span className="flex items-center justify-between text-xs font-semibold text-[#46534c]"><span>Password</span><span className="font-medium text-[#2f6f5e]">{isSignup ? "12+ characters" : "Your password"}</span></span><div className="mt-2 flex items-center rounded-[18px] border border-[#6b9b86]/16 bg-[#dfece5]/72 px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,.65)] transition focus-within:border-[#2f6f5e]/45 focus-within:bg-[#e8f2ed]"><span className="mr-3 grid size-8 place-items-center rounded-full bg-[#2f6f5e] text-white"><LockKeyhole size={16} strokeWidth={1.9} /></span><input autoComplete={isSignup ? "new-password" : "current-password"} className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[#789086]/55" minLength={isSignup ? 12 : 1} onChange={(event) => setPassword(event.target.value)} placeholder={isSignup ? "Try a memorable phrase" : "Enter your password"} required type={showPassword ? "text" : "password"} value={password} /><button aria-label={showPassword ? "Hide password" : "Show password"} className="ml-3 text-[#2f6f5e]/65 hover:text-[#1f4f40]" onClick={() => setShowPassword((current) => !current)} type="button">{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button></div></label>
+
+              {isSignup && <div aria-label={`Password strength: ${strength.label}`} className="flex items-center gap-3"><div className="grid flex-1 grid-cols-4 gap-1.5">{Array.from({ length: 4 }, (_, index) => <span className={`h-1.5 rounded-full transition-colors ${index < strength.score ? strength.score >= 4 ? "bg-[#2f6f5e]" : "bg-[#d89a42]" : "bg-[#24302a]/10"}`} key={index} />)}</div><span className="w-16 text-right text-[10px] font-semibold uppercase tracking-[0.1em] text-[#6f7e76]">{strength.label}</span></div>}
 
               {isSignup && <div className="flex items-center gap-2 text-xs text-stone-400"><span className="grid size-5 place-items-center rounded-full bg-[#dce8e1] text-[#2f6f5e]"><Check size={12} strokeWidth={2.5} /></span>Your private notes never appear in shared reports.</div>}
 
