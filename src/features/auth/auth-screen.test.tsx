@@ -36,8 +36,14 @@ describe("AuthScreen", () => {
     fireEvent.change(screen.getByPlaceholderText("How should we greet you?"), { target: { value: "Rithwik" } });
     fireEvent.change(screen.getByPlaceholderText("you@example.com"), { target: { value: "rithwik@example.com" } });
     fireEvent.change(screen.getByPlaceholderText("Try a memorable phrase"), { target: { value: "a quiet morning ritual" } });
-    fireEvent.change(screen.getByPlaceholderText("Type the same phrase again"), { target: { value: "a different morning ritual" } });
+    fireEvent.change(screen.getByPlaceholderText("Enter your password again"), { target: { value: "a different morning ritual" } });
     fireEvent.submit(screen.getByRole("button", { name: "Create my account" }).closest("form")!);
     expect(screen.getByRole("status")).toHaveTextContent("Those passwords do not match yet.");
+  });
+
+  it("gives sign-up its own motivating story", () => {
+    render(<AuthScreen mode="signup" />);
+    expect(screen.getByRole("heading", { level: 1, name: /Small steps.*A life you can see/i })).toBeInTheDocument();
+    expect(screen.getByText("Your first month starts here")).toBeInTheDocument();
   });
 });
