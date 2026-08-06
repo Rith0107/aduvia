@@ -27,6 +27,14 @@ describe("QuestsDashboard", () => {
     expect(portfolio).toHaveTextContent("Mark incomplete");
   });
 
+  it("updates a quest to paused", () => {
+    render(<QuestsDashboard initialQuests={sampleQuests} />);
+    const status = screen.getByLabelText("Status for Build portfolio homepage");
+    fireEvent.change(status, { target: { value: "paused" } });
+    expect(status).toHaveValue("paused");
+    expect(screen.getByText("Build portfolio homepage").closest("article")).toHaveTextContent("Paused");
+  });
+
   it("creates a quest", () => {
     render(<QuestsDashboard initialQuests={sampleQuests} />);
     fireEvent.click(screen.getByRole("button", { name: "+ New quest" }));

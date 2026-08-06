@@ -16,6 +16,14 @@ const days: { short: HabitDay; label: string }[] = [
   { short: "Sun", label: "Sunday" },
 ];
 
+function scheduledDaysFor(habit: HabitSummary): HabitDay[] {
+  if (habit.scheduledDays?.length) return habit.scheduledDays;
+  if (habit.frequency === "Daily") return days.map((day) => day.short);
+  if (habit.frequency === "Weekdays") return ["Mon", "Tue", "Wed", "Thu", "Fri"];
+  if (habit.frequency === "3× weekly") return ["Mon", "Wed", "Fri"];
+  return [];
+}
+
 export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
   const [habits, setHabits] = useState(initialHabits);
   const [filter, setFilter] = useState<"all" | "active" | "paused">("all");
@@ -89,14 +97,18 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
             </div>
 
             <div className="soft-flow soft-task-cards grid gap-3">
-              {visibleHabits.map((habit) => (
-                <article className="grid min-h-32 gap-4 border border-white/50 p-5 sm:grid-cols-[minmax(0,1.4fr)_170px_110px_100px] sm:items-center sm:p-6" key={habit.id}>
-                  <div className="flex items-center gap-4"><span className="grid size-11 shrink-0 place-items-center"><ActivityIcon activity={`${habit.name} ${habit.category}`} className="size-7" /></span><div><div className="flex flex-wrap items-center gap-2"><h3 className="font-bold">{habit.name}</h3>{habit.isAnchor && <span className="inline-flex items-center gap-1 rounded-full bg-[#ecd8ce] px-2 py-1 text-[9px] font-black uppercase tracking-[0.12em] text-[#9a5d49]"><Flag size={10} fill="currentColor" />Anchor</span>}</div><p className="text-sm text-[var(--soft-muted)]">{habit.category} · {habit.scheduledDays?.length ? `${habit.frequency === "3× weekly" ? "3× · " : ""}${habit.scheduledDays.join(" · ")}` : habit.frequency}</p></div></div>
-                  <div><p className="text-xs text-stone-400">Consistency</p><div className="mt-1.5 flex items-center gap-2"><div className="h-1.5 flex-1 overflow-hidden rounded-full bg-stone-200"><div className="h-full rounded-full bg-[#174f3a]" style={{ width: `${habit.consistency}%` }} /></div><span className="text-xs font-semibold">{habit.consistency}%</span></div></div>
-                  <div><p className="text-xs text-stone-400">Streak</p><p className="mt-1 text-sm font-semibold">{habit.streak} days</p></div>
-                  <button className={`rounded-full px-3 py-2 text-xs font-bold transition ${habit.state === "active" ? "bg-white/55" : "bg-[var(--soft-ink)] text-white"}`} onClick={() => toggleState(habit.id)} type="button">{habit.state === "active" ? "Pause" : "Resume"}</button>
-                </article>
-              ))}
+              {visibleHabits.map((habit) => {
+                const scheduled = scheduledDaysFor(habit);
+                return (
+                  <article className="grid min-h-36 gap-5 border border-white/50 p-5 sm:p-6 lg:grid-cols-[minmax(250px,.9fr)_minmax(270px,1.1fr)_180px_90px_100px] lg:items-center xl:grid-cols-[minmax(300px,.9fr)_minmax(340px,1.2fr)_200px_100px_110px] xl:px-8" key={habit.id}>
+                    <div className="flex items-center gap-5"><span className="grid size-12 shrink-0 place-items-center"><ActivityIcon activity={`${habit.name} ${habit.category}`} className="size-8" /></span><div><div className="flex flex-wrap items-center gap-2"><h3 className="text-lg font-bold tracking-[-0.025em]">{habit.name}</h3>{habit.isAnchor && <span className="inline-flex items-center gap-1 rounded-full bg-[#ecd8ce] px-2 py-1 text-[9px] font-black uppercase tracking-[0.12em] text-[#9a5d49]"><Flag size={10} fill="currentColor" />Anchor</span>}</div><p className="mt-1 text-sm text-[var(--soft-muted)]">{habit.category} · {habit.scheduledDays?.length ? `${habit.frequency === "3× weekly" ? "3× · " : ""}${habit.scheduledDays.join(" · ")}` : habit.frequency}</p></div></div>
+                    <div><p className="text-[10px] font-bold uppercase tracking-[0.13em] text-stone-400">Weekly cadence</p><div className="mt-2.5 grid max-w-sm grid-cols-7 gap-1.5">{days.map((day) => { const isScheduled = scheduled.includes(day.short); return <span aria-label={`${day.label}: ${isScheduled ? "scheduled" : "rest day"}`} className={`grid aspect-square max-w-9 place-items-center rounded-[10px] text-[10px] font-bold ${isScheduled ? "bg-[#174f3a] text-white shadow-[0_5px_12px_rgba(23,79,58,.14)]" : "bg-white/45 text-stone-300"}`} key={day.short}>{day.short.slice(0, 1)}</span>; })}</div></div>
+                    <div><p className="text-xs text-stone-400">Consistency</p><div className="mt-2 flex items-center gap-2"><div className="h-2 flex-1 overflow-hidden rounded-full bg-white/55"><div className="h-full rounded-full bg-[#174f3a]" style={{ width: `${habit.consistency}%` }} /></div><span className="text-xs font-semibold">{habit.consistency}%</span></div></div>
+                    <div><p className="text-xs text-stone-400">Streak</p><p className="mt-1 text-base font-semibold">{habit.streak} days</p></div>
+                    <button className={`rounded-full px-3 py-2.5 text-xs font-bold transition ${habit.state === "active" ? "bg-white/55" : "bg-[var(--soft-ink)] text-white"}`} onClick={() => toggleState(habit.id)} type="button">{habit.state === "active" ? "Pause" : "Resume"}</button>
+                  </article>
+                );
+              })}
             </div>
           </section>
 

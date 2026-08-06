@@ -13,6 +13,7 @@ type QuestsDashboardProps = { initialQuests: QuestSummary[] };
 const statusLabels: Record<QuestStatus, string> = {
   "not-started": "Not started",
   "in-progress": "In progress",
+  paused: "Paused",
   blocked: "Blocked",
   completed: "Completed",
 };
@@ -38,6 +39,20 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
               ...quest,
               status: quest.status === "completed" ? "in-progress" : "completed",
               dueLabel: quest.status === "completed" ? "Aug 31" : "Completed",
+            }
+          : quest,
+      ),
+    );
+  }
+
+  function updateQuestStatus(id: string, status: QuestStatus) {
+    setQuests((current) =>
+      current.map((quest) =>
+        quest.id === id
+          ? {
+              ...quest,
+              status,
+              dueLabel: status === "completed" ? "Completed" : quest.dueLabel === "Completed" ? "Aug 31" : quest.dueLabel,
             }
           : quest,
       ),
@@ -75,16 +90,17 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
           <section className="mt-10 border-t border-black/[0.09] pt-7">
             <div className="flex flex-col gap-4 pb-5 sm:flex-row sm:items-center sm:justify-between">
               <div><h2 className="text-xl font-semibold tracking-[-0.025em]">Monthly board</h2><p className="mt-1 text-sm text-stone-500">Meaningful goals beyond the daily routine.</p></div>
-              <div className="flex max-w-full gap-1 overflow-x-auto rounded-full bg-white/45 p-1">{(["all", "in-progress", "not-started", "blocked", "completed"] as const).map((option) => <button className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition ${filter === option ? "bg-[var(--soft-ink)] text-white" : "text-[var(--soft-muted)]"}`} key={option} onClick={() => setFilter(option)} type="button">{option === "all" ? "All" : statusLabels[option]}</button>)}</div>
+              <div className="flex max-w-full gap-1 overflow-x-auto rounded-full bg-white/45 p-1">{(["all", "in-progress", "not-started", "paused", "blocked", "completed"] as const).map((option) => <button className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition ${filter === option ? "bg-[var(--soft-ink)] text-white" : "text-[var(--soft-muted)]"}`} key={option} onClick={() => setFilter(option)} type="button">{option === "all" ? "All" : statusLabels[option]}</button>)}</div>
             </div>
 
             <div className="soft-flow soft-task-cards mt-5 grid gap-3 xl:grid-cols-2">
               {visibleQuests.map((quest) => {
                 const isComplete = quest.status === "completed";
                 return (
-                  <article className="grid min-h-40 gap-5 border border-white/50 p-5 md:grid-cols-[56px_minmax(0,1fr)_auto] md:items-center md:p-6" key={quest.id}>
+                  <article className="grid min-h-40 gap-5 border border-white/50 p-5 md:grid-cols-[56px_minmax(0,1fr)_170px_auto] md:items-center md:p-6" key={quest.id}>
                     <span className="grid size-11 place-items-center"><ActivityIcon activity={`${quest.title} ${quest.category}`} className="size-7" /></span>
                     <div><div className="flex flex-wrap items-center gap-3"><span className="text-[10px] font-black uppercase tracking-[0.13em] text-[var(--soft-accent)]">{quest.category}</span><span className="text-xs text-[var(--soft-muted)]">{quest.dueLabel}</span></div><h3 className={`mt-2 text-xl font-bold tracking-[-0.025em] ${isComplete ? "text-[var(--soft-muted)] line-through" : ""}`}>{quest.title}</h3><p className="mt-1 text-xs text-[var(--soft-muted)]">{statusLabels[quest.status]}</p></div>
+                    <label className="grid gap-1.5 text-[9px] font-black uppercase tracking-[0.13em] text-[var(--soft-muted)]">Status<select aria-label={`Status for ${quest.title}`} className="min-h-11 cursor-pointer rounded-full border border-black/[0.08] bg-white/55 px-4 text-xs font-bold normal-case tracking-normal text-[var(--soft-ink)] outline-none transition focus:border-[#174f3a]/40 focus:ring-4 focus:ring-[#174f3a]/10" onChange={(event) => updateQuestStatus(quest.id, event.target.value as QuestStatus)} value={quest.status}>{(Object.keys(statusLabels) as QuestStatus[]).map((status) => <option key={status} value={status}>{statusLabels[status]}</option>)}</select></label>
                     <button className={`min-h-12 rounded-full px-5 text-xs font-bold transition ${isComplete ? "bg-white/55 text-[var(--soft-muted)]" : "bg-[var(--soft-ink)] text-white"}`} onClick={() => toggleQuestCompletion(quest.id)} type="button">{isComplete ? "Mark incomplete" : "Mark complete"}</button>
                   </article>
                 );
