@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { calculateRoutineEfficiency } from "@/lib/metrics";
 import type { TodayHabit } from "@/features/today/types";
 import { ActivityIcon } from "@/components/activity-icon";
+import { BrandLogo } from "@/components/brand-logo";
 
 type EveningCheckInProps = { initialHabits: TodayHabit[] };
 
@@ -41,22 +42,22 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
   return (
     <main className="soft-canvas min-h-screen text-[var(--soft-ink)]">
       <div className="soft-shell min-h-screen overflow-hidden">
-        <header className="premium-toolbar mx-auto flex max-w-[1500px] items-center justify-between px-5 py-6 sm:px-9">
-          <Link className="text-xl font-black tracking-[-0.055em]" href="/">quest<span className="text-[var(--soft-accent)]">/</span>log</Link>
+        <header className="premium-toolbar flex w-full items-center justify-between px-5 py-5 sm:px-9">
+          <BrandLogo />
           <span className="evening-mode-pill"><span aria-hidden="true">☾</span> Evening mode</span>
         </header>
 
-        <div className="mx-auto max-w-6xl px-5 pb-12 pt-8 sm:px-9 sm:pt-12">
+        <div className="mx-auto max-w-[1400px] px-5 pb-12 pt-3 sm:px-9 sm:pt-4">
           <div className="evening-intro">
             <div>
               <p className="soft-kicker text-[var(--soft-accent)]">Your evening reset · under a minute</p>
-              <h1>Leave today<br />lighter.</h1>
+              <h1>Four choices.<br />Then rest.</h1>
             </div>
             <div className="evening-progress-dial" style={{ "--check-progress": `${(completedCount / habits.length) * 360}deg` } as React.CSSProperties}>
               <div><strong>{completedCount}</strong><span>of {habits.length} done</span></div>
             </div>
             <div className="evening-intro-copy">
-              <p>Mark what happened.<br />No explanations. No judgement.</p>
+              <p>Choose what happened.<br />No scoring. No explanations.</p>
               <div aria-label="Completed habits" aria-valuemax={habits.length} aria-valuemin={0} aria-valuenow={completedCount} className="evening-progress-line" role="progressbar"><span style={{ width: `${(completedCount / habits.length) * 100}%` }} /></div>
               <small>{allAnswered ? "Ready to let go" : `${habits.length - answeredCount} choices left`}</small>
             </div>
