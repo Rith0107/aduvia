@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
+import { Check, Download, Share2, Smartphone, Square } from "lucide-react";
 import {
   Area,
   AreaChart,
@@ -61,6 +62,21 @@ function TrendActiveDot({ cx = 0, cy = 0, payload }: { cx?: number; cy?: number;
       <rect fill="#f8f2e7" height="34" rx="17" stroke="rgba(255,255,255,.75)" width="118" x={cx - 59} y={cy - 48} />
       <text fill="#173d31" fontSize="12" fontWeight="700" textAnchor="middle" x={cx} y={cy - 27}>{payload.label} · {payload.score}%</text>
       <circle cx={cx} cy={cy} fill="#d89a42" r="6" stroke="#fffaf0" strokeWidth="3" />
+    </g>
+  );
+}
+
+function RhythmActiveBar({ height = 0, payload, width = 0, x = 0, y = 0 }: { height?: number; payload?: (typeof weekdayRhythm)[number]; width?: number; x?: number; y?: number }) {
+  if (!payload) return null;
+
+  const labelWidth = 104;
+  const labelX = x + width / 2 - labelWidth / 2;
+
+  return (
+    <g aria-label={`${payload.name}: ${payload.score}% completion`}>
+      <rect fill="#876f47" height={height} rx="7" width={width} x={x} y={y} />
+      <rect fill="#fffaf0" height="30" rx="15" stroke="rgba(135,111,71,.16)" width={labelWidth} x={labelX} y={y - 38} />
+      <text fill="#6e5b3c" fontSize="11" fontWeight="700" textAnchor="middle" x={x + width / 2} y={y - 19}>{payload.name} · {payload.score}%</text>
     </g>
   );
 }
@@ -140,8 +156,6 @@ export function MonthlyReport() {
   const [habits, setHabits] = useState(initialHabits);
   const [format, setFormat] = useState<ShareFormat>("square");
   const [shareMessage, setShareMessage] = useState("");
-  const [activeCategory, setActiveCategory] = useState<(typeof categoryBalance)[number] | null>(null);
-  const [activeWeekday, setActiveWeekday] = useState<(typeof weekdayRhythm)[number] | null>(null);
 
   const overallConsistency = useMemo(
     () => Math.round(habits.reduce((sum, habit) => sum + habitConsistency(habit), 0) / habits.length),
@@ -206,9 +220,9 @@ export function MonthlyReport() {
             </article>
 
             <article className="rounded-[28px] border border-[#174f3a]/10 bg-[#fffaf0] p-6 sm:p-7">
-              <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">Life balance</p><h2 className="mt-2 text-xl font-semibold tracking-[-0.03em]">Where your effort went</h2><p aria-live="polite" className="mt-3 inline-flex min-h-8 items-center rounded-full bg-[#f1e8d8] px-3 text-xs font-semibold text-[var(--soft-accent)]">{activeCategory ? `${activeCategory.name} · ${activeCategory.value}% of effort` : "Hover a segment for its share"}</p></div>
+              <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">Life balance</p><h2 className="mt-2 text-xl font-semibold tracking-[-0.03em]">Where your effort went</h2><p className="mt-2 text-xs text-stone-400">Share of completed activity this month</p></div>
               <div className="relative mx-auto mt-3 h-56 max-w-[280px]">
-                <ResponsiveContainer height="100%" width="100%"><PieChart><Pie cx="50%" cy="50%" data={categoryBalance} dataKey="value" innerRadius={62} nameKey="name" outerRadius={91} paddingAngle={4} stroke="none">{categoryBalance.map((entry) => <Cell fill={entry.color} key={entry.name} onMouseEnter={() => setActiveCategory(entry)} onMouseLeave={() => setActiveCategory(null)} />)}</Pie></PieChart></ResponsiveContainer>
+                <ResponsiveContainer height="100%" width="100%"><PieChart><Pie cx="50%" cy="50%" data={categoryBalance} dataKey="value" innerRadius={62} nameKey="name" outerRadius={91} paddingAngle={4} stroke="none">{categoryBalance.map((entry) => <Cell fill={entry.color} key={entry.name} />)}</Pie></PieChart></ResponsiveContainer>
                 <div className="pointer-events-none absolute inset-0 grid place-items-center text-center"><div><p className="text-3xl font-semibold">4</p><p className="text-[10px] uppercase tracking-[0.12em] text-stone-400">focus areas</p></div></div>
               </div>
               <div className="grid grid-cols-2 gap-x-4 gap-y-3">{categoryBalance.map((item) => <div className="flex items-center gap-2 text-xs" key={item.name}><span className="size-2.5 rounded-full" style={{ backgroundColor: item.color }} /><span className="text-stone-500">{item.name}</span><span className="ml-auto font-semibold">{item.value}%</span></div>)}</div>
@@ -217,7 +231,7 @@ export function MonthlyReport() {
 
           <section className="mt-4 grid gap-4 lg:grid-cols-[0.72fr_1.28fr]">
             <article className="rounded-[24px] bg-[#dfe8ed] p-6 text-[#284f61]"><p className="text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Best day</p><div className="mt-3 flex items-end justify-between"><div><p className="text-3xl font-semibold tracking-[-0.04em]">Wednesday</p><p className="mt-1 text-sm opacity-60">Your midweek momentum peak.</p></div><span className="text-4xl">↗</span></div></article>
-            <article className="rounded-[24px] bg-[#f3e7ca] p-5 text-[#6e5b3c] sm:p-6"><div className="flex items-center justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Weekly rhythm</p><p className="mt-2 text-lg font-semibold">Completion by weekday</p></div><p aria-live="polite" className="min-w-40 rounded-full bg-white/45 px-3 py-2 text-right text-xs font-semibold">{activeWeekday ? `${activeWeekday.name} · ${activeWeekday.score}%` : "Hover a bar for details"}</p></div><div className="mt-4 h-28"><ResponsiveContainer height="100%" width="100%"><BarChart data={weekdayRhythm}><XAxis axisLine={false} dataKey="day" tick={{ fill: "#876f47", fontSize: 10 }} tickLine={false} /><Bar dataKey="score" radius={[7, 7, 2, 2]}>{weekdayRhythm.map((entry) => <Cell fill="#876f47" key={entry.name} onMouseEnter={() => setActiveWeekday(entry)} onMouseLeave={() => setActiveWeekday(null)} />)}</Bar></BarChart></ResponsiveContainer></div></article>
+            <article className="rounded-[24px] bg-[#f3e7ca] p-5 text-[#6e5b3c] sm:p-6"><div className="flex items-center justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Weekly rhythm</p><p className="mt-2 text-lg font-semibold">Completion by weekday</p></div><p className="text-[10px] font-semibold uppercase tracking-[0.12em] opacity-45">Hover a bar</p></div><div className="mt-4 h-36"><ResponsiveContainer height="100%" width="100%"><BarChart data={weekdayRhythm} margin={{ top: 42 }}><XAxis axisLine={false} dataKey="day" tick={{ fill: "#876f47", fontSize: 10 }} tickLine={false} /><Tooltip content={() => null} cursor={false} /><Bar activeBar={<RhythmActiveBar />} dataKey="score" fill="#876f47" radius={[7, 7, 2, 2]} /></BarChart></ResponsiveContainer></div></article>
           </section>
 
           <section className="mt-7 rounded-[24px] border border-[#174f3a]/10 bg-[#f8fbf7] p-4 sm:p-6">
@@ -230,10 +244,45 @@ export function MonthlyReport() {
             </div>
           </section>
 
-          <section className="mt-5 grid gap-5 xl:grid-cols-[1fr_390px]">
-            <div className="rounded-[24px] bg-[#143d31] p-6 text-white sm:p-8"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#d5b77c]">Share your month</p><h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em]">Proof worth sharing.</h2><p className="mt-2 max-w-lg text-sm leading-6 text-white/55">Your card includes only overall consistency and completed side quests—no private notes or missed-day details.</p><div className="mt-7 flex flex-wrap gap-2">{(["square", "story"] as const).map((option) => <button className={`rounded-full px-4 py-2 text-xs font-semibold capitalize ${format === option ? "bg-[#d89a42] text-[#143d31]" : "bg-white/10 text-white/60"}`} key={option} onClick={() => setFormat(option)} type="button">{option === "square" ? "Square post" : "Story · 9:16"}</button>)}</div><div className="mt-7 flex flex-wrap gap-3"><button className="rounded-xl bg-white px-4 py-3 text-sm font-semibold text-[#143d31]" onClick={shareCard} type="button">Share image</button><button className="rounded-xl border border-white/15 px-4 py-3 text-sm font-semibold text-white" onClick={downloadCard} type="button">Download PNG</button></div>{shareMessage && <p className="mt-4 text-xs text-[#b9d4c8]" role="status">{shareMessage}</p>}</div>
+          <section className="mt-5 overflow-hidden rounded-[32px] border border-[#174f3a]/10 bg-[#e8eee9] p-3 shadow-[0_24px_70px_rgba(28,54,43,.12)] sm:p-5">
+            <div className="grid gap-5 xl:grid-cols-[0.78fr_1.22fr]">
+              <div className="flex flex-col p-4 sm:p-6">
+                <div className="flex size-12 items-center justify-center rounded-2xl bg-[#143d31] text-[#f3c878] shadow-[0_10px_24px_rgba(20,61,49,.18)]"><Share2 size={21} strokeWidth={1.8} /></div>
+                <p className="mt-8 text-xs font-semibold uppercase tracking-[0.17em] text-[#a66c58]">Share studio</p>
+                <h2 className="mt-3 max-w-sm text-4xl font-semibold tracking-[-0.055em] text-[#17251f]">Turn your month into a keepsake.</h2>
+                <p className="mt-4 max-w-md text-sm leading-6 text-stone-500">Only consistency and completed quests are included. Notes and missed-day details stay private.</p>
 
-            <div className={`relative overflow-hidden rounded-[28px] bg-[#143d31] p-7 text-white shadow-[0_20px_55px_rgba(20,61,49,0.2)] ${format === "story" ? "mx-auto aspect-[9/16] w-full max-w-[290px]" : "aspect-square"}`}><div className="absolute -right-16 -top-16 size-48 rounded-full bg-[#d89a42]/15" /><p className="relative text-[10px] font-semibold uppercase tracking-[0.18em] text-[#d5b77c]">QuestLog · August</p><p className="relative mt-8 text-6xl font-semibold tracking-[-0.06em]">{overallConsistency}%</p><p className="relative mt-1 text-sm text-white/55">monthly consistency</p><div className="relative mt-9 rounded-2xl bg-[#f3e7ca] p-5 text-[#17201c]"><p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#876f47]">Side quests completed</p>{completedQuests.map((quest) => <p className="mt-3 text-sm font-semibold" key={quest}>✓ {quest}</p>)}</div><p className="absolute bottom-6 left-7 text-[10px] text-white/40">Small steps. A month of proof.</p></div>
+                <fieldset className="mt-9">
+                  <legend className="text-[10px] font-semibold uppercase tracking-[0.15em] text-stone-400">Choose a canvas</legend>
+                  <div className="mt-3 grid max-w-md grid-cols-2 gap-3">
+                    {(["square", "story"] as const).map((option) => {
+                      const selected = format === option;
+                      const FormatIcon = option === "square" ? Square : Smartphone;
+                      return <button aria-pressed={selected} className={`group flex items-center gap-3 rounded-2xl border px-4 py-4 text-left transition ${selected ? "border-[#174f3a] bg-[#174f3a] text-white shadow-[0_10px_22px_rgba(23,79,58,.16)]" : "border-[#174f3a]/10 bg-white/55 text-[#34463e] hover:bg-white"}`} key={option} onClick={() => setFormat(option)} type="button"><FormatIcon className={selected ? "text-[#f3c878]" : "text-[#7f948a]"} size={20} strokeWidth={1.8} /><span><span className="block text-sm font-semibold">{option === "square" ? "Square post" : "Story"}</span><span className={`mt-0.5 block text-[10px] ${selected ? "text-white/50" : "text-stone-400"}`}>{option === "square" ? "1:1 feed" : "9:16 vertical"}</span></span></button>;
+                    })}
+                  </div>
+                </fieldset>
+
+                <div className="mt-auto flex flex-wrap gap-3 pt-9"><button className="inline-flex items-center gap-2 rounded-full bg-[#d89a42] px-5 py-3 text-sm font-semibold text-[#143d31] shadow-[0_10px_24px_rgba(216,154,66,.22)] transition hover:-translate-y-0.5" onClick={shareCard} type="button"><Share2 size={16} />Share image</button><button className="inline-flex items-center gap-2 rounded-full border border-[#174f3a]/15 bg-white/65 px-5 py-3 text-sm font-semibold text-[#174f3a] transition hover:bg-white" onClick={downloadCard} type="button"><Download size={16} />Download</button></div>
+                {shareMessage && <p className="mt-4 text-xs text-[#507365]" role="status">{shareMessage}</p>}
+              </div>
+
+              <div className="grid min-h-[620px] place-items-center overflow-hidden rounded-[26px] bg-[radial-gradient(circle_at_20%_10%,rgba(216,154,66,.18),transparent_34%),linear-gradient(145deg,#d9e4de,#f1e9dc)] p-5 sm:p-8">
+                <div className={`relative overflow-hidden bg-[#123f32] text-white shadow-[0_30px_70px_rgba(20,61,49,.28)] transition-all duration-500 ${format === "story" ? "aspect-[9/16] w-full max-w-[310px] rounded-[34px] p-7" : "aspect-square w-full max-w-[560px] rounded-[38px] p-8 sm:p-10"}`}>
+                  <div className="absolute -right-24 -top-24 size-64 rounded-full border-[42px] border-[#d89a42]/18" />
+                  <div className="absolute -bottom-32 -left-28 size-72 rounded-full bg-[#7fa696]/10 blur-2xl" />
+                  <div className="relative flex items-center justify-between"><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#f0c77a]">QuestLog · August</p><span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[9px] uppercase tracking-[0.13em] text-white/55">Monthly proof</span></div>
+
+                  <div className="relative mt-8 flex items-center gap-5">
+                    <div className="grid size-32 shrink-0 place-items-center rounded-full p-[9px]" style={{ background: `conic-gradient(#d89a42 ${overallConsistency * 3.6}deg, rgba(255,255,255,.1) 0deg)` }}><div className="grid size-full place-items-center rounded-full bg-[#123f32] text-center"><div><p className="text-4xl font-semibold tracking-[-0.06em]">{overallConsistency}%</p><p className="mt-1 text-[8px] uppercase tracking-[0.16em] text-white/45">consistent</p></div></div></div>
+                    <div><p className="text-xs uppercase tracking-[0.13em] text-white/40">You showed up</p><p className="mt-1 text-3xl font-semibold tracking-[-0.04em]">24 days</p><p className="mt-2 max-w-[180px] text-xs leading-5 text-white/45">A month built one quiet check-in at a time.</p></div>
+                  </div>
+
+                  <div className="relative mt-9 border-t border-white/10 pt-6"><div className="flex items-end justify-between"><div><p className="text-[9px] font-semibold uppercase tracking-[0.17em] text-[#f0c77a]">Side quests cleared</p><p className="mt-1 text-2xl font-semibold">{completedQuests.length} wins</p></div><span className="text-xs text-white/35">August 2026</span></div><div className="mt-5 space-y-3">{completedQuests.map((quest, index) => <div className="flex items-center gap-3 border-b border-white/10 pb-3" key={quest}><span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#f0c77a] text-[#123f32]"><Check size={15} strokeWidth={2.4} /></span><div><p className="text-[9px] uppercase tracking-[0.13em] text-white/35">Quest 0{index + 1}</p><p className="mt-0.5 text-sm font-semibold">{quest}</p></div></div>)}</div></div>
+                  <div className="absolute bottom-7 left-8 right-8 flex items-center justify-between text-[9px] uppercase tracking-[0.14em] text-white/30"><span>Small steps, visible proof.</span><span>quest/log</span></div>
+                </div>
+              </div>
+            </div>
           </section>
       </div>
     </AppShell>

@@ -19,7 +19,8 @@ describe("MonthlyReport", () => {
 
   it("switches social card formats", () => {
     render(<MonthlyReport />);
-    fireEvent.click(screen.getByRole("button", { name: "Story · 9:16" }));
-    expect(screen.getByRole("button", { name: "Story · 9:16" })).toHaveClass("bg-[#d89a42]");
+    const storyFormat = screen.getByRole("button", { name: /Story/ });
+    fireEvent.click(storyFormat);
+    expect(storyFormat).toHaveAttribute("aria-pressed", "true");
   });
 });
