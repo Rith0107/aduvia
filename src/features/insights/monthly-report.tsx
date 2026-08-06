@@ -199,7 +199,7 @@ export function MonthlyReport() {
     <AppShell active="Insights" eyebrow="Monthly review" title={<>Your month,<br />in motion.</>} action={<div className="flex items-center gap-2 rounded-full bg-white/45 p-1 text-xs font-bold"><button className="rounded-full px-3 py-2" type="button">←</button><span className="px-2">August 2026</span><button className="rounded-full px-3 py-2 opacity-30" disabled type="button">→</button></div>}>
       <div className="insights-flow">
           <section className="mt-12 grid gap-4 xl:grid-cols-[1.35fr_0.75fr]">
-            <article className="relative overflow-hidden rounded-[28px] bg-[#143d31] p-6 text-white shadow-[0_22px_55px_rgba(20,61,49,0.2)] sm:p-8">
+            <article className="relative overflow-hidden rounded-[44px_44px_96px_44px] bg-[#143d31] p-6 text-white shadow-[0_28px_70px_-30px_rgba(20,61,49,0.55)] sm:p-8">
               <div className="absolute -right-20 -top-20 size-64 rounded-full border-[46px] border-[#d89a42]/10" />
               <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                 <div><p className="text-xs font-semibold uppercase tracking-[0.17em] text-[#d5b77c]">Consistency signal</p><p className="mt-4 text-6xl font-semibold tracking-[-0.065em]">{overallConsistency}%</p><p className="mt-1 text-sm text-white/50">Up 8 points from July</p><p className="mt-5 inline-flex rounded-full bg-white/[0.08] px-3 py-2 text-xs font-medium text-[#c7dbd2]">You showed up on 24 days this month</p></div>
@@ -219,7 +219,8 @@ export function MonthlyReport() {
               </div>
             </article>
 
-            <article className="rounded-[28px] border border-[#174f3a]/10 bg-[#fffaf0] p-6 sm:p-7">
+            <article className="relative overflow-hidden rounded-[64px_28px_64px_64px] border border-white/70 bg-[#fffaf0]/90 p-6 shadow-[0_24px_60px_-38px_rgba(39,56,47,.4)] sm:p-7">
+              <div className="absolute -right-14 -top-14 size-40 rounded-full bg-[#d89a42]/10" />
               <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">Life balance</p><h2 className="mt-2 text-xl font-semibold tracking-[-0.03em]">Where your effort went</h2><p className="mt-2 text-xs text-stone-400">Share of completed activity this month</p></div>
               <div className="relative mx-auto mt-3 h-56 max-w-[280px]">
                 <ResponsiveContainer height="100%" width="100%"><PieChart><Pie cx="50%" cy="50%" data={categoryBalance} dataKey="value" innerRadius={62} nameKey="name" outerRadius={91} paddingAngle={4} stroke="none">{categoryBalance.map((entry) => <Cell fill={entry.color} key={entry.name} />)}</Pie></PieChart></ResponsiveContainer>
@@ -229,12 +230,12 @@ export function MonthlyReport() {
             </article>
           </section>
 
-          <section className="mt-4 grid gap-4 lg:grid-cols-[0.72fr_1.28fr]">
-            <article className="rounded-[24px] bg-[#dfe8ed] p-6 text-[#284f61]"><p className="text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Best day</p><div className="mt-3 flex items-end justify-between"><div><p className="text-3xl font-semibold tracking-[-0.04em]">Wednesday</p><p className="mt-1 text-sm opacity-60">Your midweek momentum peak.</p></div><span className="text-4xl">↗</span></div></article>
-            <article className="rounded-[24px] bg-[#f3e7ca] p-5 text-[#6e5b3c] sm:p-6"><div className="flex items-center justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Weekly rhythm</p><p className="mt-2 text-lg font-semibold">Completion by weekday</p></div><p className="text-[10px] font-semibold uppercase tracking-[0.12em] opacity-45">Hover a bar</p></div><div className="mt-4 h-36"><ResponsiveContainer height="100%" width="100%"><BarChart data={weekdayRhythm} margin={{ top: 42 }}><XAxis axisLine={false} dataKey="day" tick={{ fill: "#876f47", fontSize: 10 }} tickLine={false} /><Tooltip content={() => null} cursor={false} /><Bar activeBar={<RhythmActiveBar />} dataKey="score" fill="#876f47" radius={[7, 7, 2, 2]} /></BarChart></ResponsiveContainer></div></article>
+          <section className="mt-6 grid items-center gap-7 lg:grid-cols-[0.5fr_1.5fr]">
+            <article className="relative mx-auto flex aspect-square w-full max-w-[310px] flex-col justify-between overflow-hidden rounded-full bg-[#dfe8ed] p-10 text-[#284f61] shadow-[0_26px_60px_-34px_rgba(40,79,97,.5)] lg:mx-0"><div className="absolute -right-10 -top-10 size-36 rounded-full border-[26px] border-white/25" /><p className="relative text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Best day</p><div className="relative"><p className="text-4xl font-semibold tracking-[-0.05em]">Wednesday</p><p className="mt-2 max-w-[190px] text-sm leading-5 opacity-60">Your midweek momentum peak.</p></div><span className="absolute bottom-9 right-10 grid size-11 place-items-center rounded-full bg-[#284f61] text-xl text-white">↗</span></article>
+            <article className="overflow-hidden rounded-[52px] bg-[#f3e7ca] p-6 text-[#6e5b3c] shadow-[0_28px_65px_-42px_rgba(110,91,60,.55)] sm:p-8"><div className="flex items-center justify-between gap-4"><div><p className="text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Weekly rhythm</p><p className="mt-2 text-xl font-semibold">Completion by weekday</p></div><p className="rounded-full bg-white/30 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] opacity-55">Hover a bar</p></div><div className="mt-4 h-36"><ResponsiveContainer height="100%" width="100%"><BarChart data={weekdayRhythm} margin={{ top: 42 }}><XAxis axisLine={false} dataKey="day" tick={{ fill: "#876f47", fontSize: 10 }} tickLine={false} /><Tooltip content={() => null} cursor={false} /><Bar activeBar={<RhythmActiveBar />} dataKey="score" fill="#876f47" radius={[18, 18, 18, 18]} /></BarChart></ResponsiveContainer></div></article>
           </section>
 
-          <section className="mt-7 rounded-[24px] border border-[#174f3a]/10 bg-[#f8fbf7] p-4 sm:p-6">
+          <section className="mt-7 rounded-[44px] border border-white/70 bg-[#f8fbf7]/80 p-4 shadow-[0_26px_70px_-48px_rgba(34,61,49,.42)] sm:p-7">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-xl font-semibold">Daily consistency map</h2><p className="mt-1 text-sm text-stone-500">Tap a scheduled day to correct its completion.</p></div><div className="flex gap-3 text-xs text-stone-500"><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[#174f3a]" />Done</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[#f4dfd9]" />Missed</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-stone-200" />Not scheduled</span></div></div>
             <div className="mt-6 overflow-x-auto rounded-2xl border border-black/[0.06] bg-[#fffdf8]">
               <table className="min-w-[1500px] border-separate border-spacing-0 text-xs">
@@ -244,7 +245,7 @@ export function MonthlyReport() {
             </div>
           </section>
 
-          <section className="mt-5 overflow-hidden rounded-[32px] border border-[#174f3a]/10 bg-[#e8eee9] p-3 shadow-[0_24px_70px_rgba(28,54,43,.12)] sm:p-5">
+          <section className="mt-7 overflow-hidden rounded-[52px] border border-white/70 bg-[#e8eee9] p-3 shadow-[0_30px_80px_-42px_rgba(28,54,43,.32)] sm:p-5">
             <div className="grid gap-5 xl:grid-cols-[0.78fr_1.22fr]">
               <div className="flex flex-col p-4 sm:p-6">
                 <div className="flex size-12 items-center justify-center rounded-2xl bg-[#143d31] text-[#f3c878] shadow-[0_10px_24px_rgba(20,61,49,.18)]"><Share2 size={21} strokeWidth={1.8} /></div>
