@@ -35,11 +35,21 @@ describe("QuestsDashboard", () => {
     expect(screen.getByText("Build portfolio homepage").closest("article")).toHaveTextContent("Paused");
   });
 
+  it("moves a quest to another category", () => {
+    render(<QuestsDashboard initialQuests={sampleQuests} />);
+    const category = screen.getByLabelText("Category for Build portfolio homepage");
+    fireEvent.change(category, { target: { value: "Creative" } });
+    expect(category).toHaveValue("Creative");
+    expect(screen.getByText("Build portfolio homepage").closest("article")).toHaveTextContent("Creative");
+  });
+
   it("creates a quest", () => {
     render(<QuestsDashboard initialQuests={sampleQuests} />);
     fireEvent.click(screen.getByRole("button", { name: "+ New quest" }));
     fireEvent.change(screen.getByLabelText("Quest title"), { target: { value: "Publish a short story" } });
+    fireEvent.change(screen.getByLabelText("Category", { selector: "#quest-category" }), { target: { value: "Creative" } });
     fireEvent.click(screen.getByRole("button", { name: /^Create quest$/ }));
     expect(screen.getByText("Publish a short story")).toBeInTheDocument();
+    expect(screen.getByText("Publish a short story").closest("article")).toHaveTextContent("Creative");
   });
 });
