@@ -11,6 +11,11 @@ import { EveningCheckIn } from "./evening-check-in";
 afterEach(cleanup);
 
 describe("EveningCheckIn", () => {
+  it("always provides a way back to Today", () => {
+    render(<EveningCheckIn initialHabits={sampleHabits} />);
+    expect(screen.getByRole("link", { name: /Back to Today|Exit/ })).toHaveAttribute("href", "/today");
+  });
+
   it("requires one answer per scheduled habit", () => {
     render(<EveningCheckIn initialHabits={sampleHabits} />);
     const finish = screen.getByRole("button", { name: "Finish my day" });
