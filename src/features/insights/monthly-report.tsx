@@ -123,14 +123,24 @@ async function renderShareCard(format: ShareFormat, consistency: number, monthLa
   const context = canvas.getContext("2d");
   if (!context) throw new Error("Canvas is unavailable.");
 
-  context.fillStyle = "#143d31";
+  const styles = getComputedStyle(document.documentElement);
+  const themeColor = (name: string, fallback: string) => styles.getPropertyValue(name).trim() || fallback;
+  const deep = themeColor("--chart-deep", "#143d31");
+  const primary = themeColor("--chart-primary", "#d89a42");
+  const surface = themeColor("--chart-surface", "#f3e7ca");
+  const surfaceInk = themeColor("--chart-ink", "#6e5b3c");
+  const ink = themeColor("--soft-ink", "#17201c");
+
+  context.fillStyle = deep;
   context.fillRect(0, 0, width, height);
-  context.fillStyle = "rgba(216,154,66,0.16)";
+  context.fillStyle = primary;
+  context.globalAlpha = 0.18;
   context.beginPath();
   context.arc(width * 0.92, height * 0.08, width * 0.38, 0, Math.PI * 2);
   context.fill();
+  context.globalAlpha = 1;
   const margin = 90;
-  context.fillStyle = "#d5b77c";
+  context.fillStyle = primary;
   context.font = "600 28px system-ui";
   context.fillText(`ADUVIA · ${monthLabel.toUpperCase()}`, margin, format === "story" ? 190 : 130);
   context.fillStyle = "#fffaf0";
@@ -141,13 +151,13 @@ async function renderShareCard(format: ShareFormat, consistency: number, monthLa
   context.fillText("monthly consistency", margin, format === "story" ? 500 : 385);
 
   const questTop = format === "story" ? 760 : 560;
-  context.fillStyle = "#f3e7ca";
+  context.fillStyle = surface;
   context.roundRect(margin, questTop, width - margin * 2, format === "story" ? 520 : 340, 36);
   context.fill();
-  context.fillStyle = "#6e5b3c";
+  context.fillStyle = surfaceInk;
   context.font = "600 26px system-ui";
   context.fillText("SIDE QUESTS COMPLETED", margin + 48, questTop + 70);
-  context.fillStyle = "#17201c";
+  context.fillStyle = ink;
   context.font = "600 38px system-ui";
   completedQuests.forEach((quest, index) => {
     context.fillText(`✓  ${quest}`, margin + 48, questTop + 150 + index * 78);
@@ -293,27 +303,27 @@ export function MonthlyReport() {
                     {(["square", "story"] as const).map((option) => {
                       const selected = format === option;
                       const FormatIcon = option === "square" ? Square : Smartphone;
-                      return <button aria-pressed={selected} className={`group flex items-center gap-3 rounded-2xl border px-4 py-4 text-left transition ${selected ? "border-[#174f3a] bg-[#174f3a] text-white shadow-[0_10px_22px_rgba(23,79,58,.16)]" : "border-[#174f3a]/10 bg-white/55 text-[#34463e] hover:bg-white"}`} key={option} onClick={() => setFormat(option)} type="button"><FormatIcon className={selected ? "text-[#f3c878]" : "text-[#7f948a]"} size={20} strokeWidth={1.8} /><span><span className="block text-sm font-semibold">{option === "square" ? "Square post" : "Story"}</span><span className={`mt-0.5 block text-[10px] ${selected ? "text-white/50" : "text-stone-400"}`}>{option === "square" ? "1:1 feed" : "9:16 vertical"}</span></span></button>;
+                      return <button aria-pressed={selected} className={`group flex items-center gap-3 rounded-2xl border px-4 py-4 text-left transition ${selected ? "border-[var(--chart-deep)] bg-[var(--chart-deep)] text-white shadow-[0_10px_22px_rgba(23,79,58,.16)]" : "border-[color:color-mix(in_srgb,var(--chart-deep)_12%,transparent)] bg-white/55 text-[var(--soft-ink)] hover:bg-white"}`} key={option} onClick={() => setFormat(option)} type="button"><FormatIcon className={selected ? "text-[var(--chart-primary)]" : "text-[var(--soft-muted)]"} size={20} strokeWidth={1.8} /><span><span className="block text-sm font-semibold">{option === "square" ? "Square post" : "Story"}</span><span className={`mt-0.5 block text-[10px] ${selected ? "text-white/50" : "text-[var(--soft-muted)]"}`}>{option === "square" ? "1:1 feed" : "9:16 vertical"}</span></span></button>;
                     })}
                   </div>
                 </fieldset>
 
-                <div className="mt-auto flex flex-wrap gap-3 pt-9"><button className="inline-flex items-center gap-2 rounded-full bg-[#d89a42] px-5 py-3 text-sm font-semibold text-[#143d31] shadow-[0_10px_24px_rgba(216,154,66,.22)] transition hover:-translate-y-0.5" onClick={shareCard} type="button"><Share2 size={16} />Share image</button><button className="inline-flex items-center gap-2 rounded-full border border-[#174f3a]/15 bg-white/65 px-5 py-3 text-sm font-semibold text-[#174f3a] transition hover:bg-white" onClick={downloadCard} type="button"><Download size={16} />Download</button></div>
-                {shareMessage && <p className="mt-4 text-xs text-[#507365]" role="status">{shareMessage}</p>}
+                <div className="mt-auto flex flex-wrap gap-3 pt-9"><button className="inline-flex items-center gap-2 rounded-full bg-[var(--chart-primary)] px-5 py-3 text-sm font-semibold text-[var(--chart-deep)] shadow-[0_10px_24px_rgba(216,154,66,.22)] transition hover:-translate-y-0.5" onClick={shareCard} type="button"><Share2 size={16} />Share image</button><button className="inline-flex items-center gap-2 rounded-full border border-[color:color-mix(in_srgb,var(--chart-deep)_15%,transparent)] bg-white/65 px-5 py-3 text-sm font-semibold text-[var(--chart-deep)] transition hover:bg-white" onClick={downloadCard} type="button"><Download size={16} />Download</button></div>
+                {shareMessage && <p className="mt-4 text-xs text-[var(--soft-icon-green)]" role="status">{shareMessage}</p>}
               </div>
 
-              <div className="grid min-h-[620px] place-items-center overflow-hidden rounded-[26px] bg-[radial-gradient(circle_at_20%_10%,rgba(216,154,66,.18),transparent_34%),linear-gradient(145deg,#d9e4de,#f1e9dc)] p-5 sm:p-8">
-                <div className={`relative overflow-hidden bg-[#123f32] text-white shadow-[0_30px_70px_rgba(20,61,49,.28)] transition-all duration-500 ${format === "story" ? "aspect-[9/16] w-full max-w-[310px] rounded-[34px] p-7" : "aspect-square w-full max-w-[560px] rounded-[38px] p-8 sm:p-10"}`}>
-                  <div className="absolute -right-24 -top-24 size-64 rounded-full border-[42px] border-[#d89a42]/18" />
-                  <div className="absolute -bottom-32 -left-28 size-72 rounded-full bg-[#7fa696]/10 blur-2xl" />
-                  <div className="relative flex items-center justify-between"><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#f0c77a]">Aduvia · {monthName}</p><span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[9px] uppercase tracking-[0.13em] text-white/55">Monthly proof</span></div>
+              <div className="grid min-h-[620px] place-items-center overflow-hidden rounded-[26px] bg-[linear-gradient(145deg,var(--soft-tint-a),var(--soft-surface))] p-5 sm:p-8">
+                <div className={`relative overflow-hidden bg-[var(--chart-deep)] text-white shadow-[0_30px_70px_rgba(20,61,49,.28)] transition-all duration-500 ${format === "story" ? "aspect-[9/16] w-full max-w-[310px] rounded-[34px] p-7" : "aspect-square w-full max-w-[560px] rounded-[38px] p-8 sm:p-10"}`}>
+                  <div className="absolute -right-24 -top-24 size-64 rounded-full border-[42px] border-[color:color-mix(in_srgb,var(--chart-primary)_18%,transparent)]" />
+                  <div className="absolute -bottom-32 -left-28 size-72 rounded-full bg-[color:color-mix(in_srgb,var(--chart-blue)_14%,transparent)] blur-2xl" />
+                  <div className="relative flex items-center justify-between"><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--chart-primary)]">Aduvia · {monthName}</p><span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[9px] uppercase tracking-[0.13em] text-white/55">Monthly proof</span></div>
 
                   <div className="relative mt-8 flex items-center gap-5">
-                    <div className="grid size-32 shrink-0 place-items-center rounded-full p-[9px]" style={{ background: `conic-gradient(#d89a42 ${overallConsistency * 3.6}deg, rgba(255,255,255,.1) 0deg)` }}><div className="grid size-full place-items-center rounded-full bg-[#123f32] text-center"><div><p className="text-4xl font-semibold tracking-[-0.06em]">{overallConsistency}%</p><p className="mt-1 text-[8px] uppercase tracking-[0.16em] text-white/45">consistent</p></div></div></div>
+                    <div className="grid size-32 shrink-0 place-items-center rounded-full p-[9px]" style={{ background: `conic-gradient(var(--chart-primary) ${overallConsistency * 3.6}deg, rgba(255,255,255,.1) 0deg)` }}><div className="grid size-full place-items-center rounded-full bg-[var(--chart-deep)] text-center"><div><p className="text-4xl font-semibold tracking-[-0.06em]">{overallConsistency}%</p><p className="mt-1 text-[8px] uppercase tracking-[0.16em] text-white/45">consistent</p></div></div></div>
                     <div><p className="text-xs uppercase tracking-[0.13em] text-white/40">You showed up</p><p className="mt-1 text-3xl font-semibold tracking-[-0.04em]">24 days</p><p className="mt-2 max-w-[180px] text-xs leading-5 text-white/45">A month built one quiet check-in at a time.</p></div>
                   </div>
 
-                  <div className="relative mt-9 border-t border-white/10 pt-6"><div className="flex items-end justify-between"><div><p className="text-[9px] font-semibold uppercase tracking-[0.17em] text-[#f0c77a]">Side quests cleared</p><p className="mt-1 text-2xl font-semibold">{completedQuests.length} wins</p></div><span className="text-xs text-white/35">{monthLabel}</span></div><div className="mt-5 space-y-3">{completedQuests.map((quest, index) => <div className="flex items-center gap-3 border-b border-white/10 pb-3" key={quest}><span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#f0c77a] text-[#123f32]"><Check size={15} strokeWidth={2.4} /></span><div><p className="text-[9px] uppercase tracking-[0.13em] text-white/35">Quest 0{index + 1}</p><p className="mt-0.5 text-sm font-semibold">{quest}</p></div></div>)}</div></div>
+                  <div className="relative mt-9 border-t border-white/10 pt-6"><div className="flex items-end justify-between"><div><p className="text-[9px] font-semibold uppercase tracking-[0.17em] text-[var(--chart-primary)]">Side quests cleared</p><p className="mt-1 text-2xl font-semibold">{completedQuests.length} wins</p></div><span className="text-xs text-white/35">{monthLabel}</span></div><div className="mt-5 space-y-3">{completedQuests.map((quest, index) => <div className="flex items-center gap-3 border-b border-white/10 pb-3" key={quest}><span className="grid size-8 shrink-0 place-items-center rounded-full bg-[var(--chart-primary)] text-[var(--chart-deep)]"><Check size={15} strokeWidth={2.4} /></span><div><p className="text-[9px] uppercase tracking-[0.13em] text-white/35">Quest 0{index + 1}</p><p className="mt-0.5 text-sm font-semibold">{quest}</p></div></div>)}</div></div>
                   <div className="absolute bottom-7 left-8 right-8 flex items-center justify-between text-[9px] uppercase tracking-[0.14em] text-white/30"><span>Small steps, visible proof.</span><span>aduvia</span></div>
                 </div>
               </div>
