@@ -84,7 +84,7 @@ function RhythmActiveBar({ height = 0, payload, width = 0, x = 0, y = 0 }: { hei
 function DailyConsistencyTooltip({ active, monthName, payload }: { active?: boolean; monthName: string; payload?: Array<{ payload: { day: number; score: number } }> }) {
   if (!active || !payload?.[0]) return null;
   const point = payload[0].payload;
-  return <div className="rounded-full border border-white/80 bg-[#fffdf8]/95 px-4 py-2 text-xs font-bold text-[#173f32] shadow-[0_12px_32px_-12px_rgba(23,63,50,.4)] backdrop-blur-xl">{monthName.slice(0, 3)} {point.day} · {point.score}%</div>;
+  return <div className="rounded-full border border-white/80 bg-[color:color-mix(in_srgb,var(--theme-paper)_95%,transparent)] px-4 py-2 text-xs font-bold text-[var(--chart-deep)] shadow-[0_12px_32px_-12px_rgba(23,63,50,.4)] backdrop-blur-xl">{monthName.slice(0, 3)} {point.day} · {point.score}%</div>;
 }
 
 function buildDays(seed: number, weekdaysOnly = false, year = 2026, month = 7): CellState[] {
@@ -99,10 +99,10 @@ function buildDays(seed: number, weekdaysOnly = false, year = 2026, month = 7): 
 
 function createReportHabits(year: number, month: number): ReportHabit[] {
   return [
-    { id: "walk", name: "Morning walk", color: "#174f3a", days: buildDays(1, false, year, month) },
-    { id: "deep-work", name: "Deep work", color: "#3d6678", days: buildDays(2, true, year, month) },
-    { id: "read", name: "Read 20 pages", color: "#876f47", days: buildDays(3, false, year, month) },
-    { id: "meditate", name: "Meditate", color: "#9c4b38", days: buildDays(4, false, year, month) },
+    { id: "walk", name: "Morning walk", color: "var(--chart-green)", days: buildDays(1, false, year, month) },
+    { id: "deep-work", name: "Deep work", color: "var(--chart-blue)", days: buildDays(2, true, year, month) },
+    { id: "read", name: "Read 20 pages", color: "var(--chart-ink)", days: buildDays(3, false, year, month) },
+    { id: "meditate", name: "Meditate", color: "var(--chart-rust)", days: buildDays(4, false, year, month) },
   ];
 }
 
@@ -248,7 +248,7 @@ export function MonthlyReport() {
               </div>
             </article>
 
-            <article className="relative overflow-hidden rounded-[64px_28px_64px_64px] border border-white/70 bg-[#fffaf0]/90 p-6 shadow-[0_24px_60px_-38px_rgba(39,56,47,.4)] sm:p-7">
+            <article className="relative overflow-hidden rounded-[64px_28px_64px_64px] border border-white/70 bg-[color:color-mix(in_srgb,var(--theme-paper)_90%,transparent)] p-6 shadow-[0_24px_60px_-38px_rgba(39,56,47,.4)] sm:p-7">
               <div className="absolute -right-14 -top-14 size-40 rounded-full bg-[color-mix(in_srgb,var(--chart-primary)_12%,transparent)]" />
               <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">Life balance</p><h2 className="mt-2 text-xl font-semibold tracking-[-0.03em]">Where your effort went</h2><p className="mt-2 text-xs text-stone-400">Share of completed activity this month</p></div>
               <div className="relative mx-auto mt-3 h-56 max-w-[280px]">
@@ -260,16 +260,16 @@ export function MonthlyReport() {
           </section>
 
           <section className="mt-6 grid items-center gap-7 lg:grid-cols-[0.5fr_1.5fr]">
-            <article className="relative mx-auto flex aspect-square w-full max-w-[310px] flex-col items-center justify-center overflow-hidden rounded-full bg-[#dfe8ed] p-10 text-center text-[#284f61] shadow-[0_26px_60px_-34px_rgba(40,79,97,.5)] lg:mx-0"><div className="absolute -right-10 -top-10 size-36 rounded-full border-[26px] border-white/25" /><p className="absolute left-1/2 top-12 -translate-x-1/2 whitespace-nowrap text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Best day</p><div className="relative -translate-y-1"><p className="text-4xl font-semibold tracking-[-0.05em]">Wednesday</p><p className="mx-auto mt-2 max-w-[230px] text-sm leading-5 opacity-60">Your midweek momentum peak.</p></div><span className="absolute bottom-9 left-1/2 grid size-11 -translate-x-1/2 place-items-center rounded-full bg-[#284f61] text-xl text-white">↗</span></article>
+            <article className="relative mx-auto flex aspect-square w-full max-w-[310px] flex-col items-center justify-center overflow-hidden rounded-full bg-[var(--soft-tint-c)] p-10 text-center text-[var(--soft-icon-blue)] shadow-[0_26px_60px_-34px_rgba(40,79,97,.5)] lg:mx-0"><div className="absolute -right-10 -top-10 size-36 rounded-full border-[26px] border-white/25" /><p className="absolute left-1/2 top-12 -translate-x-1/2 whitespace-nowrap text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Best day</p><div className="relative -translate-y-1"><p className="text-4xl font-semibold tracking-[-0.05em]">Wednesday</p><p className="mx-auto mt-2 max-w-[230px] text-sm leading-5 opacity-60">Your midweek momentum peak.</p></div><span className="absolute bottom-9 left-1/2 grid size-11 -translate-x-1/2 place-items-center rounded-full bg-[var(--soft-icon-blue)] text-xl text-white">↗</span></article>
             <article className="overflow-hidden rounded-[52px] bg-[var(--chart-surface)] p-6 text-[var(--chart-ink)] shadow-[0_28px_65px_-42px_rgba(110,91,60,.55)] sm:p-8"><div><p className="text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Weekly rhythm</p><p className="mt-2 text-xl font-semibold">Completion by weekday</p></div><div className="mt-4 h-36"><ResponsiveContainer height="100%" width="100%"><BarChart data={weekdayRhythm} margin={{ top: 42 }}><XAxis axisLine={false} dataKey="day" tick={{ fill: "var(--chart-ink)", fontSize: 10 }} tickLine={false} /><Tooltip content={() => null} cursor={false} /><Bar activeBar={<RhythmActiveBar />} dataKey="score" fill="var(--chart-ink)" radius={[18, 18, 18, 18]} /></BarChart></ResponsiveContainer></div></article>
           </section>
 
-          <section className="mt-7 rounded-[44px] border border-white/70 bg-[#f8fbf7]/80 p-4 shadow-[0_26px_70px_-48px_rgba(34,61,49,.42)] sm:p-7">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-xl font-semibold">Daily consistency map</h2><p className="mt-1 text-sm text-stone-500">Tap a scheduled day to correct its completion.</p></div><div className="flex gap-3 text-xs text-stone-500"><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[#174f3a]" />Done</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[#f4dfd9]" />Missed</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-stone-200" />Not scheduled</span></div></div>
-            <div className="mt-6 overflow-x-auto rounded-2xl border border-black/[0.06] bg-[#fffdf8]">
+          <section className="mt-7 rounded-[44px] border border-white/70 bg-[color:color-mix(in_srgb,var(--soft-surface)_80%,transparent)] p-4 shadow-[0_26px_70px_-48px_rgba(34,61,49,.42)] sm:p-7">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-xl font-semibold">Daily consistency map</h2><p className="mt-1 text-sm text-[var(--soft-muted)]">Tap a scheduled day to correct its completion.</p></div><div className="flex gap-3 text-xs text-[var(--soft-muted)]"><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--chart-green)]" />Done</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--theme-missed)]" />Missed</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--theme-muted-cell)]" />Not scheduled</span></div></div>
+            <div className="mt-6 overflow-x-auto rounded-2xl border border-black/[0.06] bg-[var(--theme-paper)]">
               <table className="table-fixed border-separate border-spacing-0 text-xs" style={{ minWidth: `${256 + daysInMonth * 40}px`, width: `max(100%, ${256 + daysInMonth * 40}px)` }}>
-                <thead><tr><th className="sticky left-0 z-10 w-44 border-b border-r border-black/[0.07] bg-[#eee9dc] px-4 py-3 text-left font-semibold">Habit</th>{Array.from({ length: daysInMonth }, (_, index) => <th className={`w-10 border-b border-black/[0.06] py-3 text-center font-medium ${index + 1 === 5 ? "bg-[#f3e7ca] text-[#876f47]" : "text-stone-400"}`} key={index}>{index + 1}</th>)}<th className="sticky right-0 z-10 w-20 border-b border-l border-black/[0.07] bg-[#eee9dc] px-2 font-semibold">Score</th></tr></thead>
-                <tbody>{habits.map((habit) => <tr key={habit.id}><th className="sticky left-0 z-10 border-b border-r border-black/[0.06] bg-[#fffdf8] px-4 py-3 text-left font-medium"><span className="mr-2 inline-block size-2 rounded-full" style={{ backgroundColor: habit.color }} />{habit.name}</th>{habit.days.map((state, dayIndex) => <td className={`border-b border-black/[0.04] p-1 ${dayIndex + 1 === 5 ? "bg-[#fbf5e8]" : ""}`} key={dayIndex}><button aria-label={`${habit.name}, ${monthName} ${dayIndex + 1}: ${state}`} className={`grid size-8 place-items-center rounded-lg text-[11px] font-bold transition ${state === "done" ? "bg-[#174f3a] text-white hover:bg-[#9c4b38]" : state === "missed" ? "bg-[#f4dfd9] text-[#9c4b38] hover:bg-[#174f3a] hover:text-white" : "cursor-default bg-stone-100 text-stone-300"}`} disabled={state === "off"} onClick={() => toggleCell(habit.id, dayIndex)} type="button">{state === "done" ? "✓" : state === "missed" ? "·" : "–"}</button></td>)}<td className="sticky right-0 z-10 border-b border-l border-black/[0.06] bg-[#fffdf8] text-center font-semibold text-[#174f3a]">{habitConsistency(habit)}%</td></tr>)}</tbody>
+                <thead><tr><th className="sticky left-0 z-10 w-44 border-b border-r border-black/[0.07] bg-[var(--theme-paper-warm)] px-4 py-3 text-left font-semibold">Habit</th>{Array.from({ length: daysInMonth }, (_, index) => <th className={`w-10 border-b border-black/[0.06] py-3 text-center font-medium ${index + 1 === 5 ? "bg-[var(--theme-highlight)] text-[var(--chart-ink)]" : "text-[var(--soft-muted)]"}`} key={index}>{index + 1}</th>)}<th className="sticky right-0 z-10 w-20 border-b border-l border-black/[0.07] bg-[var(--theme-paper-warm)] px-2 font-semibold">Score</th></tr></thead>
+                <tbody>{habits.map((habit) => <tr key={habit.id}><th className="sticky left-0 z-10 border-b border-r border-black/[0.06] bg-[var(--theme-paper)] px-4 py-3 text-left font-medium"><span className="mr-2 inline-block size-2 rounded-full" style={{ backgroundColor: habit.color }} />{habit.name}</th>{habit.days.map((state, dayIndex) => <td className={`border-b border-black/[0.04] p-1 ${dayIndex + 1 === 5 ? "bg-[color:color-mix(in_srgb,var(--theme-highlight)_55%,transparent)]" : ""}`} key={dayIndex}><button aria-label={`${habit.name}, ${monthName} ${dayIndex + 1}: ${state}`} className={`grid size-8 place-items-center rounded-lg text-[11px] font-bold transition ${state === "done" ? "bg-[var(--chart-green)] text-white hover:bg-[var(--chart-rust)]" : state === "missed" ? "bg-[var(--theme-missed)] text-[var(--chart-rust)] hover:bg-[var(--chart-green)] hover:text-white" : "cursor-default bg-[var(--theme-muted-cell)] text-[var(--soft-muted)] opacity-55"}`} disabled={state === "off"} onClick={() => toggleCell(habit.id, dayIndex)} type="button">{state === "done" ? "✓" : state === "missed" ? "·" : "–"}</button></td>)}<td className="sticky right-0 z-10 border-b border-l border-black/[0.06] bg-[var(--theme-paper)] text-center font-semibold text-[var(--chart-green)]">{habitConsistency(habit)}%</td></tr>)}</tbody>
               </table>
               <div aria-label={`Daily consistency across ${monthName}`} className="grid border-t border-white/10 bg-[var(--chart-deep)] text-white" style={{ gridTemplateColumns: `176px minmax(${daysInMonth * 40}px, 1fr) 80px`, minWidth: `${256 + daysInMonth * 40}px`, width: `max(100%, ${256 + daysInMonth * 40}px)` }}>
                 <div className="flex flex-col justify-center border-r border-white/10 px-5"><p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#d5b77c]">{daysInMonth}-day pulse</p><p className="mt-2 text-sm font-semibold leading-5">Daily<br />consistency</p></div>
@@ -279,12 +279,12 @@ export function MonthlyReport() {
             </div>
           </section>
 
-          <section className="mt-7 overflow-hidden rounded-[52px] border border-white/70 bg-[#e8eee9] p-3 shadow-[0_30px_80px_-42px_rgba(28,54,43,.32)] sm:p-5">
+          <section className="mt-7 overflow-hidden rounded-[52px] border border-white/70 bg-[var(--soft-tint-a)] p-3 shadow-[0_30px_80px_-42px_rgba(28,54,43,.32)] sm:p-5">
             <div className="grid gap-5 xl:grid-cols-[0.78fr_1.22fr]">
               <div className="flex flex-col p-4 sm:p-6">
-                <div className="flex size-12 items-center justify-center rounded-2xl bg-[#143d31] text-[#f3c878] shadow-[0_10px_24px_rgba(20,61,49,.18)]"><Share2 size={21} strokeWidth={1.8} /></div>
-                <p className="mt-8 text-xs font-semibold uppercase tracking-[0.17em] text-[#a66c58]">Share studio</p>
-                <h2 className="mt-3 max-w-sm text-4xl font-semibold tracking-[-0.055em] text-[#17251f]">Turn your month into a keepsake.</h2>
+                <div className="flex size-12 items-center justify-center rounded-2xl bg-[var(--chart-deep)] text-[var(--chart-primary)] shadow-[0_10px_24px_rgba(20,61,49,.18)]"><Share2 size={21} strokeWidth={1.8} /></div>
+                <p className="mt-8 text-xs font-semibold uppercase tracking-[0.17em] text-[var(--soft-accent)]">Share studio</p>
+                <h2 className="mt-3 max-w-sm text-4xl font-semibold tracking-[-0.055em] text-[var(--soft-ink)]">Turn your month into a keepsake.</h2>
                 <p className="mt-4 max-w-md text-sm leading-6 text-stone-500">Only consistency and completed quests are included. Notes and missed-day details stay private.</p>
 
                 <fieldset className="mt-9">

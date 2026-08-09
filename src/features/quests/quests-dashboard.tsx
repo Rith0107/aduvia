@@ -32,10 +32,10 @@ const statusLabels: Record<QuestStatus, string> = {
 
 const statusColors: Record<QuestStatus, string> = {
   "not-started": "bg-stone-400",
-  "in-progress": "bg-[#2f7660]",
-  paused: "bg-[#d29a42]",
-  blocked: "bg-[#b46e57]",
-  completed: "bg-[#173f32]",
+  "in-progress": "bg-[var(--soft-icon-green)]",
+  paused: "bg-[var(--soft-icon-gold)]",
+  blocked: "bg-[var(--soft-icon-clay)]",
+  completed: "bg-[var(--soft-ink)]",
 };
 
 export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
@@ -143,7 +143,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
               <div><p className="soft-kicker text-[var(--soft-accent)]">Create a quest</p><h3>What would feel meaningful?</h3><p>Name the result, not the effort it takes to get there.</p></div>
               <label className="creation-field-label" htmlFor="quest-title">Quest title</label>
               <input autoFocus className="creation-field" id="quest-title" onChange={(event) => setTitle(event.target.value)} placeholder="e.g. Publish my portfolio" value={title} />
-              {title.trim() && <div className="flex items-center justify-between rounded-[16px] bg-[#e7eee9] px-4 py-3 text-xs"><span className="font-semibold text-[var(--soft-muted)]">Category detected automatically</span><span className="rounded-full bg-white/70 px-3 py-1.5 font-black text-[#2f6f5e]">{inferQuestCategory(title)}</span></div>}
+              {title.trim() && <div className="flex items-center justify-between rounded-[16px] bg-[var(--soft-tint-a)] px-4 py-3 text-xs"><span className="font-semibold text-[var(--soft-muted)]">Category detected automatically</span><span className="rounded-full bg-white/70 px-3 py-1.5 font-black text-[var(--soft-icon-green)]">{inferQuestCategory(title)}</span></div>}
               <div><p className="creation-field-label">A little inspiration</p><div className="creation-presets creation-presets-quest">{["Finish a course", "Publish my portfolio", "Read one book"].map((preset) => <button aria-pressed={title === preset} key={preset} onClick={() => setTitle(preset)} type="button"><ActivityIcon activity={preset} className="size-4" />{preset}</button>)}</div></div>
               <div className="creation-guidance"><span aria-hidden>◇</span><p><strong>One finish line.</strong> When the outcome exists, the quest is complete.</p></div>
               <div className="creation-actions"><button onClick={() => setIsCreating(false)} type="button">Cancel</button><button disabled={!title.trim()} type="submit"><span>Create quest</span><span aria-hidden>→</span></button></div>
