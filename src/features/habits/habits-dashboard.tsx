@@ -6,6 +6,7 @@ import { Flag, Flame, Gauge, ListChecks } from "lucide-react";
 
 import { AppShell } from "@/components/app-shell";
 import { ActivityIcon } from "@/components/activity-icon";
+import { scheduledDaysFor, useAppData } from "@/lib/app-data";
 import type { HabitDay, HabitFrequency, HabitSummary } from "./types";
 
 type HabitsDashboardProps = { initialHabits: HabitSummary[] };
@@ -16,16 +17,11 @@ const days: { short: HabitDay; label: string }[] = [
   { short: "Sun", label: "Sunday" },
 ];
 
-function scheduledDaysFor(habit: HabitSummary): HabitDay[] {
-  if (habit.scheduledDays?.length) return habit.scheduledDays;
-  if (habit.frequency === "Daily") return days.map((day) => day.short);
-  if (habit.frequency === "Weekdays") return ["Mon", "Tue", "Wed", "Thu", "Fri"];
-  if (habit.frequency === "3× weekly") return ["Mon", "Wed", "Fri"];
-  return [];
-}
-
 export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
-  const [habits, setHabits] = useState(initialHabits);
+  const appData = useAppData();
+  const [localHabits, setLocalHabits] = useState(initialHabits);
+  const habits = appData?.habits ?? localHabits;
+  const setHabits = appData?.setHabits ?? setLocalHabits;
   const [filter, setFilter] = useState<"all" | "active" | "paused">("all");
   const [isCreating, setIsCreating] = useState(false);
   const [name, setName] = useState("");

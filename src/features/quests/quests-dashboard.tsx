@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 
 import { AppShell } from "@/components/app-shell";
 import { ActivityIcon } from "@/components/activity-icon";
+import { useAppData } from "@/lib/app-data";
 import type { QuestStatus, QuestSummary } from "./types";
 
 type QuestsDashboardProps = { initialQuests: QuestSummary[] };
@@ -39,7 +40,10 @@ const statusColors: Record<QuestStatus, string> = {
 };
 
 export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
-  const [quests, setQuests] = useState(initialQuests);
+  const appData = useAppData();
+  const [localQuests, setLocalQuests] = useState(initialQuests);
+  const quests = appData?.quests ?? localQuests;
+  const setQuests = appData?.setQuests ?? setLocalQuests;
   const [filter, setFilter] = useState<"all" | QuestStatus>("all");
   const [isCreating, setIsCreating] = useState(false);
   const [title, setTitle] = useState("");

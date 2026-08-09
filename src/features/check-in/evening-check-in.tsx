@@ -8,11 +8,15 @@ import type { TodayHabit } from "@/features/today/types";
 import { ActivityIcon } from "@/components/activity-icon";
 import { BrandLogo } from "@/components/brand-logo";
 import { PaletteChooser } from "@/components/palette-chooser";
+import { todaysHabits, useAppData } from "@/lib/app-data";
 
 type EveningCheckInProps = { initialHabits: TodayHabit[] };
 
 export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
-  const [habits, setHabits] = useState<TodayHabit[]>(initialHabits.map((habit) => ({ ...habit, completion: 0, status: "pending" })));
+  const appData = useAppData();
+  const sharedHabits = appData ? todaysHabits(appData.habits, appData.completions) : null;
+  const [localHabits, setLocalHabits] = useState<TodayHabit[]>(initialHabits.map((habit) => ({ ...habit, completion: 0, status: "pending" })));
+  const habits = sharedHabits ?? localHabits;
   const [isFinished, setIsFinished] = useState(false);
   const completedCount = habits.filter((habit) => habit.status === "complete").length;
   const answeredCount = habits.filter((habit) => habit.status !== "pending").length;
@@ -20,7 +24,8 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
   const allAnswered = habits.every((habit) => habit.status !== "pending");
 
   function setHabitStatus(id: string, completed: boolean) {
-    setHabits((current) => current.map((habit) => habit.id === id ? { ...habit, status: completed ? "complete" : "skipped", completion: completed ? 1 : 0 } : habit));
+    if (appData) appData.setHabitStatus(id, completed ? "complete" : "skipped");
+    else setLocalHabits((current) => current.map((habit) => habit.id === id ? { ...habit, status: completed ? "complete" : "skipped", completion: completed ? 1 : 0 } : habit));
   }
 
   if (isFinished) {
