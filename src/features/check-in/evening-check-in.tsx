@@ -7,6 +7,7 @@ import { calculateRoutineEfficiency } from "@/lib/metrics";
 import type { TodayHabit } from "@/features/today/types";
 import { ActivityIcon } from "@/components/activity-icon";
 import { BrandLogo } from "@/components/brand-logo";
+import { PaletteChooser } from "@/components/palette-chooser";
 
 type EveningCheckInProps = { initialHabits: TodayHabit[] };
 
@@ -45,7 +46,7 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
         <div className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col justify-center px-5 py-6 sm:px-9 sm:py-8">
           <header className="mb-5 flex items-center justify-between px-1 sm:mb-6">
             <BrandLogo />
-            <span className="evening-mode-pill"><span aria-hidden="true">☾</span> Evening mode</span>
+            <div className="flex items-center gap-2"><PaletteChooser /><span className="evening-mode-pill"><span aria-hidden="true">☾</span> Evening mode</span></div>
           </header>
           <div className="evening-intro">
             <div>
