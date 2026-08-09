@@ -59,7 +59,7 @@ function TrendActiveDot({ cx = 0, cy = 0, payload }: { cx?: number; cy?: number;
 
   return (
     <g aria-label={`Week of ${payload.label}: ${payload.score}% consistency`}>
-      <rect fill="#f8f2e7" height="34" rx="17" stroke="rgba(255,255,255,.75)" width="118" x={cx - 59} y={cy - 48} />
+      <rect fill="var(--theme-paper)" height="34" rx="17" stroke="rgba(255,255,255,.75)" width="118" x={cx - 59} y={cy - 48} />
       <text fill="var(--chart-deep)" fontSize="12" fontWeight="700" textAnchor="middle" x={cx} y={cy - 27}>{payload.label} · {payload.score}%</text>
       <circle cx={cx} cy={cy} fill="var(--chart-primary)" r="6" stroke="#fffaf0" strokeWidth="3" />
     </g>
@@ -75,7 +75,7 @@ function RhythmActiveBar({ height = 0, payload, width = 0, x = 0, y = 0 }: { hei
   return (
     <g aria-label={`${payload.name}: ${payload.score}% completion`}>
       <rect fill="var(--chart-ink)" height={height} rx="7" width={width} x={x} y={y} />
-      <rect fill="#fffaf0" height="30" rx="15" stroke="rgba(135,111,71,.16)" width={labelWidth} x={labelX} y={y - 38} />
+      <rect fill="var(--theme-paper)" height="30" rx="15" stroke="rgba(135,111,71,.16)" width={labelWidth} x={labelX} y={y - 38} />
       <text fill="var(--chart-ink)" fontSize="11" fontWeight="700" textAnchor="middle" x={x + width / 2} y={y - 19}>{payload.name} · {payload.score}%</text>
     </g>
   );
@@ -242,7 +242,7 @@ export function MonthlyReport() {
               <div className="absolute -right-20 -top-20 size-64 rounded-full border-[46px] border-[color-mix(in_srgb,var(--chart-primary)_12%,transparent)]" />
               <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                 <div><p className="text-xs font-semibold uppercase tracking-[0.17em] text-[var(--chart-primary)]">Consistency signal</p><p className="mt-4 text-6xl font-semibold tracking-[-0.065em]">{overallConsistency}%</p><p className="mt-1 text-sm text-white/50">Up 8 points from July</p><p className="mt-5 inline-flex rounded-full bg-white/[0.08] px-3 py-2 text-xs font-medium text-white/70">You showed up on 24 days this month</p></div>
-                <div className="grid grid-cols-7 gap-1.5 rounded-2xl bg-white/[0.06] p-4" aria-label={`${monthName} activity heatmap`}>{Array.from({ length: Math.ceil(daysInMonth / 7) * 7 }, (_, index) => { const point = dailyConsistency[index]; const state = !point ? "" : point.score >= 75 ? "high activity" : point.score >= 50 ? "partial activity" : "low activity"; return <span aria-label={point ? `${monthName} ${point.day}: ${state}` : undefined} className={`size-3 rounded-[4px] ${!point ? "bg-transparent" : point.score >= 75 ? "bg-[var(--chart-green)]" : point.score >= 50 ? "bg-[var(--chart-primary)]" : "bg-[var(--chart-rust)] opacity-75"}`} key={index} title={point ? `${monthName} ${point.day} · ${point.score}%` : undefined} />; })}</div>
+                <div className="grid grid-cols-7 gap-1.5 rounded-2xl bg-white/[0.08] p-4" aria-label={`${monthName} activity heatmap`}>{Array.from({ length: Math.ceil(daysInMonth / 7) * 7 }, (_, index) => { const point = dailyConsistency[index]; const state = !point ? "" : point.score >= 75 ? "high activity" : point.score >= 50 ? "partial activity" : "low activity"; return <span aria-label={point ? `${monthName} ${point.day}: ${state}` : undefined} className={`size-3 rounded-[4px] ${!point ? "bg-transparent" : point.score >= 75 ? "bg-[var(--heatmap-high)]" : point.score >= 50 ? "bg-[var(--heatmap-mid)]" : "bg-[var(--heatmap-low)]"}`} key={index} title={point ? `${monthName} ${point.day} · ${point.score}%` : undefined} />; })}</div>
               </div>
               <div className="relative mt-7"><p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/45">Weekly consistency trend</p></div>
               <div className="relative mt-8 h-52 w-full">
