@@ -38,10 +38,10 @@ const consistencyTrend = [
 ];
 
 const categoryBalance = [
-  { name: "Growth", value: 34, color: "#174f3a" },
-  { name: "Wellbeing", value: 28, color: "#d89a42" },
-  { name: "Career", value: 23, color: "#3d6678" },
-  { name: "Creative", value: 15, color: "#9c4b38" },
+  { name: "Growth", value: 34, color: "var(--chart-green)" },
+  { name: "Wellbeing", value: 28, color: "var(--chart-primary)" },
+  { name: "Career", value: 23, color: "var(--chart-blue)" },
+  { name: "Creative", value: 15, color: "var(--chart-rust)" },
 ];
 
 const weekdayRhythm = [
@@ -60,8 +60,8 @@ function TrendActiveDot({ cx = 0, cy = 0, payload }: { cx?: number; cy?: number;
   return (
     <g aria-label={`Week of ${payload.label}: ${payload.score}% consistency`}>
       <rect fill="#f8f2e7" height="34" rx="17" stroke="rgba(255,255,255,.75)" width="118" x={cx - 59} y={cy - 48} />
-      <text fill="#173d31" fontSize="12" fontWeight="700" textAnchor="middle" x={cx} y={cy - 27}>{payload.label} · {payload.score}%</text>
-      <circle cx={cx} cy={cy} fill="#d89a42" r="6" stroke="#fffaf0" strokeWidth="3" />
+      <text fill="var(--chart-deep)" fontSize="12" fontWeight="700" textAnchor="middle" x={cx} y={cy - 27}>{payload.label} · {payload.score}%</text>
+      <circle cx={cx} cy={cy} fill="var(--chart-primary)" r="6" stroke="#fffaf0" strokeWidth="3" />
     </g>
   );
 }
@@ -74,9 +74,9 @@ function RhythmActiveBar({ height = 0, payload, width = 0, x = 0, y = 0 }: { hei
 
   return (
     <g aria-label={`${payload.name}: ${payload.score}% completion`}>
-      <rect fill="#876f47" height={height} rx="7" width={width} x={x} y={y} />
+      <rect fill="var(--chart-ink)" height={height} rx="7" width={width} x={x} y={y} />
       <rect fill="#fffaf0" height="30" rx="15" stroke="rgba(135,111,71,.16)" width={labelWidth} x={labelX} y={y - 38} />
-      <text fill="#6e5b3c" fontSize="11" fontWeight="700" textAnchor="middle" x={x + width / 2} y={y - 19}>{payload.name} · {payload.score}%</text>
+      <text fill="var(--chart-ink)" fontSize="11" fontWeight="700" textAnchor="middle" x={x + width / 2} y={y - 19}>{payload.name} · {payload.score}%</text>
     </g>
   );
 }
@@ -228,8 +228,8 @@ export function MonthlyReport() {
     <AppShell active="Insights" eyebrow="Monthly review" title={<>Your month,<br />in motion.</>} action={<div className="flex items-center gap-2 rounded-full bg-white/45 p-1 text-xs font-bold"><button aria-label="Previous month" className="rounded-full px-3 py-2 transition hover:bg-white/60" onClick={() => changeMonth(-1)} type="button">←</button><span className="min-w-28 px-2 text-center">{monthLabel}</span><button aria-label="Next month" className="rounded-full px-3 py-2 transition hover:bg-white/60" onClick={() => changeMonth(1)} type="button">→</button></div>}>
       <div className="insights-flow">
           <section className="mt-12 grid gap-4 xl:grid-cols-[1.35fr_0.75fr]">
-            <article className="relative overflow-hidden rounded-[44px_44px_96px_44px] bg-[#143d31] p-6 text-white shadow-[0_28px_70px_-30px_rgba(20,61,49,0.55)] sm:p-8">
-              <div className="absolute -right-20 -top-20 size-64 rounded-full border-[46px] border-[#d89a42]/10" />
+            <article className="relative overflow-hidden rounded-[44px_44px_96px_44px] bg-[var(--chart-deep)] p-6 text-white shadow-[0_28px_70px_-30px_rgba(20,61,49,0.55)] sm:p-8">
+              <div className="absolute -right-20 -top-20 size-64 rounded-full border-[46px] border-[color-mix(in_srgb,var(--chart-primary)_12%,transparent)]" />
               <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                 <div><p className="text-xs font-semibold uppercase tracking-[0.17em] text-[#d5b77c]">Consistency signal</p><p className="mt-4 text-6xl font-semibold tracking-[-0.065em]">{overallConsistency}%</p><p className="mt-1 text-sm text-white/50">Up 8 points from July</p><p className="mt-5 inline-flex rounded-full bg-white/[0.08] px-3 py-2 text-xs font-medium text-[#c7dbd2]">You showed up on 24 days this month</p></div>
                 <div className="grid grid-cols-7 gap-1.5 rounded-2xl bg-white/[0.06] p-4" aria-label={`${monthName} activity heatmap`}>{Array.from({ length: Math.ceil(daysInMonth / 7) * 7 }, (_, index) => { const point = dailyConsistency[index]; const state = !point ? "" : point.score >= 75 ? "high activity" : point.score >= 50 ? "partial activity" : "low activity"; return <span aria-label={point ? `${monthName} ${point.day}: ${state}` : undefined} className={`size-3 rounded-[4px] ${!point ? "bg-transparent" : point.score >= 75 ? "bg-[#8eb5a6]" : point.score >= 50 ? "bg-[#d89a42]" : "bg-[#9c4b38]/70"}`} key={index} title={point ? `${monthName} ${point.day} · ${point.score}%` : undefined} />; })}</div>
@@ -238,18 +238,18 @@ export function MonthlyReport() {
               <div className="relative mt-8 h-52 w-full">
                 <ResponsiveContainer height="100%" width="100%">
                   <AreaChart data={consistencyTrend} margin={{ left: 0, right: 8, top: 52, bottom: 0 }}>
-                    <defs><linearGradient id="consistencyFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="#d89a42" stopOpacity={0.5} /><stop offset="100%" stopColor="#d89a42" stopOpacity={0} /></linearGradient></defs>
+                    <defs><linearGradient id="consistencyFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="var(--chart-primary)" stopOpacity={0.5} /><stop offset="100%" stopColor="var(--chart-primary)" stopOpacity={0} /></linearGradient></defs>
                     <CartesianGrid stroke="rgba(255,255,255,0.08)" strokeDasharray="3 6" vertical={false} />
                     <XAxis axisLine={false} dataKey="label" tick={{ fill: "rgba(255,255,255,0.42)", fontSize: 10 }} tickLine={false} />
                     <Tooltip content={() => null} cursor={{ stroke: "rgba(216,154,66,.3)", strokeWidth: 2 }} />
-                    <Area activeDot={<TrendActiveDot />} dataKey="score" fill="url(#consistencyFill)" stroke="#d89a42" strokeWidth={3} type="monotone" />
+                    <Area activeDot={<TrendActiveDot />} dataKey="score" fill="url(#consistencyFill)" stroke="var(--chart-primary)" strokeWidth={3} type="monotone" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
             </article>
 
             <article className="relative overflow-hidden rounded-[64px_28px_64px_64px] border border-white/70 bg-[#fffaf0]/90 p-6 shadow-[0_24px_60px_-38px_rgba(39,56,47,.4)] sm:p-7">
-              <div className="absolute -right-14 -top-14 size-40 rounded-full bg-[#d89a42]/10" />
+              <div className="absolute -right-14 -top-14 size-40 rounded-full bg-[color-mix(in_srgb,var(--chart-primary)_12%,transparent)]" />
               <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">Life balance</p><h2 className="mt-2 text-xl font-semibold tracking-[-0.03em]">Where your effort went</h2><p className="mt-2 text-xs text-stone-400">Share of completed activity this month</p></div>
               <div className="relative mx-auto mt-3 h-56 max-w-[280px]">
                 <ResponsiveContainer height="100%" width="100%"><PieChart><Pie cx="50%" cy="50%" data={categoryBalance} dataKey="value" innerRadius={62} nameKey="name" outerRadius={91} paddingAngle={4} stroke="none">{categoryBalance.map((entry) => <Cell fill={entry.color} key={entry.name} />)}</Pie></PieChart></ResponsiveContainer>
@@ -261,7 +261,7 @@ export function MonthlyReport() {
 
           <section className="mt-6 grid items-center gap-7 lg:grid-cols-[0.5fr_1.5fr]">
             <article className="relative mx-auto flex aspect-square w-full max-w-[310px] flex-col items-center justify-center overflow-hidden rounded-full bg-[#dfe8ed] p-10 text-center text-[#284f61] shadow-[0_26px_60px_-34px_rgba(40,79,97,.5)] lg:mx-0"><div className="absolute -right-10 -top-10 size-36 rounded-full border-[26px] border-white/25" /><p className="absolute left-1/2 top-12 -translate-x-1/2 whitespace-nowrap text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Best day</p><div className="relative -translate-y-1"><p className="text-4xl font-semibold tracking-[-0.05em]">Wednesday</p><p className="mx-auto mt-2 max-w-[230px] text-sm leading-5 opacity-60">Your midweek momentum peak.</p></div><span className="absolute bottom-9 left-1/2 grid size-11 -translate-x-1/2 place-items-center rounded-full bg-[#284f61] text-xl text-white">↗</span></article>
-            <article className="overflow-hidden rounded-[52px] bg-[#f3e7ca] p-6 text-[#6e5b3c] shadow-[0_28px_65px_-42px_rgba(110,91,60,.55)] sm:p-8"><div><p className="text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Weekly rhythm</p><p className="mt-2 text-xl font-semibold">Completion by weekday</p></div><div className="mt-4 h-36"><ResponsiveContainer height="100%" width="100%"><BarChart data={weekdayRhythm} margin={{ top: 42 }}><XAxis axisLine={false} dataKey="day" tick={{ fill: "#876f47", fontSize: 10 }} tickLine={false} /><Tooltip content={() => null} cursor={false} /><Bar activeBar={<RhythmActiveBar />} dataKey="score" fill="#876f47" radius={[18, 18, 18, 18]} /></BarChart></ResponsiveContainer></div></article>
+            <article className="overflow-hidden rounded-[52px] bg-[var(--chart-surface)] p-6 text-[var(--chart-ink)] shadow-[0_28px_65px_-42px_rgba(110,91,60,.55)] sm:p-8"><div><p className="text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Weekly rhythm</p><p className="mt-2 text-xl font-semibold">Completion by weekday</p></div><div className="mt-4 h-36"><ResponsiveContainer height="100%" width="100%"><BarChart data={weekdayRhythm} margin={{ top: 42 }}><XAxis axisLine={false} dataKey="day" tick={{ fill: "var(--chart-ink)", fontSize: 10 }} tickLine={false} /><Tooltip content={() => null} cursor={false} /><Bar activeBar={<RhythmActiveBar />} dataKey="score" fill="var(--chart-ink)" radius={[18, 18, 18, 18]} /></BarChart></ResponsiveContainer></div></article>
           </section>
 
           <section className="mt-7 rounded-[44px] border border-white/70 bg-[#f8fbf7]/80 p-4 shadow-[0_26px_70px_-48px_rgba(34,61,49,.42)] sm:p-7">
@@ -271,9 +271,9 @@ export function MonthlyReport() {
                 <thead><tr><th className="sticky left-0 z-10 w-44 border-b border-r border-black/[0.07] bg-[#eee9dc] px-4 py-3 text-left font-semibold">Habit</th>{Array.from({ length: daysInMonth }, (_, index) => <th className={`w-10 border-b border-black/[0.06] py-3 text-center font-medium ${index + 1 === 5 ? "bg-[#f3e7ca] text-[#876f47]" : "text-stone-400"}`} key={index}>{index + 1}</th>)}<th className="sticky right-0 z-10 w-20 border-b border-l border-black/[0.07] bg-[#eee9dc] px-2 font-semibold">Score</th></tr></thead>
                 <tbody>{habits.map((habit) => <tr key={habit.id}><th className="sticky left-0 z-10 border-b border-r border-black/[0.06] bg-[#fffdf8] px-4 py-3 text-left font-medium"><span className="mr-2 inline-block size-2 rounded-full" style={{ backgroundColor: habit.color }} />{habit.name}</th>{habit.days.map((state, dayIndex) => <td className={`border-b border-black/[0.04] p-1 ${dayIndex + 1 === 5 ? "bg-[#fbf5e8]" : ""}`} key={dayIndex}><button aria-label={`${habit.name}, ${monthName} ${dayIndex + 1}: ${state}`} className={`grid size-8 place-items-center rounded-lg text-[11px] font-bold transition ${state === "done" ? "bg-[#174f3a] text-white hover:bg-[#9c4b38]" : state === "missed" ? "bg-[#f4dfd9] text-[#9c4b38] hover:bg-[#174f3a] hover:text-white" : "cursor-default bg-stone-100 text-stone-300"}`} disabled={state === "off"} onClick={() => toggleCell(habit.id, dayIndex)} type="button">{state === "done" ? "✓" : state === "missed" ? "·" : "–"}</button></td>)}<td className="sticky right-0 z-10 border-b border-l border-black/[0.06] bg-[#fffdf8] text-center font-semibold text-[#174f3a]">{habitConsistency(habit)}%</td></tr>)}</tbody>
               </table>
-              <div aria-label={`Daily consistency across ${monthName}`} className="grid border-t border-white/10 bg-[#173f32] text-white" style={{ gridTemplateColumns: `176px minmax(${daysInMonth * 40}px, 1fr) 80px`, minWidth: `${256 + daysInMonth * 40}px`, width: `max(100%, ${256 + daysInMonth * 40}px)` }}>
+              <div aria-label={`Daily consistency across ${monthName}`} className="grid border-t border-white/10 bg-[var(--chart-deep)] text-white" style={{ gridTemplateColumns: `176px minmax(${daysInMonth * 40}px, 1fr) 80px`, minWidth: `${256 + daysInMonth * 40}px`, width: `max(100%, ${256 + daysInMonth * 40}px)` }}>
                 <div className="flex flex-col justify-center border-r border-white/10 px-5"><p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#d5b77c]">{daysInMonth}-day pulse</p><p className="mt-2 text-sm font-semibold leading-5">Daily<br />consistency</p></div>
-                <div className="h-52"><ResponsiveContainer height="100%" width="100%"><AreaChart data={dailyConsistency} margin={{ bottom: 8, left: 0, right: 0, top: 28 }}><defs><linearGradient id="dailyConsistencyFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="#d89a42" stopOpacity={0.5} /><stop offset="100%" stopColor="#d89a42" stopOpacity={0.03} /></linearGradient></defs><CartesianGrid stroke="rgba(255,255,255,.08)" strokeDasharray="3 7" vertical={false} /><XAxis axisLine={false} dataKey="day" domain={[0.5, daysInMonth + 0.5]} hide type="number" /><Tooltip content={<DailyConsistencyTooltip monthName={monthName} />} cursor={{ stroke: "rgba(216,154,66,.32)", strokeWidth: 2 }} /><Area activeDot={{ fill: "#d89a42", r: 5, stroke: "#fffaf0", strokeWidth: 3 }} dataKey="score" fill="url(#dailyConsistencyFill)" isAnimationActive={false} stroke="#d89a42" strokeWidth={2.5} type="monotone" /></AreaChart></ResponsiveContainer></div>
+                <div className="h-52"><ResponsiveContainer height="100%" width="100%"><AreaChart data={dailyConsistency} margin={{ bottom: 8, left: 0, right: 0, top: 28 }}><defs><linearGradient id="dailyConsistencyFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="var(--chart-primary)" stopOpacity={0.5} /><stop offset="100%" stopColor="var(--chart-primary)" stopOpacity={0.03} /></linearGradient></defs><CartesianGrid stroke="rgba(255,255,255,.08)" strokeDasharray="3 7" vertical={false} /><XAxis axisLine={false} dataKey="day" domain={[0.5, daysInMonth + 0.5]} hide type="number" /><Tooltip content={<DailyConsistencyTooltip monthName={monthName} />} cursor={{ stroke: "var(--chart-primary)", strokeOpacity: .32, strokeWidth: 2 }} /><Area activeDot={{ fill: "var(--chart-primary)", r: 5, stroke: "#fffaf0", strokeWidth: 3 }} dataKey="score" fill="url(#dailyConsistencyFill)" isAnimationActive={false} stroke="var(--chart-primary)" strokeWidth={2.5} type="monotone" /></AreaChart></ResponsiveContainer></div>
                 <div className="flex flex-col items-center justify-center border-l border-white/10 text-center"><p className="text-2xl font-semibold tracking-[-0.04em] text-[#f3c878]">{overallConsistency}%</p><p className="mt-1 text-[8px] font-semibold uppercase leading-3 tracking-[0.12em] text-white/40">Month<br />average</p></div>
               </div>
             </div>

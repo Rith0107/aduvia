@@ -15,7 +15,14 @@
   --soft-icon-clay: #a35f49;
   --soft-icon-blue: #456c85;
   --soft-icon-gold: #9b762f;
-  --paper-line: rgb(41 50 44 / 2.2%);
+  --paper-line: rgb(41 50 44 / 4.8%);
+  --chart-deep: #143d31;
+  --chart-primary: #d89a42;
+  --chart-green: #174f3a;
+  --chart-blue: #3d6678;
+  --chart-rust: #9c4b38;
+  --chart-surface: #f3e7ca;
+  --chart-ink: #6e5b3c;
 }
 
 :root[data-palette="coastal"] {
@@ -31,7 +38,14 @@
   --soft-icon-clay: #b96750;
   --soft-icon-blue: #416f89;
   --soft-icon-gold: #a17b34;
-  --paper-line: rgb(24 50 74 / 2.4%);
+  --paper-line: rgb(24 50 74 / 5%);
+  --chart-deep: #18324a;
+  --chart-primary: #d88467;
+  --chart-green: #39786f;
+  --chart-blue: #557f9a;
+  --chart-rust: #a96878;
+  --chart-surface: #dbe6f3;
+  --chart-ink: #365b71;
 }
 
 :root[data-palette="clay"] {
@@ -47,7 +61,14 @@
   --soft-icon-clay: #a85c45;
   --soft-icon-blue: #65777a;
   --soft-icon-gold: #96702e;
-  --paper-line: rgb(52 56 45 / 2.8%);
+  --paper-line: rgb(52 56 45 / 5.2%);
+  --chart-deep: #34382d;
+  --chart-primary: #a85c45;
+  --chart-green: #66764d;
+  --chart-blue: #65777a;
+  --chart-rust: #b27457;
+  --chart-surface: #e5d8bd;
+  --chart-ink: #6f6044;
 }
 
 @theme inline {
@@ -77,7 +98,7 @@ body::after {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.42'/%3E%3C/svg%3E");
   content: "";
   mix-blend-mode: multiply;
-  opacity: .045;
+  opacity: .075;
   pointer-events: none;
 }
 
@@ -113,7 +134,8 @@ h3 {
 .soft-canvas {
   background:
     repeating-linear-gradient(0deg, transparent 0 31px, var(--paper-line) 31px 32px),
-    repeating-linear-gradient(90deg, transparent 0 119px, color-mix(in srgb, var(--paper-line) 60%, transparent) 119px 120px),
+    repeating-linear-gradient(90deg, transparent 0 119px, color-mix(in srgb, var(--paper-line) 72%, transparent) 119px 120px),
+    repeating-linear-gradient(117deg, transparent 0 47px, color-mix(in srgb, var(--paper-line) 42%, transparent) 47px 48px),
     radial-gradient(circle at 5% 8%, color-mix(in srgb, var(--soft-tint-a) 92%, transparent) 0, transparent 36%),
     radial-gradient(circle at 94% 9%, color-mix(in srgb, var(--soft-tint-b) 90%, transparent) 0, transparent 38%),
     radial-gradient(circle at 72% 72%, color-mix(in srgb, var(--soft-tint-c) 78%, transparent) 0, transparent 35%),
