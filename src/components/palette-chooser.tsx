@@ -7,6 +7,8 @@ const palettes = [
   { id: "forest", label: "Forest Dawn", colors: ["#e7e8e3", "#29322c", "#a86f5b", "#d7e3dc"] },
   { id: "coastal", label: "Coastal Quiet", colors: ["#e5edef", "#18324a", "#d88467", "#badfd8"] },
   { id: "clay", label: "Clay & Moss", colors: ["#ede6d8", "#34382d", "#a85c45", "#c8d2a7"] },
+  { id: "lavender", label: "Lavender Hush", colors: ["#e9e6f0", "#343047", "#9b718f", "#d8d4e8"] },
+  { id: "blue-hour", label: "Blue Hour", colors: ["#dfe8ec", "#243847", "#a06f69", "#cadde1"] },
 ] as const;
 
 type PaletteId = (typeof palettes)[number]["id"];

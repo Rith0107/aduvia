@@ -95,6 +95,66 @@
   --heatmap-low: #b27457;
 }
 
+:root[data-palette="lavender"] {
+  --soft-canvas: #e9e6f0;
+  --soft-surface: #f0edf5;
+  --soft-ink: #343047;
+  --soft-muted: #777187;
+  --soft-accent: #9b718f;
+  --soft-tint-a: #d8d4e8;
+  --soft-tint-b: #ead5df;
+  --soft-tint-c: #d2e1e3;
+  --soft-icon-green: #677e79;
+  --soft-icon-clay: #9b718f;
+  --soft-icon-blue: #676f98;
+  --soft-icon-gold: #9a7b52;
+  --chart-deep: #343047;
+  --chart-primary: #bd8eae;
+  --chart-green: #677e79;
+  --chart-blue: #717ba3;
+  --chart-rust: #a96f7f;
+  --chart-surface: #e5d8e9;
+  --chart-ink: #67546d;
+  --theme-paper: #fbf9fd;
+  --theme-paper-warm: #e5e0ec;
+  --theme-missed: #ead5df;
+  --theme-muted-cell: #e2dfe9;
+  --theme-highlight: #ddd6e9;
+  --heatmap-high: #a9c5bc;
+  --heatmap-mid: #c998b8;
+  --heatmap-low: #be7f8e;
+}
+
+:root[data-palette="blue-hour"] {
+  --soft-canvas: #dfe8ec;
+  --soft-surface: #e9f0f2;
+  --soft-ink: #243847;
+  --soft-muted: #697b85;
+  --soft-accent: #a06f69;
+  --soft-tint-a: #cadde1;
+  --soft-tint-b: #ead5d0;
+  --soft-tint-c: #cad5e3;
+  --soft-icon-green: #527a77;
+  --soft-icon-clay: #a06f69;
+  --soft-icon-blue: #4d7088;
+  --soft-icon-gold: #987b48;
+  --chart-deep: #243847;
+  --chart-primary: #c38a78;
+  --chart-green: #527a77;
+  --chart-blue: #587d96;
+  --chart-rust: #a76570;
+  --chart-surface: #ead5d0;
+  --chart-ink: #79564f;
+  --theme-paper: #f7fafb;
+  --theme-paper-warm: #d8e3e6;
+  --theme-missed: #ead5d0;
+  --theme-muted-cell: #d7e0e4;
+  --theme-highlight: #d3deea;
+  --heatmap-high: #96bdb7;
+  --heatmap-mid: #d09582;
+  --heatmap-low: #b8737d;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -150,10 +210,10 @@ h3 {
 
 .soft-canvas {
   background:
-    radial-gradient(circle at 5% 8%, color-mix(in srgb, var(--soft-tint-a) 92%, transparent) 0, transparent 36%),
-    radial-gradient(circle at 94% 9%, color-mix(in srgb, var(--soft-tint-b) 90%, transparent) 0, transparent 38%),
-    radial-gradient(circle at 72% 72%, color-mix(in srgb, var(--soft-tint-c) 78%, transparent) 0, transparent 35%),
-    var(--soft-canvas);
+    radial-gradient(ellipse at 3% 5%, color-mix(in srgb, var(--soft-tint-a) 94%, transparent) 0, transparent 52%),
+    radial-gradient(ellipse at 98% 6%, color-mix(in srgb, var(--soft-tint-b) 90%, transparent) 0, transparent 54%),
+    radial-gradient(ellipse at 68% 82%, color-mix(in srgb, var(--soft-tint-c) 84%, transparent) 0, transparent 52%),
+    linear-gradient(135deg, color-mix(in srgb, var(--soft-canvas) 72%, var(--soft-tint-a)), color-mix(in srgb, var(--soft-canvas) 68%, var(--soft-tint-b)));
   background-attachment: fixed;
 }
 
@@ -179,7 +239,7 @@ h3 {
 
 .soft-shell {
   position: relative;
-  background: rgb(246 246 241 / 24%);
+  background: color-mix(in srgb, var(--soft-surface) 16%, transparent);
   backdrop-filter: blur(26px);
 }
 

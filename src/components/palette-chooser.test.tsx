@@ -19,4 +19,11 @@ describe("PaletteChooser", () => {
     fireEvent.click(screen.getByRole("menuitem", { name: /Coastal Quiet/ }));
     expect(document.documentElement).toHaveAttribute("data-palette", "coastal");
   });
+
+  it("offers the expanded calm palette collection", () => {
+    render(<PaletteChooser />);
+    fireEvent.click(screen.getByRole("button", { name: "Choose colour palette" }));
+    expect(screen.getByRole("menuitem", { name: /Lavender Hush/ })).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: /Blue Hour/ })).toBeInTheDocument();
+  });
 });
