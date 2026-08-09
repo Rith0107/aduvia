@@ -48,12 +48,12 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
   return (
     <main className="soft-canvas min-h-screen text-[var(--soft-ink)]">
       <div className="soft-shell min-h-screen overflow-hidden">
-        <div className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col justify-center px-5 py-6 sm:px-9 sm:py-8">
-          <header className="mb-5 flex items-center justify-between px-1 sm:mb-6">
+        <div className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col px-5 pb-6 sm:px-9 sm:pb-8">
+          <header className="premium-toolbar sticky top-0 z-40 mb-6 flex items-center justify-between py-5 sm:mb-8">
             <BrandLogo />
             <div className="flex items-center gap-2"><PaletteChooser /><Link className="evening-exit-pill" href="/today"><span aria-hidden="true">←</span><span className="hidden sm:inline">Back to Today</span><span className="sm:hidden">Exit</span></Link><span className="evening-mode-pill"><span aria-hidden="true">☾</span><span className="hidden sm:inline">Evening mode</span></span></div>
           </header>
-          <div className="evening-intro">
+          <div className="evening-intro mt-auto">
             <div>
               <p className="soft-kicker text-[var(--soft-accent)]">Your evening reset · under a minute</p>
               <h1>Four choices.<br />Then rest.</h1>
@@ -83,7 +83,7 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
             ))}
           </section>
 
-          <div className="evening-finish-dock">
+          <div className="evening-finish-dock mb-auto">
             <p><span>{allAnswered ? "Every habit has an answer." : "One choice per habit."}</span><small>{allAnswered ? "Nothing else is required tonight." : "No explanations needed."}</small></p>
             <button disabled={!allAnswered} onClick={() => setIsFinished(true)} type="button"><span>Finish my day</span><span aria-hidden="true">→</span></button>
           </div>

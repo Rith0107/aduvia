@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ChartNoAxesCombined, CircleCheck, Gem, ListChecks, MoonStar } from "lucide-react";
+import { ChartNoAxesCombined, CircleCheck, Gem, ListChecks, MoonStar, UserRound } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { PaletteChooser } from "@/components/palette-chooser";
 
@@ -33,7 +33,7 @@ export function AppShell({ active, children, eyebrow, title, action }: AppShellP
           <div className="flex items-center gap-2">
             <PaletteChooser />
             <Link className="flex min-h-10 items-center gap-2 rounded-full bg-white/45 px-3 text-xs font-bold text-[var(--soft-ink)] shadow-[inset_0_1px_0_rgba(255,255,255,.55)] backdrop-blur-xl sm:px-4" href="/check-in"><MoonStar aria-hidden className="size-4 text-[var(--soft-accent)]" strokeWidth={1.8} /><span className="hidden sm:inline">Evening mode</span></Link>
-            <button aria-label="Open profile" className="grid size-10 place-items-center rounded-full border-4 border-white/55 bg-[var(--soft-accent)] text-[10px] font-black text-white shadow-sm" type="button">QL</button>
+            <button aria-label="Open profile" className="grid size-10 place-items-center rounded-full border-4 border-white/55 bg-[var(--soft-accent)] text-white shadow-sm transition hover:-translate-y-0.5" type="button"><UserRound aria-hidden className="size-4" strokeWidth={2} /></button>
           </div>
         </header>
 

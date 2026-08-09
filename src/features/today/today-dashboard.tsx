@@ -25,7 +25,6 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
   const efficiency = useMemo(() => calculateRoutineEfficiency(habits.map(({ completion, priority }) => ({ completion, priority }))), [habits]);
   const completedQuests = quests.filter((quest) => quest.status === "completed").length;
   const questProgress = quests.length ? Math.round((completedQuests / quests.length) * 100) : Math.round((sideQuest.completedMilestones / sideQuest.totalMilestones) * 100);
-  const featuredQuest = quests.find((quest) => quest.status !== "completed")?.title ?? sideQuest.title;
 
   function toggleHabit(id: string) {
     if (appData) {
@@ -69,11 +68,12 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
 
         <div className="soft-quest-signal">
           <div className="flex items-center justify-between"><p className="soft-kicker text-[var(--soft-accent)]">In your orbit</p><span className="soft-quest-status">On course</span></div>
-          <div className="soft-orbit-mark" aria-hidden="true"><span style={{ transform: `rotate(${questProgress * 3.6}deg)` }} /></div>
+          <div className="soft-orbit-mark" aria-hidden="true">{quests.slice(0, 4).map((quest, index) => <span className={quest.status === "completed" ? "complete" : ""} key={quest.id} style={{ "--orbit-index": index } as React.CSSProperties}><i>✓</i></span>)}</div>
           <div className="soft-quest-feature">
             <p className="soft-quest-percentage">{questProgress}<span>%</span></p>
-            <p className="mt-5 text-xs text-[var(--soft-muted)]">Current monthly quest</p>
-            <h2>{featuredQuest}</h2>
+            <p className="mt-5 text-xs text-[var(--soft-muted)]">Monthly side quests</p>
+            <h2>{quests.length ? `${quests.length} quests in your orbit` : sideQuest.title}</h2>
+            {quests.length > 0 && <p className="mt-2 text-xs font-semibold text-[var(--soft-muted)]">{completedQuests} completed · {quests.length - completedQuests} still moving</p>}
           </div>
           <div><div className="soft-quest-track"><span style={{ width: `${questProgress}%` }} /></div><p className="mt-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--soft-muted)]">Progress this month</p></div>
           {quests.length > 0 && <div className="mt-6 border-t border-black/[0.09] pt-4"><div className="flex items-center justify-between"><p className="soft-kicker text-[var(--soft-muted)]">Monthly side quests</p><Link className="text-[10px] font-black uppercase tracking-[0.13em] text-[var(--soft-accent)]" href="/quests">Manage</Link></div><div className="mt-3 grid gap-2">{quests.map((quest) => { const complete = quest.status === "completed"; return <button aria-label={`${complete ? "Undo" : "Complete"} ${quest.title}`} className="group flex w-full items-center gap-3 rounded-[14px] bg-white/35 px-3 py-2.5 text-left transition hover:bg-white/60" key={quest.id} onClick={() => toggleQuest(quest.id)} type="button"><span className={`grid size-6 shrink-0 place-items-center rounded-full border text-xs ${complete ? "border-[var(--soft-ink)] bg-[var(--soft-ink)] text-white" : "border-black/15 text-transparent"}`}>✓</span><span className={`min-w-0 flex-1 truncate text-xs font-bold ${complete ? "text-[var(--soft-muted)] line-through" : "text-[var(--soft-ink)]"}`}>{quest.title}</span></button>; })}</div></div>}
