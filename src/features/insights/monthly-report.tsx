@@ -96,7 +96,7 @@ function cardDimensions(format: ShareFormat) {
   return format === "story" ? { width: 1080, height: 1920 } : { width: 1080, height: 1080 };
 }
 
-async function renderShareCard(format: ShareFormat, consistency: number, monthLabel: string, completedQuestTitles: string[]) {
+async function renderShareCard(format: ShareFormat, consistency: number, monthLabel: string, completedQuestTitles: string[], habits: ReportHabit[], daysShownUp: number) {
   const { width, height } = cardDimensions(format);
   const canvas = document.createElement("canvas");
   canvas.width = width;
@@ -111,49 +111,129 @@ async function renderShareCard(format: ShareFormat, consistency: number, monthLa
   const surface = themeColor("--chart-surface", "#f3e7ca");
   const surfaceInk = themeColor("--chart-ink", "#6e5b3c");
   const ink = themeColor("--soft-ink", "#17201c");
+  const blue = themeColor("--chart-blue", "#3d6678");
+  const green = themeColor("--chart-green", "#174f3a");
 
-  context.fillStyle = deep;
+  const gradient = context.createLinearGradient(0, 0, width, height);
+  gradient.addColorStop(0, deep);
+  gradient.addColorStop(1, green);
+  context.fillStyle = gradient;
   context.fillRect(0, 0, width, height);
-  context.fillStyle = primary;
-  context.globalAlpha = 0.18;
-  context.beginPath();
-  context.arc(width * 0.92, height * 0.08, width * 0.38, 0, Math.PI * 2);
-  context.fill();
-  context.globalAlpha = 1;
+
+  context.strokeStyle = "rgba(255,255,255,.035)";
+  context.lineWidth = 2;
+  for (let y = 0; y < height; y += 26) {
+    context.beginPath();
+    for (let x = 0; x <= width; x += 18) {
+      const waveY = y + Math.sin((x + y) / 58) * 7;
+      if (x === 0) context.moveTo(x, waveY);
+      else context.lineTo(x, waveY);
+    }
+    context.stroke();
+  }
+
   const margin = 90;
   context.fillStyle = primary;
-  context.font = "600 28px system-ui";
-  context.fillText(`ADUVIA · ${monthLabel.toUpperCase()}`, margin, format === "story" ? 190 : 130);
-  context.fillStyle = "#fffaf0";
-  context.font = `700 ${format === "story" ? 118 : 104}px system-ui`;
-  context.fillText(`${consistency}%`, margin, format === "story" ? 440 : 330);
-  context.font = "500 38px system-ui";
-  context.fillStyle = "rgba(255,250,240,0.68)";
-  context.fillText("monthly consistency", margin, format === "story" ? 500 : 385);
+  context.font = "700 25px system-ui";
+  context.fillText("ADUVIA · MONTHLY CONSTELLATION", margin, format === "story" ? 150 : 92);
+  context.fillStyle = "rgba(255,250,240,.48)";
+  context.font = "500 22px system-ui";
+  context.textAlign = "right";
+  context.fillText(monthLabel.toUpperCase(), width - margin, format === "story" ? 150 : 92);
+  context.textAlign = "left";
 
-  const questTop = format === "story" ? 760 : 560;
-  context.fillStyle = surface;
-  context.roundRect(margin, questTop, width - margin * 2, format === "story" ? 520 : 340, 36);
-  context.fill();
-  context.fillStyle = surfaceInk;
-  context.font = "600 26px system-ui";
-  context.fillText("SIDE QUESTS COMPLETED", margin + 48, questTop + 70);
-  context.fillStyle = ink;
-  context.font = "600 38px system-ui";
-  const questLimit = format === "square" ? 3 : 5;
-  const visibleQuests = completedQuestTitles.slice(0, questLimit);
-  visibleQuests.forEach((quest, index) => {
-    context.fillText(`✓  ${quest}`, margin + 48, questTop + 150 + index * 78);
+  const orbitCenterX = width / 2;
+  const orbitCenterY = format === "story" ? 610 : 365;
+  const orbitScale = format === "story" ? 1.25 : 1;
+  const orbitColors = [primary, "#9bc9c1", blue, surfaceInk];
+  habits.slice(0, 4).forEach((habit, index) => {
+    const radiusX = (160 + index * 72) * orbitScale;
+    const radiusY = (82 + index * 38) * orbitScale;
+    context.save();
+    context.translate(orbitCenterX, orbitCenterY);
+    context.rotate((index - 1.5) * 0.12);
+    context.strokeStyle = `rgba(255,255,255,${0.17 - index * 0.018})`;
+    context.lineWidth = 2;
+    context.beginPath();
+    context.ellipse(0, 0, radiusX, radiusY, 0, 0, Math.PI * 2);
+    context.stroke();
+    const done = habit.days.filter((day) => day === "done").length;
+    const markerCount = Math.min(format === "story" ? 16 : 12, Math.max(2, done));
+    for (let marker = 0; marker < markerCount; marker += 1) {
+      const angle = (marker / markerCount) * Math.PI * 2 + index * 0.7;
+      context.fillStyle = orbitColors[index];
+      context.globalAlpha = marker < Math.round(markerCount * habitConsistency(habit) / 100) ? 1 : 0.18;
+      context.beginPath();
+      context.arc(Math.cos(angle) * radiusX, Math.sin(angle) * radiusY, marker % 4 === 0 ? 7 : 4, 0, Math.PI * 2);
+      context.fill();
+    }
+    context.restore();
   });
-  const remaining = completedQuestTitles.length - visibleQuests.length;
-  if (remaining > 0) {
+  context.globalAlpha = 1;
+
+  context.fillStyle = deep;
+  context.beginPath();
+  context.arc(orbitCenterX, orbitCenterY, 104, 0, Math.PI * 2);
+  context.fill();
+  context.strokeStyle = primary;
+  context.lineWidth = 9;
+  context.beginPath();
+  context.arc(orbitCenterX, orbitCenterY, 104, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * consistency / 100);
+  context.stroke();
+  context.fillStyle = "#fffaf0";
+  context.textAlign = "center";
+  context.font = "700 58px system-ui";
+  context.fillText(`${consistency}%`, orbitCenterX, orbitCenterY + 12);
+  context.font = "600 15px system-ui";
+  context.fillStyle = "rgba(255,250,240,.5)";
+  context.fillText("RHYTHM SIGNAL", orbitCenterX, orbitCenterY + 44);
+
+  const ledgerTop = format === "story" ? 1120 : 680;
+  context.fillStyle = surface;
+  context.globalAlpha = 0.96;
+  context.roundRect(margin, ledgerTop, width - margin * 2, format === "story" ? 560 : 280, 38);
+  context.fill();
+  context.globalAlpha = 1;
+  context.textAlign = "left";
+  context.fillStyle = surfaceInk;
+  context.font = "700 19px system-ui";
+  context.fillText("CONSTELLATION RECORD", margin + 42, ledgerTop + 48);
+  context.fillStyle = ink;
+  context.font = "700 44px system-ui";
+  context.fillText(`${daysShownUp}`, margin + 42, ledgerTop + 108);
+  context.font = "500 18px system-ui";
+  context.fillStyle = surfaceInk;
+  context.fillText("days in orbit", margin + 42, ledgerTop + 137);
+  context.fillStyle = ink;
+  context.font = "700 44px system-ui";
+  context.fillText(`${habits.length}`, margin + 250, ledgerTop + 108);
+  context.font = "500 18px system-ui";
+  context.fillStyle = surfaceInk;
+  context.fillText("daily rituals", margin + 250, ledgerTop + 137);
+  context.fillStyle = ink;
+  context.font = "700 44px system-ui";
+  context.fillText(`${completedQuestTitles.length}`, margin + 450, ledgerTop + 108);
+  context.font = "500 18px system-ui";
+  context.fillStyle = surfaceInk;
+  context.fillText("quests landed", margin + 450, ledgerTop + 137);
+
+  const visibleQuests = completedQuestTitles.slice(0, format === "story" ? 5 : 3);
+  const questStart = ledgerTop + 198;
+  visibleQuests.forEach((quest, index) => {
+    const x = margin + 42 + (format === "square" ? index * 278 : 0);
+    const y = questStart + (format === "story" ? index * 66 : 0);
     context.fillStyle = primary;
-    context.font = "600 28px system-ui";
-    context.fillText(`+ ${remaining} more ${remaining === 1 ? "win" : "wins"}`, margin + 48, questTop + 150 + visibleQuests.length * 78);
-  }
+    context.beginPath();
+    context.arc(x + 11, y - 6, 10, 0, Math.PI * 2);
+    context.fill();
+    context.fillStyle = ink;
+    context.font = `600 ${format === "story" ? 25 : 19}px system-ui`;
+    const maxLength = format === "story" ? 42 : 21;
+    context.fillText(quest.length > maxLength ? `${quest.slice(0, maxLength - 1)}…` : quest, x + 30, y);
+  });
   context.fillStyle = "rgba(255,250,240,0.5)";
-  context.font = "500 26px system-ui";
-  context.fillText("Small steps. A month of proof.", margin, height - 90);
+  context.font = "500 20px system-ui";
+  context.fillText(`ISSUED ${monthLabel.toUpperCase()} · SMALL STEPS, VISIBLE PROOF`, margin, height - 55);
 
   return new Promise<Blob>((resolve, reject) =>
     canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("Could not create image."))), "image/png"),
@@ -251,7 +331,7 @@ export function MonthlyReport() {
   }
 
   async function downloadCard() {
-    const blob = await renderShareCard(format, overallConsistency, monthLabel, completedQuestTitles);
+    const blob = await renderShareCard(format, overallConsistency, monthLabel, completedQuestTitles, habits, daysShownUp);
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -262,7 +342,7 @@ export function MonthlyReport() {
   }
 
   async function shareCard() {
-    const blob = await renderShareCard(format, overallConsistency, monthLabel, completedQuestTitles);
+    const blob = await renderShareCard(format, overallConsistency, monthLabel, completedQuestTitles, habits, daysShownUp);
     const file = new File([blob], `aduvia-${monthName.toLowerCase()}-${reportMonth.year}-${format}.png`, { type: "image/png" });
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
       await navigator.share({ files: [file], title: "My Aduvia monthly report" });
@@ -337,8 +417,8 @@ export function MonthlyReport() {
               <div className="flex flex-col p-4 sm:p-6">
                 <div className="flex size-12 items-center justify-center rounded-2xl bg-[var(--chart-deep)] text-[var(--chart-primary)] shadow-[0_10px_24px_rgba(20,61,49,.18)]"><Share2 size={21} strokeWidth={1.8} /></div>
                 <p className="mt-8 text-xs font-semibold uppercase tracking-[0.17em] text-[var(--soft-accent)]">Share studio</p>
-                <h2 className="mt-3 max-w-sm text-4xl font-semibold tracking-[-0.055em] text-[var(--soft-ink)]">Turn your month into a keepsake.</h2>
-                <p className="mt-4 max-w-md text-sm leading-6 text-stone-500">Only consistency and completed quests are included. Notes and missed-day details stay private.</p>
+                <h2 className="mt-3 max-w-sm text-4xl font-semibold tracking-[-0.055em] text-[var(--soft-ink)]">Map your month into a constellation.</h2>
+                <p className="mt-4 max-w-md text-sm leading-6 text-stone-500">Each orbit is a habit, every bright marker is proof you showed up, and completed quests become landed discoveries. Private notes and missed-day details stay private.</p>
 
                 <fieldset className="mt-9">
                   <legend className="text-[10px] font-semibold uppercase tracking-[0.15em] text-stone-400">Choose a canvas</legend>
@@ -356,18 +436,21 @@ export function MonthlyReport() {
               </div>
 
               <div className="grid min-h-[620px] place-items-center overflow-hidden rounded-[26px] bg-[linear-gradient(145deg,var(--soft-tint-a),var(--soft-surface))] p-5 sm:p-8">
-                <div className={`relative overflow-hidden bg-[var(--chart-deep)] pb-16 text-white shadow-[0_30px_70px_rgba(20,61,49,.28)] transition-all duration-500 ${format === "story" ? "aspect-[9/16] w-full max-w-[310px] rounded-[34px] p-7 pb-14" : "aspect-square w-full max-w-[560px] rounded-[38px] p-8 pb-16 sm:p-10 sm:pb-16"}`}>
-                  <div className="absolute -right-24 -top-24 size-64 rounded-full border-[42px] border-[color:color-mix(in_srgb,var(--chart-primary)_18%,transparent)]" />
-                  <div className="absolute -bottom-32 -left-28 size-72 rounded-full bg-[color:color-mix(in_srgb,var(--chart-blue)_14%,transparent)] blur-2xl" />
-                  <div className="relative flex items-center justify-between"><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--chart-primary)]">Aduvia · {monthName}</p><span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[9px] uppercase tracking-[0.13em] text-white/55">Monthly proof</span></div>
+                <div className={`relative overflow-hidden bg-[linear-gradient(145deg,var(--chart-deep),color-mix(in_srgb,var(--chart-deep)_78%,var(--chart-green)))] text-white shadow-[0_30px_70px_rgba(20,61,49,.28)] transition-all duration-500 ${format === "story" ? "aspect-[9/16] w-full max-w-[310px] rounded-[34px] p-6" : "aspect-square w-full max-w-[560px] rounded-[38px] p-8 sm:p-9"}`}>
+                  <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "repeating-radial-gradient(ellipse at 25% 10%, transparent 0 15px, rgba(255,255,255,.055) 16px 17px)" }} />
+                  <div className="relative flex items-start justify-between"><div><p className="text-[9px] font-black uppercase tracking-[0.21em] text-[var(--chart-primary)]">Aduvia</p><p className="mt-1 text-[8px] uppercase tracking-[.14em] text-white/40">Monthly constellation</p></div><div className="text-right"><p className="text-[9px] font-semibold uppercase tracking-[.14em]">{monthName}</p><p className="mt-1 text-[8px] text-white/35">{reportMonth.year} · #{String(reportMonth.month + 1).padStart(2, "0")}</p></div></div>
 
-                  <div className="relative mt-8 flex items-center gap-5">
-                    <div className="grid size-32 shrink-0 place-items-center rounded-full p-[9px]" style={{ background: `conic-gradient(var(--chart-primary) ${overallConsistency * 3.6}deg, rgba(255,255,255,.1) 0deg)` }}><div className="grid size-full place-items-center rounded-full bg-[var(--chart-deep)] text-center"><div><p className="text-4xl font-semibold tracking-[-0.06em]">{overallConsistency}%</p><p className="mt-1 text-[8px] uppercase tracking-[0.16em] text-white/45">consistent</p></div></div></div>
-                    <div><p className="text-xs uppercase tracking-[0.13em] text-white/40">You showed up</p><p className="mt-1 text-3xl font-semibold tracking-[-0.04em]">{daysShownUp} days</p><p className="mt-2 max-w-[180px] text-xs leading-5 text-white/45">A month built one quiet check-in at a time.</p></div>
+                  <div className={`relative mx-auto ${format === "story" ? "mt-8 h-[43%] w-full" : "mt-3 h-[48%] w-[92%]"}`} aria-label={`${monthLabel} habit constellation`}>
+                    {habits.slice(0, 4).map((habit, orbitIndex) => {
+                      const sizes = format === "story" ? [42, 58, 74, 90] : [40, 57, 74, 91];
+                      const markerCount = Math.min(10, Math.max(2, habit.days.filter((day) => day === "done").length));
+                      return <div className="absolute left-1/2 top-1/2 rounded-[50%] border border-white/15" key={habit.id} style={{ height: `${sizes[orbitIndex] * .48}%`, transform: `translate(-50%, -50%) rotate(${(orbitIndex - 1.5) * 7}deg)`, width: `${sizes[orbitIndex]}%` }}>{Array.from({ length: markerCount }, (_, markerIndex) => { const angle = markerIndex / markerCount * Math.PI * 2 + orbitIndex * .7; return <i className="absolute block rounded-full bg-[var(--chart-primary)] shadow-[0_0_10px_color-mix(in_srgb,var(--chart-primary)_65%,transparent)]" key={markerIndex} style={{ height: markerIndex % 4 === 0 ? 7 : 4, left: `${50 + Math.cos(angle) * 50}%`, opacity: markerIndex < Math.round(markerCount * habitConsistency(habit) / 100) ? 1 : .2, top: `${50 + Math.sin(angle) * 50}%`, transform: "translate(-50%, -50%)", width: markerIndex % 4 === 0 ? 7 : 4 }} />; })}</div>;
+                    })}
+                    <div className="absolute left-1/2 top-1/2 grid size-24 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[var(--chart-deep)] p-[6px] shadow-[0_15px_35px_rgba(0,0,0,.25)]" style={{ background: `conic-gradient(var(--chart-primary) ${overallConsistency * 3.6}deg, rgba(255,255,255,.12) 0deg)` }}><div className="grid size-full place-items-center rounded-full bg-[var(--chart-deep)] text-center"><div><p className="text-2xl font-semibold tracking-[-.06em]">{overallConsistency}%</p><p className="text-[6px] uppercase tracking-[.16em] text-white/45">rhythm signal</p></div></div></div>
                   </div>
 
-                  <div className="relative mt-7 border-t border-white/10 pt-5"><div className="flex items-end justify-between"><div><p className="text-[9px] font-semibold uppercase tracking-[0.17em] text-[var(--chart-primary)]">Side quests cleared</p><p className="mt-1 text-2xl font-semibold">{completedQuestTitles.length} wins</p></div><span className="text-xs text-white/35">{monthLabel}</span></div><div className="relative mt-4 space-y-2.5 before:absolute before:bottom-4 before:left-4 before:top-4 before:w-px before:bg-white/10">{visibleShareQuests.map((quest, index) => <div className="relative flex items-center gap-3" key={quest}><span className="z-10 grid size-8 shrink-0 place-items-center rounded-full bg-[var(--chart-primary)] text-[10px] font-black text-[var(--chart-deep)]">{String(index + 1).padStart(2, "0")}</span><div className="min-w-0 flex-1 rounded-2xl bg-white/[0.055] px-3 py-2.5"><p className="truncate text-sm font-semibold">{quest}</p></div></div>)}{remainingShareQuests > 0 && <div className="ml-11 inline-flex rounded-full border border-[var(--chart-primary)]/25 bg-[var(--chart-primary)]/10 px-3 py-1.5 text-[10px] font-semibold text-[var(--chart-primary)]">+{remainingShareQuests} more {remainingShareQuests === 1 ? "win" : "wins"}</div>}</div></div>
-                  <div className="absolute bottom-7 left-8 right-8 flex items-center justify-between text-[9px] uppercase tracking-[0.14em] text-white/30"><span>Small steps, visible proof.</span><span>aduvia</span></div>
+                  <div className={`relative rounded-[22px] bg-[var(--chart-surface)] text-[var(--soft-ink)] ${format === "story" ? "p-4" : "p-5"}`}><p className="text-[7px] font-black uppercase tracking-[.18em] text-[var(--chart-ink)]">Constellation record</p><div className="mt-3 grid grid-cols-3 gap-2"><div><p className="text-2xl font-semibold">{daysShownUp}</p><p className="text-[7px] text-[var(--chart-ink)]">days in orbit</p></div><div><p className="text-2xl font-semibold">{habits.length}</p><p className="text-[7px] text-[var(--chart-ink)]">daily rituals</p></div><div><p className="text-2xl font-semibold">{completedQuestTitles.length}</p><p className="text-[7px] text-[var(--chart-ink)]">quests landed</p></div></div><div className={`mt-4 border-t border-[var(--chart-ink)]/15 pt-3 ${format === "story" ? "space-y-2" : "grid grid-cols-3 gap-2"}`}>{visibleShareQuests.map((quest, index) => <div className="flex min-w-0 items-center gap-2" key={quest}><span className="size-2 shrink-0 rounded-full bg-[var(--chart-primary)]" /><p className="truncate text-[8px] font-semibold">{String(index + 1).padStart(2, "0")} · {quest}</p></div>)}{remainingShareQuests > 0 && <p className="text-[8px] font-semibold text-[var(--chart-ink)]">+{remainingShareQuests} more in orbit</p>}</div></div>
+                  <div className="absolute bottom-4 left-6 right-6 flex items-center justify-between text-[6px] uppercase tracking-[.14em] text-white/35"><span>Issued {monthLabel}</span><span>Small steps · visible proof</span></div>
                 </div>
               </div>
             </div>
