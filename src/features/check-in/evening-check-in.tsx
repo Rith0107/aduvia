@@ -53,7 +53,7 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
             <BrandLogo />
             <div className="flex items-center gap-2"><PaletteChooser /><Link className="evening-exit-pill" href="/today"><span aria-hidden="true">←</span><span className="hidden sm:inline">Back to Today</span><span className="sm:hidden">Exit</span></Link><span className="evening-mode-pill"><span aria-hidden="true">☾</span><span className="hidden sm:inline">Evening mode</span></span></div>
           </header>
-          <div className="evening-intro mt-auto">
+          <div className="evening-intro">
             <div>
               <p className="soft-kicker text-[var(--soft-accent)]">Your evening reset · under a minute</p>
               <h1>Four choices.<br />Then rest.</h1>
@@ -83,7 +83,7 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
             ))}
           </section>
 
-          <div className="evening-finish-dock mb-auto">
+          <div className="evening-finish-dock">
             <p><span>{allAnswered ? "Every habit has an answer." : "One choice per habit."}</span><small>{allAnswered ? "Nothing else is required tonight." : "No explanations needed."}</small></p>
             <button disabled={!allAnswered} onClick={() => setIsFinished(true)} type="button"><span>Finish my day</span><span aria-hidden="true">→</span></button>
           </div>

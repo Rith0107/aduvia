@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
+import { scheduledDaysFor, useAppData } from "@/lib/app-data";
 import { Check, Download, Share2, Smartphone, Square } from "lucide-react";
 import {
   Area,
@@ -29,14 +30,6 @@ type ReportHabit = {
 
 const completedQuests = ["Created a monthly budget", "Shipped my portfolio homepage"];
 
-const consistencyTrend = [
-  { label: "Jul 6", score: 58 },
-  { label: "Jul 13", score: 66 },
-  { label: "Jul 20", score: 63 },
-  { label: "Jul 27", score: 74 },
-  { label: "Aug 3", score: 82 },
-];
-
 const categoryBalance = [
   { name: "Growth", value: 34, color: "var(--chart-green)" },
   { name: "Wellbeing", value: 28, color: "var(--chart-primary)" },
@@ -44,17 +37,7 @@ const categoryBalance = [
   { name: "Creative", value: 15, color: "var(--chart-rust)" },
 ];
 
-const weekdayRhythm = [
-  { day: "M", name: "Monday", score: 88 },
-  { day: "T", name: "Tuesday", score: 74 },
-  { day: "W", name: "Wednesday", score: 91 },
-  { day: "T", name: "Thursday", score: 68 },
-  { day: "F", name: "Friday", score: 83 },
-  { day: "S", name: "Saturday", score: 57 },
-  { day: "S", name: "Sunday", score: 62 },
-];
-
-function TrendActiveDot({ cx = 0, cy = 0, payload }: { cx?: number; cy?: number; payload?: (typeof consistencyTrend)[number] }) {
+function TrendActiveDot({ cx = 0, cy = 0, payload }: { cx?: number; cy?: number; payload?: { label: string; score: number } }) {
   if (!payload) return null;
 
   return (
@@ -66,7 +49,7 @@ function TrendActiveDot({ cx = 0, cy = 0, payload }: { cx?: number; cy?: number;
   );
 }
 
-function RhythmActiveBar({ height = 0, payload, width = 0, x = 0, y = 0 }: { height?: number; payload?: (typeof weekdayRhythm)[number]; width?: number; x?: number; y?: number }) {
+function RhythmActiveBar({ height = 0, payload, width = 0, x = 0, y = 0 }: { height?: number; payload?: { day: string; name: string; score: number }; width?: number; x?: number; y?: number }) {
   if (!payload) return null;
 
   const labelWidth = 104;
@@ -106,9 +89,13 @@ function createReportHabits(year: number, month: number): ReportHabit[] {
   ];
 }
 
+function dateStorageKey(year: number, month: number, day: number) {
+  return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
 function habitConsistency(habit: ReportHabit) {
   const scheduled = habit.days.filter((day) => day !== "off");
-  return Math.round((scheduled.filter((day) => day === "done").length / scheduled.length) * 100);
+  return scheduled.length ? Math.round((scheduled.filter((day) => day === "done").length / scheduled.length) * 100) : 0;
 }
 
 function cardDimensions(format: ShareFormat) {
@@ -172,13 +159,34 @@ async function renderShareCard(format: ShareFormat, consistency: number, monthLa
 }
 
 export function MonthlyReport() {
-  const [reportMonth, setReportMonth] = useState({ year: 2026, month: 7 });
-  const [habits, setHabits] = useState(() => createReportHabits(2026, 7));
+  const appData = useAppData();
+  const now = new Date();
+  const [reportMonth, setReportMonth] = useState({ year: now.getFullYear(), month: now.getMonth() });
+  const [fallbackHabits, setFallbackHabits] = useState(() => createReportHabits(now.getFullYear(), now.getMonth()));
   const [format, setFormat] = useState<ShareFormat>("square");
   const [shareMessage, setShareMessage] = useState("");
-  const daysInMonth = new Date(reportMonth.year, reportMonth.month + 1, 0).getDate();
+  const calendarDaysInMonth = new Date(reportMonth.year, reportMonth.month + 1, 0).getDate();
+  const reportMonthStart = new Date(reportMonth.year, reportMonth.month, 1);
+  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const daysInMonth = reportMonthStart.getTime() === currentMonthStart.getTime() ? now.getDate() : reportMonthStart < currentMonthStart ? calendarDaysInMonth : 0;
   const monthName = new Intl.DateTimeFormat("en-US", { month: "long" }).format(new Date(reportMonth.year, reportMonth.month, 1));
   const monthLabel = `${monthName} ${reportMonth.year}`;
+
+  const habits = useMemo<ReportHabit[]>(() => {
+    if (!appData) return fallbackHabits.map((habit) => ({ ...habit, days: habit.days.slice(0, daysInMonth) }));
+    const colorByIndex = ["var(--chart-green)", "var(--chart-blue)", "var(--chart-ink)", "var(--chart-rust)"];
+    return appData.habits.map((habit, habitIndex) => ({
+      id: habit.id,
+      name: habit.name,
+      color: colorByIndex[habitIndex % colorByIndex.length],
+      days: Array.from({ length: daysInMonth }, (_, index): CellState => {
+        const date = new Date(reportMonth.year, reportMonth.month, index + 1);
+        const weekday = (["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const)[date.getDay()];
+        if (!scheduledDaysFor(habit).includes(weekday)) return "off";
+        return appData.completions[dateStorageKey(reportMonth.year, reportMonth.month, index + 1)]?.[habit.id] === "complete" ? "done" : "missed";
+      }),
+    }));
+  }, [appData, daysInMonth, fallbackHabits, reportMonth.month, reportMonth.year]);
 
   const overallConsistency = useMemo(
     () => Math.round(habits.reduce((sum, habit) => sum + habitConsistency(habit), 0) / habits.length),
@@ -188,28 +196,25 @@ export function MonthlyReport() {
     () => Array.from({ length: daysInMonth }, (_, dayIndex) => {
       const scheduled = habits.filter((habit) => habit.days[dayIndex] !== "off");
       const completed = scheduled.filter((habit) => habit.days[dayIndex] === "done").length;
-      return { day: dayIndex + 1, score: scheduled.length ? Math.round((completed / scheduled.length) * 100) : 0 };
+      return { day: dayIndex + 1, label: `${monthName.slice(0, 3)} ${dayIndex + 1}`, score: scheduled.length ? Math.round((completed / scheduled.length) * 100) : 0 };
     }),
-    [daysInMonth, habits],
+    [daysInMonth, habits, monthName],
   );
+
+  const weekdayReport = useMemo(() => {
+    const labels = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    return labels.map((name, weekday) => {
+      const points = dailyConsistency.filter((point) => new Date(reportMonth.year, reportMonth.month, point.day).getDay() === weekday);
+      return { day: name.slice(0, 1), name, score: points.length ? Math.round(points.reduce((sum, point) => sum + point.score, 0) / points.length) : 0 };
+    });
+  }, [dailyConsistency, reportMonth.month, reportMonth.year]);
 
   function changeMonth(offset: number) {
     const next = new Date(reportMonth.year, reportMonth.month + offset, 1);
     const year = next.getFullYear();
     const month = next.getMonth();
     setReportMonth({ year, month });
-    setHabits(createReportHabits(year, month));
-  }
-
-  function toggleCell(habitId: string, dayIndex: number) {
-    setHabits((current) =>
-      current.map((habit) => {
-        if (habit.id !== habitId || habit.days[dayIndex] === "off") return habit;
-        const days = [...habit.days];
-        days[dayIndex] = days[dayIndex] === "done" ? "missed" : "done";
-        return { ...habit, days };
-      }),
-    );
+    setFallbackHabits(createReportHabits(year, month));
   }
 
   async function downloadCard() {
@@ -234,8 +239,10 @@ export function MonthlyReport() {
     await downloadCard();
   }
 
+  const viewingCurrentMonth = reportMonth.year === now.getFullYear() && reportMonth.month === now.getMonth();
+
   return (
-    <AppShell active="Insights" eyebrow="Monthly review" title={<>Your month,<br />in motion.</>} action={<div className="flex items-center gap-2 rounded-full bg-white/45 p-1 text-xs font-bold"><button aria-label="Previous month" className="rounded-full px-3 py-2 transition hover:bg-white/60" onClick={() => changeMonth(-1)} type="button">←</button><span className="min-w-28 px-2 text-center">{monthLabel}</span><button aria-label="Next month" className="rounded-full px-3 py-2 transition hover:bg-white/60" onClick={() => changeMonth(1)} type="button">→</button></div>}>
+    <AppShell active="Insights" eyebrow="Monthly review" title={<>Your month,<br />in motion.</>} action={<div className="flex items-center gap-2 rounded-full bg-white/45 p-1 text-xs font-bold"><button aria-label="Previous month" className="rounded-full px-3 py-2 transition hover:bg-white/60" onClick={() => changeMonth(-1)} type="button">←</button><span className="min-w-28 px-2 text-center">{monthLabel}</span><button aria-label="Next month" className="rounded-full px-3 py-2 transition hover:bg-white/60 disabled:cursor-not-allowed disabled:opacity-30" disabled={viewingCurrentMonth} onClick={() => changeMonth(1)} type="button">→</button></div>}>
       <div className="insights-flow">
           <section className="mt-12 grid gap-4 xl:grid-cols-[1.35fr_0.75fr]">
             <article className="relative overflow-hidden rounded-[44px_44px_96px_44px] bg-[var(--chart-deep)] p-6 text-white shadow-[0_28px_70px_-30px_rgba(20,61,49,0.55)] sm:p-8">
@@ -244,10 +251,10 @@ export function MonthlyReport() {
                 <div><p className="text-xs font-semibold uppercase tracking-[0.17em] text-[var(--chart-primary)]">Consistency signal</p><p className="mt-4 text-6xl font-semibold tracking-[-0.065em]">{overallConsistency}%</p><p className="mt-1 text-sm text-white/50">Up 8 points from July</p><p className="mt-5 inline-flex rounded-full bg-white/[0.08] px-3 py-2 text-xs font-medium text-white/70">You showed up on 24 days this month</p></div>
                 <div className="grid grid-cols-7 gap-1.5 rounded-2xl bg-white/[0.08] p-4" aria-label={`${monthName} activity heatmap`}>{Array.from({ length: Math.ceil(daysInMonth / 7) * 7 }, (_, index) => { const point = dailyConsistency[index]; const state = !point ? "" : point.score >= 75 ? "high activity" : point.score >= 50 ? "partial activity" : "low activity"; return <span aria-label={point ? `${monthName} ${point.day}: ${state}` : undefined} className={`size-3 rounded-[4px] ${!point ? "bg-transparent" : point.score >= 75 ? "bg-[var(--heatmap-high)]" : point.score >= 50 ? "bg-[var(--heatmap-mid)]" : "bg-[var(--heatmap-low)]"}`} key={index} title={point ? `${monthName} ${point.day} · ${point.score}%` : undefined} />; })}</div>
               </div>
-              <div className="relative mt-7"><p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/45">Weekly consistency trend</p></div>
+              <div className="relative mt-7"><p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/45">Daily consistency trend · month to date</p></div>
               <div className="relative mt-8 h-52 w-full">
                 <ResponsiveContainer height="100%" width="100%">
-                  <AreaChart data={consistencyTrend} margin={{ left: 0, right: 8, top: 52, bottom: 0 }}>
+                  <AreaChart data={dailyConsistency} margin={{ left: 0, right: 8, top: 52, bottom: 0 }}>
                     <defs><linearGradient id="consistencyFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="var(--chart-primary)" stopOpacity={0.5} /><stop offset="100%" stopColor="var(--chart-primary)" stopOpacity={0} /></linearGradient></defs>
                     <CartesianGrid stroke="rgba(255,255,255,0.08)" strokeDasharray="3 6" vertical={false} />
                     <XAxis axisLine={false} dataKey="label" tick={{ fill: "rgba(255,255,255,0.42)", fontSize: 10 }} tickLine={false} />
@@ -271,15 +278,15 @@ export function MonthlyReport() {
 
           <section className="mt-6 grid items-center gap-7 lg:grid-cols-[0.5fr_1.5fr]">
             <article className="relative mx-auto flex aspect-square w-full max-w-[310px] flex-col items-center justify-center overflow-hidden rounded-full bg-[var(--soft-tint-c)] p-10 text-center text-[var(--soft-icon-blue)] shadow-[0_26px_60px_-34px_rgba(40,79,97,.5)] lg:mx-0"><div className="absolute -right-10 -top-10 size-36 rounded-full border-[26px] border-white/25" /><p className="absolute left-1/2 top-12 -translate-x-1/2 whitespace-nowrap text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Best day</p><div className="relative -translate-y-1"><p className="text-4xl font-semibold tracking-[-0.05em]">Wednesday</p><p className="mx-auto mt-2 max-w-[230px] text-sm leading-5 opacity-60">Your midweek momentum peak.</p></div><span className="absolute bottom-9 left-1/2 grid size-11 -translate-x-1/2 place-items-center rounded-full bg-[var(--soft-icon-blue)] text-xl text-white">↗</span></article>
-            <article className="overflow-hidden rounded-[52px] bg-[var(--chart-surface)] p-6 text-[var(--chart-ink)] shadow-[0_28px_65px_-42px_rgba(110,91,60,.55)] sm:p-8"><div><p className="text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Weekly rhythm</p><p className="mt-2 text-xl font-semibold">Completion by weekday</p></div><div className="mt-4 h-36"><ResponsiveContainer height="100%" width="100%"><BarChart data={weekdayRhythm} margin={{ top: 42 }}><XAxis axisLine={false} dataKey="day" tick={{ fill: "var(--chart-ink)", fontSize: 10 }} tickLine={false} /><Tooltip content={() => null} cursor={false} /><Bar activeBar={<RhythmActiveBar />} dataKey="score" fill="var(--chart-ink)" radius={[18, 18, 18, 18]} /></BarChart></ResponsiveContainer></div></article>
+            <article className="overflow-hidden rounded-[52px] bg-[var(--chart-surface)] p-6 text-[var(--chart-ink)] shadow-[0_28px_65px_-42px_rgba(110,91,60,.55)] sm:p-8"><div><p className="text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Weekly rhythm</p><p className="mt-2 text-xl font-semibold">Completion by weekday</p></div><div className="mt-4 h-36"><ResponsiveContainer height="100%" width="100%"><BarChart data={weekdayReport} margin={{ top: 42 }}><XAxis axisLine={false} dataKey="day" tick={{ fill: "var(--chart-ink)", fontSize: 10 }} tickLine={false} /><Tooltip content={() => null} cursor={false} /><Bar activeBar={<RhythmActiveBar />} dataKey="score" fill="var(--chart-ink)" radius={[18, 18, 18, 18]} /></BarChart></ResponsiveContainer></div></article>
           </section>
 
           <section className="mt-7 rounded-[44px] border border-white/70 bg-[color:color-mix(in_srgb,var(--soft-surface)_80%,transparent)] p-4 shadow-[0_26px_70px_-48px_rgba(34,61,49,.42)] sm:p-7">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-xl font-semibold">Daily consistency map</h2><p className="mt-1 text-sm text-[var(--soft-muted)]">Tap a scheduled day to correct its completion.</p></div><div className="flex gap-3 text-xs text-[var(--soft-muted)]"><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--chart-green)]" />Done</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--theme-missed)]" />Missed</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--theme-muted-cell)]" />Not scheduled</span></div></div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-xl font-semibold">Daily consistency map</h2><p className="mt-1 text-sm text-[var(--soft-muted)]">Read-only history from your daily check-ins.</p></div><div className="flex gap-3 text-xs text-[var(--soft-muted)]"><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--chart-green)]" />Done</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--theme-missed)]" />Missed</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--theme-muted-cell)]" />Not scheduled</span></div></div>
             <div className="mt-6 overflow-x-auto rounded-2xl border border-black/[0.06] bg-[var(--theme-paper)]">
               <table className="table-fixed border-separate border-spacing-0 text-xs" style={{ minWidth: `${256 + daysInMonth * 40}px`, width: `max(100%, ${256 + daysInMonth * 40}px)` }}>
                 <thead><tr><th className="sticky left-0 z-10 w-44 border-b border-r border-black/[0.07] bg-[var(--theme-paper-warm)] px-4 py-3 text-left font-semibold">Habit</th>{Array.from({ length: daysInMonth }, (_, index) => <th className={`w-10 border-b border-black/[0.06] py-3 text-center font-medium ${index + 1 === 5 ? "bg-[var(--theme-highlight)] text-[var(--chart-ink)]" : "text-[var(--soft-muted)]"}`} key={index}>{index + 1}</th>)}<th className="sticky right-0 z-10 w-20 border-b border-l border-black/[0.07] bg-[var(--theme-paper-warm)] px-2 font-semibold">Score</th></tr></thead>
-                <tbody>{habits.map((habit) => <tr key={habit.id}><th className="sticky left-0 z-10 border-b border-r border-black/[0.06] bg-[var(--theme-paper)] px-4 py-3 text-left font-medium"><span className="mr-2 inline-block size-2 rounded-full" style={{ backgroundColor: habit.color }} />{habit.name}</th>{habit.days.map((state, dayIndex) => <td className={`border-b border-black/[0.04] p-1 ${dayIndex + 1 === 5 ? "bg-[color:color-mix(in_srgb,var(--theme-highlight)_55%,transparent)]" : ""}`} key={dayIndex}><button aria-label={`${habit.name}, ${monthName} ${dayIndex + 1}: ${state}`} className={`grid size-8 place-items-center rounded-lg text-[11px] font-bold transition ${state === "done" ? "bg-[var(--chart-green)] text-white hover:bg-[var(--chart-rust)]" : state === "missed" ? "bg-[var(--theme-missed)] text-[var(--chart-rust)] hover:bg-[var(--chart-green)] hover:text-white" : "cursor-default bg-[var(--theme-muted-cell)] text-[var(--soft-muted)] opacity-55"}`} disabled={state === "off"} onClick={() => toggleCell(habit.id, dayIndex)} type="button">{state === "done" ? "✓" : state === "missed" ? "·" : "–"}</button></td>)}<td className="sticky right-0 z-10 border-b border-l border-black/[0.06] bg-[var(--theme-paper)] text-center font-semibold text-[var(--chart-green)]">{habitConsistency(habit)}%</td></tr>)}</tbody>
+                <tbody>{habits.map((habit) => <tr key={habit.id}><th className="sticky left-0 z-10 border-b border-r border-black/[0.06] bg-[var(--theme-paper)] px-4 py-3 text-left font-medium"><span className="mr-2 inline-block size-2 rounded-full" style={{ backgroundColor: habit.color }} />{habit.name}</th>{habit.days.map((state, dayIndex) => <td className={`border-b border-black/[0.04] p-1 ${dayIndex + 1 === now.getDate() ? "bg-[color:color-mix(in_srgb,var(--theme-highlight)_55%,transparent)]" : ""}`} key={dayIndex}><span aria-label={`${habit.name}, ${monthName} ${dayIndex + 1}: ${state}`} className={`grid size-8 place-items-center rounded-lg text-[11px] font-bold ${state === "done" ? "bg-[var(--chart-green)] text-white" : state === "missed" ? "bg-[var(--theme-missed)] text-[var(--chart-rust)]" : "bg-[var(--theme-muted-cell)] text-[var(--soft-muted)] opacity-55"}`}>{state === "done" ? "✓" : state === "missed" ? "·" : "–"}</span></td>)}<td className="sticky right-0 z-10 border-b border-l border-black/[0.06] bg-[var(--theme-paper)] text-center font-semibold text-[var(--chart-green)]">{habitConsistency(habit)}%</td></tr>)}</tbody>
               </table>
               <div aria-label={`Daily consistency across ${monthName}`} className="grid border-t border-white/10 bg-[var(--chart-deep)] text-white" style={{ gridTemplateColumns: `176px minmax(${daysInMonth * 40}px, 1fr) 80px`, minWidth: `${256 + daysInMonth * 40}px`, width: `max(100%, ${256 + daysInMonth * 40}px)` }}>
                 <div className="flex flex-col justify-center border-r border-white/10 px-5"><p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[var(--chart-primary)]">{daysInMonth}-day pulse</p><p className="mt-2 text-sm font-semibold leading-5">Daily<br />consistency</p></div>

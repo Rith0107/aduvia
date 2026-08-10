@@ -68,7 +68,7 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
 
         <div className="soft-quest-signal">
           <div className="flex items-center justify-between"><p className="soft-kicker text-[var(--soft-accent)]">In your orbit</p><span className="soft-quest-status">On course</span></div>
-          <div className="soft-orbit-mark" aria-hidden="true">{quests.slice(0, 4).map((quest, index) => <span className={quest.status === "completed" ? "complete" : ""} key={quest.id} style={{ "--orbit-index": index } as React.CSSProperties}><i>✓</i></span>)}</div>
+          <div className="soft-orbit-mark" aria-hidden="true">{quests.slice(0, 4).map((quest, index) => <span className={quest.status === "completed" ? "complete" : ""} key={quest.id} style={{ "--orbit-index": index } as React.CSSProperties} />)}</div>
           <div className="soft-quest-feature">
             <p className="soft-quest-percentage">{questProgress}<span>%</span></p>
             <p className="mt-5 text-xs text-[var(--soft-muted)]">Monthly side quests</p>
