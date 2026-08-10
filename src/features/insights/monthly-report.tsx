@@ -313,7 +313,7 @@ export function MonthlyReport() {
   }, [appData, daysInMonth, fallbackHabits, reportMonth.month, reportMonth.year]);
 
   const overallConsistency = useMemo(
-    () => Math.round(habits.reduce((sum, habit) => sum + habitConsistency(habit), 0) / habits.length),
+    () => habits.length ? Math.round(habits.reduce((sum, habit) => sum + habitConsistency(habit), 0) / habits.length) : 0,
     [habits],
   );
   const dailyConsistency = useMemo(
@@ -332,7 +332,7 @@ export function MonthlyReport() {
       return { day: name.slice(0, 1), name, score: points.length ? Math.round(points.reduce((sum, point) => sum + point.score, 0) / points.length) : 0 };
     });
   }, [dailyConsistency, reportMonth.month, reportMonth.year]);
-  const bestDay = weekdayReport.reduce((best, day) => day.score > best.score ? day : best, weekdayReport[0]);
+  const bestDay = weekdayReport.reduce((best, day) => day.score > best.score ? day : best, weekdayReport[0] ?? { day: "–", name: "No data yet", score: 0 });
   const daysShownUp = dailyConsistency.filter((point) => point.score > 0).length;
   const completedQuestTitles = appData ? appData.quests.filter((quest) => quest.status === "completed").map((quest) => quest.title) : fallbackCompletedQuests;
   const categoryBalance = useMemo(() => {

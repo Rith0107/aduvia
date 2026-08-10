@@ -20,7 +20,10 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
   const [localHabits, setLocalHabits] = useState(initialHabits);
   const habits = appData ? todaysHabits(appData.habits, appData.completions) : localHabits;
   const quests = appData?.quests ?? [];
-  const [reflection, setReflection] = useState("");
+  const todayKey = (() => { const date = new Date(); return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`; })();
+  const [reflectionDraft, setReflectionDraft] = useState<string | null>(null);
+  const reflection = reflectionDraft ?? appData?.reflections[todayKey] ?? "";
+  const [reflectionStatus, setReflectionStatus] = useState<"idle" | "saving" | "saved">("idle");
   const completedCount = habits.filter((habit) => habit.status === "complete").length;
   const efficiency = useMemo(() => calculateRoutineEfficiency(habits.map(({ completion, priority }) => ({ completion, priority }))), [habits]);
   const completedQuests = quests.filter((quest) => quest.status === "completed").length;
@@ -35,6 +38,13 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
 
   function toggleQuest(id: string) {
     appData?.setQuests((current) => current.map((quest) => quest.id === id ? { ...quest, status: quest.status === "completed" ? "in-progress" : "completed", dueLabel: quest.status === "completed" ? "Aug 31" : "Completed" } : quest));
+  }
+
+  async function saveReflection() {
+    if (!reflection.trim() || reflectionStatus === "saving") return;
+    setReflectionStatus("saving");
+    const saved = appData ? await appData.saveReflection(reflection) : true;
+    setReflectionStatus(saved ? "saved" : "idle");
   }
 
   return (
@@ -82,8 +92,8 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
         <div className="soft-note-ribbon lg:col-span-2">
           <div><p className="soft-kicker">One quiet note</p><p className="mt-2 text-sm text-[var(--soft-muted)]">Keep the feeling, not the full story.</p></div>
           <label className="sr-only" htmlFor="daily-reflection">One-line reflection</label>
-          <input id="daily-reflection" maxLength={180} onChange={(event) => setReflection(event.target.value)} placeholder="What felt good today?" value={reflection} />
-          <button aria-label="Save note" disabled={!reflection.trim()} type="button"><span>{reflection.trim() ? "Keep note" : "Write a thought"}</span><span aria-hidden="true">→</span></button>
+          <input id="daily-reflection" maxLength={180} onChange={(event) => { setReflectionDraft(event.target.value); setReflectionStatus("idle"); }} placeholder="What felt good today?" value={reflection} />
+          <button aria-label="Save note" disabled={!reflection.trim() || reflectionStatus === "saving"} onClick={saveReflection} type="button"><span>{reflectionStatus === "saved" ? "Note kept" : reflectionStatus === "saving" ? "Saving…" : reflection.trim() ? "Keep note" : "Write a thought"}</span><span aria-hidden="true">{reflectionStatus === "saved" ? "✓" : "→"}</span></button>
         </div>
       </section>
     </AppShell>

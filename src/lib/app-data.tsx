@@ -16,8 +16,10 @@ type AppData = {
   quests: QuestSummary[];
   setQuests: React.Dispatch<React.SetStateAction<QuestSummary[]>>;
   completions: CompletionMap;
+  reflections: Record<string, string>;
   syncError: string | null;
   setHabitStatus: (habitId: string, status: "pending" | "complete" | "skipped", date?: Date) => void;
+  saveReflection: (note: string, date?: Date) => Promise<boolean>;
 };
 
 const STORAGE_KEY = "aduvia-app-data-v1";
@@ -29,6 +31,7 @@ type RemoteCategory = { id: string; name: string; color: string | null };
 type RemoteHabit = { id: string; name: string; schedule: unknown; priority: number; status: "active" | "paused" | "archived"; category_id: string | null };
 type RemoteQuest = { id: string; title: string; target_date: string | null; estimated_minutes: number | null; status: string; category_id: string | null };
 type RemoteCheckIn = { habit_id: string; scheduled_date: string; status: string };
+type RemoteReflection = { reflection_date: string; note: string | null };
 
 function hasRemoteConfiguration() {
   return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY));
@@ -118,6 +121,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [habits, setHabits] = useState(sampleHabitSummaries);
   const [quests, setQuests] = useState(sampleQuests);
   const [completions, setCompletions] = useState<CompletionMap>({});
+  const [reflections, setReflections] = useState<Record<string, string>>({});
   const [hydrated, setHydrated] = useState(false);
   const [remoteUserId, setRemoteUserId] = useState<string | null>(null);
   const [categoryIds, setCategoryIds] = useState<Record<string, string>>({});
@@ -131,13 +135,14 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       const { data: authData } = await supabase.auth.getUser();
       if (!active || !authData.user) return;
       const userId = authData.user.id;
-      const [{ data: categoryRows, error: categoryError }, { data: habitRows, error: habitError }, { data: questRows, error: questError }, { data: checkInRows, error: checkInError }] = await Promise.all([
+      const [{ data: categoryRows, error: categoryError }, { data: habitRows, error: habitError }, { data: questRows, error: questError }, { data: checkInRows, error: checkInError }, { data: reflectionRows, error: reflectionError }] = await Promise.all([
         supabase.from("categories").select("id,name,color").eq("user_id", userId),
         supabase.from("habits").select("id,name,schedule,priority,status,category_id").eq("user_id", userId),
         supabase.from("side_quests").select("id,title,target_date,estimated_minutes,status,category_id").eq("user_id", userId),
         supabase.from("habit_check_ins").select("habit_id,scheduled_date,status").eq("user_id", userId),
+        supabase.from("daily_reflections").select("reflection_date,note").eq("user_id", userId),
       ]);
-      const error = categoryError || habitError || questError || checkInError;
+      const error = categoryError || habitError || questError || checkInError || reflectionError;
       if (error) throw error;
       if (!active) return;
       const categories = (categoryRows ?? []) as RemoteCategory[];
@@ -159,6 +164,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         completionState[check.scheduled_date] = { ...(completionState[check.scheduled_date] ?? {}), [check.habit_id]: status };
       });
       setCompletions(completionState);
+      setReflections(Object.fromEntries(((reflectionRows ?? []) as RemoteReflection[]).map((reflection) => [reflection.reflection_date, reflection.note ?? ""])));
       setRemoteUserId(userId);
       setHydrated(true);
     })().catch((error: unknown) => {
@@ -166,6 +172,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       setHabits([]);
       setQuests([]);
       setCompletions({});
+      setReflections({});
       setSyncError(error instanceof Error ? error.message : "Unable to load your Aduvia data.");
       setHydrated(true);
     });
@@ -178,10 +185,11 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       const saved = window.localStorage.getItem(STORAGE_KEY);
       if (saved) {
         try {
-          const parsed = JSON.parse(saved) as Partial<{ habits: HabitSummary[]; quests: QuestSummary[]; completions: CompletionMap }>;
+          const parsed = JSON.parse(saved) as Partial<{ habits: HabitSummary[]; quests: QuestSummary[]; completions: CompletionMap; reflections: Record<string, string> }>;
           if (parsed.habits) setHabits(parsed.habits);
           if (parsed.quests) setQuests(parsed.quests);
           if (parsed.completions) setCompletions(parsed.completions);
+          if (parsed.reflections) setReflections(parsed.reflections);
         } catch { /* Keep the safe sample state if storage is malformed. */ }
       }
       setHydrated(true);
@@ -190,8 +198,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (hydrated && !hasRemoteConfiguration()) window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ habits, quests, completions }));
-  }, [completions, habits, hydrated, quests]);
+    if (hydrated && !hasRemoteConfiguration()) window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ habits, quests, completions, reflections }));
+  }, [completions, habits, hydrated, quests, reflections]);
 
   async function ensureCategories(names: string[]) {
     if (!remoteUserId) return categoryIds;
@@ -232,7 +240,19 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   }
 
   const value = useMemo<AppData>(() => ({
-    habits, setHabits: updateHabits, quests, setQuests: updateQuests, completions, syncError,
+    habits, setHabits: updateHabits, quests, setQuests: updateQuests, completions, reflections, syncError,
+    async saveReflection(note, date = new Date()) {
+      const key = dateKey(date);
+      const cleanNote = note.trim();
+      setReflections((current) => ({ ...current, [key]: cleanNote }));
+      if (!remoteUserId) return true;
+      const { error } = await createBrowserSupabaseClient().from("daily_reflections").upsert({ user_id: remoteUserId, reflection_date: key, note: cleanNote }, { onConflict: "user_id,reflection_date" });
+      if (error) {
+        setSyncError(error.message);
+        return false;
+      }
+      return true;
+    },
     setHabitStatus(habitId, status, date = new Date()) {
       const key = dateKey(date);
       setCompletions((current) => {
@@ -254,7 +274,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     },
   // The dispatcher functions intentionally use the latest render's remote identity and category map.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [categoryIds, completions, habits, quests, remoteUserId, syncError]);
+  }), [categoryIds, completions, habits, quests, reflections, remoteUserId, syncError]);
 
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;
 }

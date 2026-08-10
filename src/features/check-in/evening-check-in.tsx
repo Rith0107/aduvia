@@ -23,6 +23,7 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
   const answeredCount = habits.filter((habit) => habit.status !== "pending").length;
   const efficiency = useMemo(() => calculateRoutineEfficiency(habits.map(({ completion, priority }) => ({ completion, priority }))), [habits]);
   const allAnswered = habits.every((habit) => habit.status !== "pending");
+  const completionRatio = habits.length ? completedCount / habits.length : 0;
 
   function setHabitStatus(id: string, completed: boolean) {
     if (appData) appData.setHabitStatus(id, completed ? "complete" : "skipped");
@@ -59,12 +60,12 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
               <p className="soft-kicker text-[var(--soft-accent)]">Your evening reset · under a minute</p>
               <h1>Four choices.<br />Then rest.</h1>
             </div>
-            <div className="evening-progress-dial" style={{ "--check-progress": `${(completedCount / habits.length) * 360}deg` } as React.CSSProperties}>
+            <div className="evening-progress-dial" style={{ "--check-progress": `${completionRatio * 360}deg` } as React.CSSProperties}>
               <div><strong>{completedCount}</strong><span>of {habits.length} done</span></div>
             </div>
             <div className="evening-intro-copy">
               <p>Choose what happened.<br />No scoring. No explanations.</p>
-              <div aria-label="Completed habits" aria-valuemax={habits.length} aria-valuemin={0} aria-valuenow={completedCount} className="evening-progress-line" role="progressbar"><span style={{ width: `${(completedCount / habits.length) * 100}%` }} /></div>
+              <div aria-label="Completed habits" aria-valuemax={habits.length} aria-valuemin={0} aria-valuenow={completedCount} className="evening-progress-line" role="progressbar"><span style={{ width: `${completionRatio * 100}%` }} /></div>
               <small>{allAnswered ? "Ready to let go" : `${habits.length - answeredCount} choices left`}</small>
             </div>
           </div>
