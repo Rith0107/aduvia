@@ -4,8 +4,9 @@ import { BrandLogo } from "@/components/brand-logo";
 
 export function LandingPage() {
   return (
-    <main className="landing-canvas min-h-screen overflow-hidden text-[#203029]">
-      <header className="sticky top-0 z-50 border-b border-[#173f32]/8 bg-[#f3f3ec]/78 backdrop-blur-2xl">
+    <main className="landing-canvas public-canvas min-h-screen overflow-hidden text-[var(--soft-ink)]">
+      <a className="skip-link" href="#landing-content">Skip to main content</a>
+      <header className="public-toolbar sticky top-0 z-50 border-b">
         <div className="mx-auto flex max-w-[1500px] items-center justify-between px-5 py-4 sm:px-9 lg:px-14">
           <BrandLogo />
           <nav aria-label="Landing page" className="hidden items-center gap-8 text-xs font-semibold text-[#5d6b64] md:flex"><a href="#why">Why Aduvia</a><a href="#how">How it works</a><a href="#month">Your month</a></nav>
@@ -13,7 +14,7 @@ export function LandingPage() {
         </div>
       </header>
 
-      <section className="relative mx-auto grid min-h-[760px] max-w-[1500px] items-center gap-14 px-5 py-20 sm:px-9 lg:grid-cols-[.9fr_1.1fr] lg:px-14 lg:py-28">
+      <section className="relative mx-auto grid min-h-[760px] max-w-[1500px] items-center gap-14 px-5 py-20 sm:px-9 lg:grid-cols-[.9fr_1.1fr] lg:px-14 lg:py-28" id="landing-content">
         <div className="pointer-events-none absolute -left-40 top-8 size-[500px] rounded-full bg-[#b8d7c7]/35 blur-3xl" />
         <div className="relative">
           <p className="inline-flex items-center gap-2 rounded-full bg-[#efddd4] px-4 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#9a5d49]"><Sparkles size={13} />Progress without pressure</p>

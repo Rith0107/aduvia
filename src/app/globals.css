@@ -224,20 +224,50 @@ h3 {
   background-attachment: fixed;
 }
 
-.auth-canvas {
+.auth-canvas,
+.landing-canvas,
+.public-canvas {
   background:
-    radial-gradient(circle at 7% 12%, rgb(177 211 195 / 92%), transparent 34%),
-    radial-gradient(circle at 94% 8%, rgb(232 190 169 / 88%), transparent 36%),
-    radial-gradient(circle at 74% 92%, rgb(184 205 218 / 78%), transparent 31%),
-    linear-gradient(145deg, #dce8e0, #eee4d9 60%, #d5e1e1);
+    radial-gradient(circle at 7% 12%, color-mix(in srgb, var(--soft-tint-a) 88%, transparent), transparent 34%),
+    radial-gradient(circle at 94% 8%, color-mix(in srgb, var(--soft-tint-b) 84%, transparent), transparent 36%),
+    radial-gradient(circle at 74% 92%, color-mix(in srgb, var(--soft-tint-c) 76%, transparent), transparent 31%),
+    linear-gradient(145deg, var(--soft-surface), color-mix(in srgb, var(--soft-surface) 72%, var(--soft-tint-b)) 60%, color-mix(in srgb, var(--soft-surface) 70%, var(--soft-tint-a)));
   background-attachment: fixed;
 }
 
-.landing-canvas {
-  background:
-    radial-gradient(circle at 8% 7%, rgb(193 219 206 / 72%), transparent 31%),
-    radial-gradient(circle at 94% 5%, rgb(235 208 193 / 76%), transparent 32%),
-    linear-gradient(145deg, #eef1eb, #f3eee7 58%, #e2e9e6);
+.public-canvas {
+  /* Aduvia Calm is the fixed pre-auth identity; personal themes begin inside the app. */
+  --font-body: var(--type-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: var(--type-manrope), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --soft-canvas: #e7e8e3;
+  --soft-surface: #eef0e9;
+  --soft-ink: #29322c;
+  --soft-muted: #737b75;
+  --soft-accent: #a86f5b;
+  --soft-tint-a: #d7e3dc;
+  --soft-tint-b: #ead8cd;
+  --soft-tint-c: #dbe2e9;
+  --soft-icon-green: #2f6f5e;
+  --soft-icon-clay: #a35f49;
+  --soft-icon-blue: #456c85;
+  --soft-icon-gold: #9b762f;
+  --chart-deep: #143d31;
+  --chart-primary: #d89a42;
+  --chart-surface: #f3e7ca;
+  --theme-paper: #fffdf8;
+}
+
+.public-surface {
+  border: 1px solid rgb(255 255 255 / 70%);
+  background: color-mix(in srgb, var(--soft-surface) 84%, transparent);
+  box-shadow: 0 34px 90px -48px color-mix(in srgb, var(--soft-ink) 46%, transparent);
+  backdrop-filter: blur(24px);
+}
+
+.public-toolbar {
+  border-color: color-mix(in srgb, var(--soft-ink) 8%, transparent);
+  background: color-mix(in srgb, var(--soft-surface) 80%, transparent);
+  backdrop-filter: blur(24px) saturate(145%);
 }
 
 .landing-canvas a {
