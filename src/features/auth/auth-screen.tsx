@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Check, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import { BrandLogo } from "@/components/brand-logo";
 
@@ -125,7 +125,9 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
           <div className="relative w-full max-w-[470px]">
             <div className="flex items-center justify-between lg:hidden"><BrandLogo /><span className="rounded-full bg-[#dce8e1] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#2f6f5e]">Your quiet space</span></div>
 
-            <p className="mt-14 inline-flex rounded-full bg-[#f0ddd4] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9a5c48] lg:mt-0">{isSignup ? "Begin your rhythm" : "Welcome back"}</p>
+            <Link className="mt-8 flex w-fit items-center gap-2 text-[11px] font-semibold text-[#607168] transition hover:text-[#2f6f5e] lg:mt-10" href="/"><ArrowLeft size={14} />Back to Aduvia</Link>
+
+            <p className="mt-8 inline-flex rounded-full bg-[#f0ddd4] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9a5c48] lg:mt-9">{isSignup ? "Begin your rhythm" : "Welcome back"}</p>
             <h2 className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{isSignup ? "Create your space." : "Continue your story."}</h2>
             <p className="mt-4 text-sm leading-6 text-stone-500">{isSignup ? "A private home for your routines, monthly quests, and progress." : "Your routines and quests are waiting exactly where you left them."}</p>
 
@@ -147,8 +149,8 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
               <button className="group flex w-full items-center justify-between rounded-full bg-[linear-gradient(100deg,#1f4f40,#2f6f5e)] py-2 pl-6 pr-2 text-sm font-semibold text-white shadow-[0_16px_34px_rgba(36,80,62,.24)] transition hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-60" disabled={submitting} type="submit"><span>{submitting ? "Please wait…" : isSignup ? "Create my account" : "Enter Aduvia"}</span><span className="grid size-11 place-items-center rounded-full bg-[#e0a13f] text-[#24302a] shadow-[inset_0_1px_0_rgba(255,255,255,.38)] transition group-hover:translate-x-0.5"><ArrowRight size={18} /></span></button>
             </form>
 
-            {!isSignup && <div className="mt-5 flex items-center gap-3"><span className="h-px flex-1 bg-[#24302a]/10" /><span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-400">or</span><span className="h-px flex-1 bg-[#24302a]/10" /></div>}
-            {!isSignup && <Link className="mt-5 flex w-full items-center justify-center rounded-full border border-[#2f6f5e]/15 bg-white/55 px-5 py-4 text-sm font-semibold text-[#2f6f5e] transition hover:bg-white" href="/today">Preview with demo data</Link>}
+            <div className="mt-5 flex items-center gap-3"><span className="h-px flex-1 bg-[#24302a]/10" /><span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-400">or</span><span className="h-px flex-1 bg-[#24302a]/10" /></div>
+            <Link className="mt-5 flex w-full items-center justify-center rounded-full border border-[#2f6f5e]/15 bg-white/55 px-5 py-4 text-sm font-semibold text-[#2f6f5e] transition hover:bg-white" href="/today">{isSignup ? "Explore the demo first" : "Preview with demo data"}</Link>
 
             <p className="mt-8 text-center text-sm text-stone-500">{isSignup ? "Already have your space?" : "New to Aduvia?"} <Link className="font-semibold text-[#2f6f5e] hover:underline" href={isSignup ? "/login" : "/signup"}>{isSignup ? "Log in" : "Create an account"}</Link></p>
           </div>
