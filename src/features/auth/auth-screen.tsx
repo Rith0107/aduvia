@@ -61,7 +61,7 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
     try {
       const supabase = createBrowserSupabaseClient();
       const result = isSignup
-        ? await supabase.auth.signUp({ email, password, options: { data: { display_name: name.trim() } } })
+        ? await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/today`, data: { display_name: name.trim(), timezone: Intl.DateTimeFormat().resolvedOptions().timeZone } } })
         : await supabase.auth.signInWithPassword({ email, password });
 
       if (result.error) throw result.error;
@@ -148,9 +148,6 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
 
               <button className="group flex w-full items-center justify-between rounded-full bg-[linear-gradient(100deg,#1f4f40,#2f6f5e)] py-2 pl-6 pr-2 text-sm font-semibold text-white shadow-[0_16px_34px_rgba(36,80,62,.24)] transition hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-60" disabled={submitting} type="submit"><span>{submitting ? "Please wait…" : isSignup ? "Create my account" : "Enter Aduvia"}</span><span className="grid size-11 place-items-center rounded-full bg-[#e0a13f] text-[#24302a] shadow-[inset_0_1px_0_rgba(255,255,255,.38)] transition group-hover:translate-x-0.5"><ArrowRight size={18} /></span></button>
             </form>
-
-            <div className="mt-5 flex items-center gap-3"><span className="h-px flex-1 bg-[#24302a]/10" /><span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-400">or</span><span className="h-px flex-1 bg-[#24302a]/10" /></div>
-            <Link className="mt-5 flex w-full items-center justify-center rounded-full border border-[#2f6f5e]/15 bg-white/55 px-5 py-4 text-sm font-semibold text-[#2f6f5e] transition hover:bg-white" href="/today">{isSignup ? "Explore the demo first" : "Preview with demo data"}</Link>
 
             <p className="mt-8 text-center text-sm text-stone-500">{isSignup ? "Already have your space?" : "New to Aduvia?"} <Link className="font-semibold text-[#2f6f5e] hover:underline" href={isSignup ? "/login" : "/signup"}>{isSignup ? "Log in" : "Create an account"}</Link></p>
           </div>

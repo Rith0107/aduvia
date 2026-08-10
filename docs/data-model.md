@@ -26,10 +26,15 @@ Priorities use integer weights:
 - Medium: `2`
 - High: `3`
 
-## Before production data
+## Production foundation
 
-- Add a profile-creation trigger for new authenticated users.
-- Validate category ownership when assigning categories.
-- Validate habit ownership when inserting check-ins.
-- Add updated-at triggers.
+- New authenticated users receive a profile automatically.
+- Category, check-in, and milestone relationships validate ownership.
+- Mutable records maintain `updated_at` automatically.
+- Quest storage supports the paused state used by the product UI.
+
+## Before launch
+
 - Test every row-level security policy against two separate users.
+- Add generated TypeScript database types to CI.
+- Define retention and account-deletion behavior for user-owned data.

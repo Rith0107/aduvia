@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ChartNoAxesCombined, CircleCheck, Gem, ListChecks, MoonStar } from "lucide-react";
@@ -5,6 +7,7 @@ import { AccountMenu } from "@/components/account-menu";
 import { BrandLogo } from "@/components/brand-logo";
 import { PaletteChooser } from "@/components/palette-chooser";
 import { TypographyChooser } from "@/components/typography-chooser";
+import { useAppData } from "@/lib/app-data";
 
 const navItems = [
   { label: "Today", href: "/today", icon: CircleCheck },
@@ -22,6 +25,7 @@ type AppShellProps = {
 };
 
 export function AppShell({ active, children, eyebrow, title, action }: AppShellProps) {
+  const syncError = useAppData()?.syncError;
   return (
     <main className="soft-canvas min-h-screen text-[var(--soft-ink)]">
       <div className="soft-shell min-h-screen overflow-hidden">
@@ -41,6 +45,7 @@ export function AppShell({ active, children, eyebrow, title, action }: AppShellP
         </header>
 
         <div className="mx-auto max-w-[1800px] px-5 pb-24 pt-9 sm:px-9 lg:px-14 lg:pb-14">
+          {syncError && <div className="mb-6 rounded-2xl border border-[var(--soft-icon-clay)]/25 bg-white/55 px-4 py-3 text-sm text-[var(--soft-ink)]" role="status"><strong>Changes are not syncing.</strong> {syncError}</div>}
           <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[var(--soft-accent)]">{eyebrow}</p>

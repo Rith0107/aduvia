@@ -54,7 +54,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
     [filter, quests],
   );
   const completed = quests.filter((quest) => quest.status === "completed").length;
-  const overallProgress = Math.round((completed / quests.length) * 100);
+  const overallProgress = quests.length ? Math.round((completed / quests.length) * 100) : 0;
 
   function toggleQuestCompletion(id: string) {
     setQuests((current) =>
@@ -91,7 +91,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
     setQuests((current) => [
       ...current,
       {
-        id: `quest-${current.length + 1}`,
+        id: crypto.randomUUID(),
         title: title.trim(),
         category: inferQuestCategory(title),
         status: "not-started",
