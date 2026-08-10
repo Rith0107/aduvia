@@ -26,6 +26,14 @@ describe("MonthlyReport", () => {
     expect(storyFormat).toHaveAttribute("aria-pressed", "true");
   });
 
+  it("offers distinct visual trims for the share artifact", () => {
+    render(<MonthlyReport />);
+    const aurora = screen.getByRole("button", { name: "aurora" });
+    fireEvent.click(aurora);
+    expect(aurora).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "archive" })).toBeInTheDocument();
+  });
+
   it("uses the calendar day count when changing months", () => {
     render(<MonthlyReport />);
     const previous = screen.getByRole("button", { name: "Previous month" });

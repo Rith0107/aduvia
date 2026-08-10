@@ -20,6 +20,7 @@ import {
 
 type CellState = "done" | "missed" | "off";
 type ShareFormat = "square" | "story";
+type ShareTrim = "orbit" | "archive" | "aurora";
 
 type ReportHabit = {
   id: string;
@@ -96,7 +97,7 @@ function cardDimensions(format: ShareFormat) {
   return format === "story" ? { width: 1080, height: 1920 } : { width: 1080, height: 1080 };
 }
 
-async function renderShareCard(format: ShareFormat, consistency: number, monthLabel: string, completedQuestTitles: string[], habits: ReportHabit[], daysShownUp: number) {
+async function renderShareCard(format: ShareFormat, trim: ShareTrim, consistency: number, monthLabel: string, completedQuestTitles: string[], habits: ReportHabit[], daysShownUp: number) {
   const { width, height } = cardDimensions(format);
   const canvas = document.createElement("canvas");
   canvas.width = width;
@@ -119,6 +120,32 @@ async function renderShareCard(format: ShareFormat, consistency: number, monthLa
   gradient.addColorStop(1, green);
   context.fillStyle = gradient;
   context.fillRect(0, 0, width, height);
+
+  if (trim === "archive") {
+    context.strokeStyle = primary;
+    context.lineWidth = 5;
+    context.strokeRect(28, 28, width - 56, height - 56);
+    context.strokeStyle = "rgba(255,255,255,.28)";
+    context.lineWidth = 2;
+    context.strokeRect(44, 44, width - 88, height - 88);
+    context.fillStyle = primary;
+    [[28, 28], [width - 28, 28], [28, height - 28], [width - 28, height - 28]].forEach(([x, y]) => { context.beginPath(); context.arc(x, y, 11, 0, Math.PI * 2); context.fill(); });
+  }
+  if (trim === "aurora") {
+    const glow = context.createRadialGradient(width * .15, height * .12, 0, width * .15, height * .12, width * .65);
+    glow.addColorStop(0, "rgba(124,227,210,.38)");
+    glow.addColorStop(.55, "rgba(189,142,174,.18)");
+    glow.addColorStop(1, "rgba(0,0,0,0)");
+    context.fillStyle = glow;
+    context.fillRect(0, 0, width, height);
+    const edge = context.createLinearGradient(0, 0, width, height);
+    edge.addColorStop(0, "#8fe1d0");
+    edge.addColorStop(.5, primary);
+    edge.addColorStop(1, "#c99fc8");
+    context.strokeStyle = edge;
+    context.lineWidth = 14;
+    context.strokeRect(12, 12, width - 24, height - 24);
+  }
 
   context.strokeStyle = "rgba(255,255,255,.035)";
   context.lineWidth = 2;
@@ -246,6 +273,7 @@ export function MonthlyReport() {
   const [reportMonth, setReportMonth] = useState({ year: now.getFullYear(), month: now.getMonth() });
   const [fallbackHabits, setFallbackHabits] = useState(() => createReportHabits(now.getFullYear(), now.getMonth()));
   const [format, setFormat] = useState<ShareFormat>("square");
+  const [shareTrim, setShareTrim] = useState<ShareTrim>("orbit");
   const [shareMessage, setShareMessage] = useState("");
   const calendarDaysInMonth = new Date(reportMonth.year, reportMonth.month + 1, 0).getDate();
   const reportMonthStart = new Date(reportMonth.year, reportMonth.month, 1);
@@ -331,7 +359,7 @@ export function MonthlyReport() {
   }
 
   async function downloadCard() {
-    const blob = await renderShareCard(format, overallConsistency, monthLabel, completedQuestTitles, habits, daysShownUp);
+    const blob = await renderShareCard(format, shareTrim, overallConsistency, monthLabel, completedQuestTitles, habits, daysShownUp);
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -342,7 +370,7 @@ export function MonthlyReport() {
   }
 
   async function shareCard() {
-    const blob = await renderShareCard(format, overallConsistency, monthLabel, completedQuestTitles, habits, daysShownUp);
+    const blob = await renderShareCard(format, shareTrim, overallConsistency, monthLabel, completedQuestTitles, habits, daysShownUp);
     const file = new File([blob], `aduvia-${monthName.toLowerCase()}-${reportMonth.year}-${format}.png`, { type: "image/png" });
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
       await navigator.share({ files: [file], title: "My Aduvia monthly report" });
@@ -431,13 +459,20 @@ export function MonthlyReport() {
                   </div>
                 </fieldset>
 
+                <fieldset className="mt-6">
+                  <legend className="text-[10px] font-semibold uppercase tracking-[0.15em] text-stone-400">Choose a trim</legend>
+                  <div className="mt-3 flex flex-wrap gap-2">{(["orbit", "archive", "aurora"] as const).map((trim) => <button aria-pressed={shareTrim === trim} className={`rounded-full px-4 py-2 text-[11px] font-bold capitalize transition ${shareTrim === trim ? "bg-[var(--chart-deep)] text-white shadow-md" : "bg-white/55 text-[var(--soft-muted)] hover:bg-white"}`} key={trim} onClick={() => setShareTrim(trim)} type="button">{trim === "orbit" ? "Soft orbit" : trim}</button>)}</div>
+                </fieldset>
+
                 <div className="mt-auto flex flex-wrap gap-3 pt-9"><button className="inline-flex items-center gap-2 rounded-full bg-[var(--chart-primary)] px-5 py-3 text-sm font-semibold text-[var(--chart-deep)] shadow-[0_10px_24px_rgba(216,154,66,.22)] transition hover:-translate-y-0.5" onClick={shareCard} type="button"><Share2 size={16} />Share image</button><button className="inline-flex items-center gap-2 rounded-full border border-[color:color-mix(in_srgb,var(--chart-deep)_15%,transparent)] bg-white/65 px-5 py-3 text-sm font-semibold text-[var(--chart-deep)] transition hover:bg-white" onClick={downloadCard} type="button"><Download size={16} />Download</button></div>
                 {shareMessage && <p className="mt-4 text-xs text-[var(--soft-icon-green)]" role="status">{shareMessage}</p>}
               </div>
 
               <div className="grid min-h-[620px] place-items-center overflow-hidden rounded-[26px] bg-[linear-gradient(145deg,var(--soft-tint-a),var(--soft-surface))] p-5 sm:p-8">
-                <div className={`relative overflow-hidden bg-[linear-gradient(145deg,var(--chart-deep),color-mix(in_srgb,var(--chart-deep)_78%,var(--chart-green)))] text-white shadow-[0_30px_70px_rgba(20,61,49,.28)] transition-all duration-500 ${format === "story" ? "aspect-[9/16] w-full max-w-[310px] rounded-[34px] p-6" : "aspect-square w-full max-w-[560px] rounded-[38px] p-8 sm:p-9"}`}>
+                <div className={`relative overflow-hidden bg-[linear-gradient(145deg,var(--chart-deep),color-mix(in_srgb,var(--chart-deep)_78%,var(--chart-green)))] text-white shadow-[0_30px_70px_rgba(20,61,49,.28)] transition-all duration-500 ${shareTrim === "archive" ? "rounded-[8px] border-[5px] border-[var(--chart-primary)] outline outline-1 outline-offset-[-14px] outline-white/25" : shareTrim === "aurora" ? "rounded-[28px] border-[7px] border-[color:color-mix(in_srgb,var(--chart-primary)_55%,#9edfd5)] shadow-[0_0_45px_color-mix(in_srgb,var(--chart-primary)_24%,transparent)]" : "rounded-[38px]"} ${format === "story" ? "aspect-[9/16] w-full max-w-[310px] p-6" : "aspect-square w-full max-w-[560px] p-8 sm:p-9"}`}>
                   <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "repeating-radial-gradient(ellipse at 25% 10%, transparent 0 15px, rgba(255,255,255,.055) 16px 17px)" }} />
+                  {shareTrim === "archive" && <><i className="absolute left-4 top-4 size-2 rounded-full bg-[var(--chart-primary)]" /><i className="absolute right-4 top-4 size-2 rounded-full bg-[var(--chart-primary)]" /><i className="absolute bottom-4 left-4 size-2 rounded-full bg-[var(--chart-primary)]" /><i className="absolute bottom-4 right-4 size-2 rounded-full bg-[var(--chart-primary)]" /></>}
+                  {shareTrim === "aurora" && <div className="absolute -left-1/4 -top-1/4 size-[80%] rounded-full bg-[radial-gradient(circle,color-mix(in_srgb,#9edfd5_35%,transparent),color-mix(in_srgb,var(--chart-primary)_16%,transparent)_45%,transparent_70%)] blur-xl" />}
                   <div className="relative flex items-start justify-between"><div><p className="text-[9px] font-black uppercase tracking-[0.21em] text-[var(--chart-primary)]">Aduvia</p><p className="mt-1 text-[8px] uppercase tracking-[.14em] text-white/40">Monthly constellation</p></div><div className="text-right"><p className="text-[9px] font-semibold uppercase tracking-[.14em]">{monthName}</p><p className="mt-1 text-[8px] text-white/35">{reportMonth.year} · #{String(reportMonth.month + 1).padStart(2, "0")}</p></div></div>
 
                   <div className={`relative mx-auto ${format === "story" ? "mt-8 h-[43%] w-full" : "mt-3 h-[48%] w-[92%]"}`} aria-label={`${monthLabel} habit constellation`}>

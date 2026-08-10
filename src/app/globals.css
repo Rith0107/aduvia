@@ -35,11 +35,9 @@
   --heatmap-low: #b96852;
 }
 
-:root[data-typography="cormorant-inter"] { --font-body: var(--type-inter), sans-serif; --font-display: var(--type-cormorant), Georgia, serif; }
-:root[data-typography="canela-inter"] { --font-body: var(--type-inter), sans-serif; --font-display: var(--type-dm-serif), Georgia, serif; }
-:root[data-typography="season-satoshi"] { --font-body: var(--type-manrope), sans-serif; --font-display: var(--type-bodoni), Georgia, serif; }
-:root[data-typography="athelas-vanguard"] { --font-body: var(--type-space), sans-serif; --font-display: var(--type-lora), Georgia, serif; }
-:root[data-typography="archivo-stix"] { --font-body: var(--type-stix), Georgia, serif; --font-display: var(--type-archivo), sans-serif; }
+:root[data-typography="soft-journal"] { --font-body: var(--type-inter), sans-serif; --font-display: var(--type-lora), Georgia, serif; }
+:root[data-typography="quiet-literary"] { --font-body: var(--type-manrope), sans-serif; --font-display: var(--type-cormorant), Georgia, serif; }
+:root[data-typography="grounded-classic"] { --font-body: var(--type-archivo), sans-serif; --font-display: var(--type-stix), Georgia, serif; }
 
 :root[data-palette="coastal"] {
   --soft-canvas: #e5edef;
