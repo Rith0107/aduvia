@@ -30,7 +30,7 @@ export function scheduledDaysFor(habit: HabitSummary): HabitDay[] {
   if (habit.scheduledDays?.length) return habit.scheduledDays;
   if (habit.frequency === "Daily") return weekdayKeys;
   if (habit.frequency === "Weekdays") return ["Mon", "Tue", "Wed", "Thu", "Fri"];
-  if (habit.frequency === "3× weekly") return ["Mon", "Wed", "Fri"];
+  if (habit.frequency === "3× weekly") return ["Sun", "Tue", "Thu"];
   return [];
 }
 
