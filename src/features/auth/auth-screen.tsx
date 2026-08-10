@@ -61,14 +61,14 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
     try {
       const supabase = createBrowserSupabaseClient();
       const result = isSignup
-        ? await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/today`, data: { display_name: name.trim(), timezone: Intl.DateTimeFormat().resolvedOptions().timeZone } } })
+        ? await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/onboarding`, data: { display_name: name.trim(), timezone: Intl.DateTimeFormat().resolvedOptions().timeZone } } })
         : await supabase.auth.signInWithPassword({ email, password });
 
       if (result.error) throw result.error;
       if (isSignup && !result.data.session) {
         setMessage("Check your inbox to confirm your account.");
       } else {
-        router.push("/today");
+        router.push(isSignup ? "/onboarding" : "/today");
       }
     } catch (error) {
       setMessage(error instanceof Error && !error.message.includes("environment variables") ? error.message : "Authentication is ready once Supabase keys are added.");

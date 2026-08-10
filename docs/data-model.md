@@ -32,9 +32,10 @@ Priorities use integer weights:
 - Category, check-in, and milestone relationships validate ownership.
 - Mutable records maintain `updated_at` automatically.
 - Quest storage supports the paused state used by the product UI.
+- Authenticated users can permanently delete their own account through a narrowly scoped database function; cascading ownership relationships remove their Aduvia data with it.
 
 ## Before launch
 
 - Test every row-level security policy against two separate users.
 - Add generated TypeScript database types to CI.
-- Define retention and account-deletion behavior for user-owned data.
+- Document production retention periods and backup expiry.
