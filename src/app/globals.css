@@ -429,7 +429,7 @@ h3 {
 .soft-orbit-mark { position: absolute; top: 18%; right: -7%; width: 14rem; aspect-ratio: 1; border-radius: 50%; }
 .soft-orbit-mark span { position: absolute; inset: calc(var(--orbit-index) * 11%); border: 1px solid color-mix(in srgb, var(--soft-accent) 18%, transparent); border-radius: inherit; transform: rotate(calc(var(--orbit-index) * 72deg + 18deg)); }
 .soft-orbit-mark span::after { content: ""; position: absolute; top: 50%; left: -7px; width: 14px; aspect-ratio: 1; border: 2px solid color-mix(in srgb, var(--soft-accent) 70%, white); border-radius: 50%; background: var(--soft-surface); box-shadow: 0 5px 15px color-mix(in srgb, var(--soft-accent) 28%, transparent); }
-.soft-orbit-mark span.complete { animation: quest-orbit-complete .72s cubic-bezier(.22,.82,.2,1) 1; }
+.soft-orbit-mark span.complete { animation: quest-orbit-complete 1.4s cubic-bezier(.22,.72,.2,1) 1; }
 .soft-orbit-mark span.complete::after { background: var(--soft-accent); }
 @keyframes quest-orbit-complete { from { transform: rotate(calc(var(--orbit-index) * 72deg + 18deg)); } to { transform: rotate(calc(var(--orbit-index) * 72deg + 378deg)); } }
 @media (prefers-reduced-motion: reduce) { .soft-orbit-mark span.complete { animation: none; } }
