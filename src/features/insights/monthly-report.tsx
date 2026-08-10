@@ -160,13 +160,20 @@ async function renderShareCard(format: ShareFormat, trim: ShareTrim, consistency
   }
 
   const margin = 90;
-  context.fillStyle = primary;
+  const headerY = format === "story" ? 150 : 92;
+  if (trim === "aurora") {
+    context.fillStyle = "rgba(10,30,38,.62)";
+    context.beginPath();
+    context.roundRect(margin - 28, headerY - 48, width - margin * 2 + 56, 76, 22);
+    context.fill();
+  }
+  context.fillStyle = trim === "aurora" ? "#fffaf0" : primary;
   context.font = "700 25px system-ui";
-  context.fillText("ADUVIA · MONTHLY CONSTELLATION", margin, format === "story" ? 150 : 92);
-  context.fillStyle = "rgba(255,250,240,.48)";
+  context.fillText("ADUVIA · MONTHLY CONSTELLATION", margin, headerY);
+  context.fillStyle = trim === "aurora" ? "rgba(255,250,240,.82)" : "rgba(255,250,240,.48)";
   context.font = "500 22px system-ui";
   context.textAlign = "right";
-  context.fillText(monthLabel.toUpperCase(), width - margin, format === "story" ? 150 : 92);
+  context.fillText(monthLabel.toUpperCase(), width - margin, headerY);
   context.textAlign = "left";
 
   const orbitCenterX = width / 2;
@@ -258,7 +265,13 @@ async function renderShareCard(format: ShareFormat, trim: ShareTrim, consistency
     const maxLength = format === "story" ? 42 : 21;
     context.fillText(quest.length > maxLength ? `${quest.slice(0, maxLength - 1)}…` : quest, x + 30, y);
   });
-  context.fillStyle = "rgba(255,250,240,0.5)";
+  if (trim === "aurora") {
+    context.fillStyle = "rgba(10,30,38,.62)";
+    context.beginPath();
+    context.roundRect(margin - 28, height - 92, width - margin * 2 + 56, 62, 20);
+    context.fill();
+  }
+  context.fillStyle = trim === "aurora" ? "rgba(255,250,240,.86)" : "rgba(255,250,240,0.5)";
   context.font = "500 20px system-ui";
   context.fillText(`ISSUED ${monthLabel.toUpperCase()} · SMALL STEPS, VISIBLE PROOF`, margin, height - 55);
 
@@ -473,7 +486,7 @@ export function MonthlyReport() {
                   <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "repeating-radial-gradient(ellipse at 25% 10%, transparent 0 15px, rgba(255,255,255,.055) 16px 17px)" }} />
                   {shareTrim === "archive" && <><i className="absolute left-3 top-3 size-2 rounded-full bg-[var(--chart-primary)]" /><i className="absolute right-3 top-3 size-2 rounded-full bg-[var(--chart-primary)]" /><i className="absolute bottom-3 left-3 size-2 rounded-full bg-[var(--chart-primary)]" /><i className="absolute bottom-3 right-3 size-2 rounded-full bg-[var(--chart-primary)]" /><span className="absolute bottom-1/2 right-2 translate-y-1/2 rotate-90 text-[6px] font-black uppercase tracking-[.22em] text-white/25">Rhythm archive · verified record</span></>}
                   {shareTrim === "aurora" && <><div className="absolute -left-1/4 -top-1/4 size-[80%] rounded-full bg-[radial-gradient(circle,#9edfd566,transparent_68%)] blur-xl" /><i className="absolute left-[16%] top-[22%] size-1.5 rounded-full bg-[#d7b3ef] shadow-[0_0_12px_#d7b3ef]" /><i className="absolute right-[18%] top-[34%] size-1 rounded-full bg-[#9edfd5] shadow-[0_0_12px_#9edfd5]" /><i className="absolute bottom-[22%] left-[12%] size-1 rounded-full bg-[var(--chart-primary)] shadow-[0_0_12px_var(--chart-primary)]" /></>}
-                  <div className="relative flex items-start justify-between"><div><p className="text-[9px] font-black uppercase tracking-[0.21em] text-[var(--chart-primary)]">Aduvia</p><p className="mt-1 text-[8px] uppercase tracking-[.14em] text-white/40">Monthly constellation</p></div><div className="text-right"><p className="text-[9px] font-semibold uppercase tracking-[.14em]">{monthName}</p><p className="mt-1 text-[8px] text-white/35">{reportMonth.year} · #{String(reportMonth.month + 1).padStart(2, "0")}</p></div></div>
+                  <div className={`relative flex items-start justify-between ${shareTrim === "aurora" ? "rounded-xl bg-[#102936]/65 px-3 py-2 shadow-sm backdrop-blur-sm" : ""}`}><div><p className={`text-[9px] font-black uppercase tracking-[0.21em] ${shareTrim === "aurora" ? "text-[#fffaf0]" : "text-[var(--chart-primary)]"}`}>Aduvia</p><p className={`mt-1 text-[8px] uppercase tracking-[.14em] ${shareTrim === "aurora" ? "text-white/75" : "text-white/40"}`}>Monthly constellation</p></div><div className="text-right"><p className="text-[9px] font-semibold uppercase tracking-[.14em]">{monthName}</p><p className={`mt-1 text-[8px] ${shareTrim === "aurora" ? "text-white/70" : "text-white/35"}`}>{reportMonth.year} · #{String(reportMonth.month + 1).padStart(2, "0")}</p></div></div>
 
                   <div className={`relative mx-auto ${format === "story" ? "mt-8 h-[43%] w-full" : "mt-3 h-[48%] w-[92%]"}`} aria-label={`${monthLabel} habit constellation`}>
                     {habits.slice(0, 4).map((habit, orbitIndex) => {
@@ -485,7 +498,7 @@ export function MonthlyReport() {
                   </div>
 
                   <div className={`relative rounded-[22px] bg-[var(--chart-surface)] text-[var(--soft-ink)] ${format === "story" ? "p-4" : "p-5"}`}><p className="text-[7px] font-black uppercase tracking-[.18em] text-[var(--chart-ink)]">Constellation record</p><div className="mt-3 grid grid-cols-3 gap-2"><div><p className="text-2xl font-semibold">{daysShownUp}</p><p className="text-[7px] text-[var(--chart-ink)]">days in orbit</p></div><div><p className="text-2xl font-semibold">{habits.length}</p><p className="text-[7px] text-[var(--chart-ink)]">daily rituals</p></div><div><p className="text-2xl font-semibold">{completedQuestTitles.length}</p><p className="text-[7px] text-[var(--chart-ink)]">quests landed</p></div></div><div className={`mt-4 border-t border-[var(--chart-ink)]/15 pt-3 ${format === "story" ? "space-y-2" : "grid grid-cols-3 gap-2"}`}>{visibleShareQuests.map((quest, index) => <div className="flex min-w-0 items-center gap-2" key={quest}><span className="size-2 shrink-0 rounded-full bg-[var(--chart-primary)]" /><p className="truncate text-[8px] font-semibold">{String(index + 1).padStart(2, "0")} · {quest}</p></div>)}{remainingShareQuests > 0 && <p className="text-[8px] font-semibold text-[var(--chart-ink)]">+{remainingShareQuests} more in orbit</p>}</div></div>
-                  <div className="absolute bottom-4 left-6 right-6 flex items-center justify-between text-[6px] uppercase tracking-[.14em] text-white/35"><span>Issued {monthLabel}</span><span>Small steps · visible proof</span></div>
+                  <div className={`absolute bottom-4 left-6 right-6 flex items-center justify-between text-[6px] uppercase tracking-[.14em] ${shareTrim === "aurora" ? "rounded-full bg-[#102936]/70 px-3 py-2 text-white/85 shadow-sm backdrop-blur-sm" : "text-white/35"}`}><span>Issued {monthLabel}</span><span>Small steps · visible proof</span></div>
                 </div>
               </div>
             </div>
