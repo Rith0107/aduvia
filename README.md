@@ -6,7 +6,7 @@ The name blends the Telugu word **adugu** (అడుగు, “step”) with **v
 
 ## Project status
 
-The application foundation is being built with Next.js, TypeScript, Tailwind CSS, Supabase, and Recharts. The current dashboard uses sample data while the first vertical product slice is developed. GitHub is the source of truth.
+The working application uses Next.js, TypeScript, Tailwind CSS, Supabase, and Recharts. Authenticated accounts persist habits, schedules, daily check-ins, side quests, and private reflections in Supabase; an unconfigured local environment falls back to browser-local preview data. GitHub is the source of truth.
 
 ## Product areas
 
@@ -20,6 +20,8 @@ The application foundation is being built with Next.js, TypeScript, Tailwind CSS
 - [Product requirements](docs/PRD.md)
 - [Contributing workflow](CONTRIBUTING.md)
 - [Architecture decisions](docs/decisions/README.md)
+- [Design system](docs/design-system.md)
+- [Launch checklist](docs/launch-checklist.md)
 
 ## Local development
 
@@ -33,8 +35,6 @@ pnpm dev
 
 Run the quality checks with `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build`.
 
-## Next decisions
+## Before production
 
-1. Confirm the database schema and row-level security policies.
-2. Build the Today dashboard as the first complete product slice.
-3. Select the hosting and deployment approach.
+Apply every Supabase migration, configure the public Supabase environment variables, verify row-level security with two independent users, and complete the launch checklist. The prepared quality workflow in `docs/quality-workflow.yml` runs typecheck, lint, tests, and the production build; move it into `.github/workflows/` after the repository token receives workflow permission.
