@@ -582,6 +582,28 @@ h3 {
   }
 }
 
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--soft-accent, #a86550) 72%, white);
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  transform: translateY(-180%);
+  border-radius: 999px;
+  background: var(--soft-ink, #24302a);
+  padding: .75rem 1rem;
+  color: white;
+  font-size: .75rem;
+  font-weight: 800;
+  transition: transform 150ms ease;
+}
+
+.skip-link:focus { transform: translateY(0); }
+
 @media (prefers-reduced-transparency: reduce) {
   .premium-toolbar,
   .soft-shell,

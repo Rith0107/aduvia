@@ -98,6 +98,7 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
 
   return (
     <main className="auth-canvas min-h-screen p-3 text-[#24302a] sm:p-5">
+      <a className="skip-link" href="#auth-form">Skip to account form</a>
       <div className="mx-auto grid min-h-[calc(100vh-1.5rem)] max-w-[1500px] overflow-hidden rounded-[34px] border border-white/70 bg-[#f7f6f0]/82 shadow-[0_36px_100px_rgba(35,55,45,.16)] backdrop-blur-2xl sm:min-h-[calc(100vh-2.5rem)] lg:grid-cols-[1.04fr_.96fr]">
         <section className="relative hidden overflow-hidden bg-[#153f32] p-12 text-white lg:flex lg:flex-col xl:p-16">
           <div className="absolute -right-28 -top-28 size-96 rounded-full border-[72px] border-[#d89a42]/12" />
@@ -118,7 +119,7 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
           <p className="relative text-xs text-white/35">Private by default. Yours to reflect on and share.</p>
         </section>
 
-        <section className="relative flex items-center justify-center overflow-hidden bg-[linear-gradient(145deg,rgba(255,252,244,.82),rgba(232,240,235,.82))] px-6 py-10 sm:px-12 lg:px-16 xl:px-24">
+        <section className="relative flex items-center justify-center overflow-hidden bg-[linear-gradient(145deg,rgba(255,252,244,.82),rgba(232,240,235,.82))] px-6 py-10 sm:px-12 lg:px-16 xl:px-24" id="auth-form">
           <div className="pointer-events-none absolute -right-24 top-[8%] size-64 rounded-full bg-[#e8c9ba]/45 blur-3xl" />
           <div className="pointer-events-none absolute -left-24 bottom-[7%] size-72 rounded-full bg-[#b9d5c8]/45 blur-3xl" />
           <div className="pointer-events-none absolute right-[12%] top-[19%] size-24 rounded-full border-[18px] border-[#d8a54e]/10" />

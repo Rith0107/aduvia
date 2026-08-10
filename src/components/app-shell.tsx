@@ -28,6 +28,7 @@ export function AppShell({ active, children, eyebrow, title, action }: AppShellP
   const syncError = useAppData()?.syncError;
   return (
     <main className="soft-canvas min-h-screen text-[var(--soft-ink)]">
+      <a className="skip-link" href="#main-content">Skip to main content</a>
       <div className="soft-shell min-h-screen overflow-hidden">
         <header className="premium-toolbar sticky top-0 z-40 mx-auto flex max-w-[1800px] items-center justify-between px-5 py-5 sm:px-9 lg:px-14">
           <BrandLogo />
@@ -44,7 +45,7 @@ export function AppShell({ active, children, eyebrow, title, action }: AppShellP
           </div>
         </header>
 
-        <div className="mx-auto max-w-[1800px] px-5 pb-24 pt-9 sm:px-9 lg:px-14 lg:pb-14">
+        <div className="mx-auto max-w-[1800px] px-5 pb-24 pt-9 sm:px-9 lg:px-14 lg:pb-14" id="main-content">
           {syncError && <div className="mb-6 rounded-2xl border border-[var(--soft-icon-clay)]/25 bg-white/55 px-4 py-3 text-sm text-[var(--soft-ink)]" role="status"><strong>Changes are not syncing.</strong> {syncError}</div>}
           <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
