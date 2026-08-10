@@ -28,10 +28,10 @@ describe("MonthlyReport", () => {
 
   it("offers distinct visual trims for the share artifact", () => {
     render(<MonthlyReport />);
-    const aurora = screen.getByRole("button", { name: "aurora" });
+    const aurora = screen.getByRole("button", { name: "Aurora Glow" });
     fireEvent.click(aurora);
     expect(aurora).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", { name: "archive" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Archive File" })).toBeInTheDocument();
   });
 
   it("uses the calendar day count when changing months", () => {

@@ -30,7 +30,15 @@ export function AccountMenu() {
     setOpen(false);
   }
 
-  return <div className="relative"><button aria-expanded={open} aria-haspopup="menu" aria-label="Open account menu" className="grid size-10 place-items-center rounded-full border-4 border-white/55 bg-[var(--soft-accent)] text-white shadow-sm transition hover:-translate-y-0.5" onClick={() => setOpen((current) => { if (!current) window.dispatchEvent(new CustomEvent("aduvia:toolbar-menu", { detail: "account" })); return !current; })} type="button"><UserRound aria-hidden className="size-4" strokeWidth={2} /></button>
+  function toggleMenu() {
+    if (open) setOpen(false);
+    else {
+      window.dispatchEvent(new CustomEvent("aduvia:toolbar-menu", { detail: "account" }));
+      setOpen(true);
+    }
+  }
+
+  return <div className="relative"><button aria-expanded={open} aria-haspopup="menu" aria-label="Open account menu" className="grid size-10 place-items-center rounded-full border-4 border-white/55 bg-[var(--soft-accent)] text-white shadow-sm transition hover:-translate-y-0.5" onClick={toggleMenu} type="button"><UserRound aria-hidden className="size-4" strokeWidth={2} /></button>
   {open && <div aria-label="Account menu" className="absolute right-0 top-12 z-50 w-72 rounded-[26px] border border-white/70 bg-[color:color-mix(in_srgb,var(--soft-surface)_95%,transparent)] p-2 shadow-[0_26px_70px_-26px_rgba(28,43,35,.55)] backdrop-blur-2xl" role="menu"><div className="rounded-[20px] bg-[linear-gradient(135deg,var(--soft-tint-a),var(--soft-tint-b))] p-4"><div className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-2xl bg-[var(--soft-ink)] text-white"><UserRound className="size-4" /></span><div className="min-w-0"><p className="truncate text-sm font-bold">{viewer?.name || "Preview profile"}</p><p className="truncate text-[10px] text-[var(--soft-muted)]">{viewer?.email || "Progress saved in this browser"}</p></div></div></div><div className="p-1 pt-2"><MenuLink href="/account" icon={Settings2} label="Account settings" /><MenuLink href="/account#privacy" icon={ShieldCheck} label="Privacy & data" />{viewer ? <button className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left text-xs font-bold text-[var(--soft-ink)] transition hover:bg-white/55" onClick={signOut} role="menuitem" type="button"><LogOut className="size-4 text-[var(--soft-accent)]" />Log out</button> : <MenuLink href="/login" icon={LogIn} label="Log in or create account" />}</div></div>}</div>;
 }
 
