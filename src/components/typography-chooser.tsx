@@ -12,7 +12,7 @@ const typographyPairs = [
 
 type TypographyId = (typeof typographyPairs)[number]["id"];
 
-export function TypographyChooser() {
+export function TypographyChooser({ embedded = false }: { embedded?: boolean } = {}) {
   const [selected, setSelected] = useState<TypographyId>(() => {
     if (typeof window === "undefined" || !window.localStorage) return "modern";
     const saved = window.localStorage.getItem("aduvia-typography") as TypographyId | null;
@@ -27,16 +27,17 @@ export function TypographyChooser() {
 
   useEffect(() => {
     const closeOtherMenus = (event: Event) => {
-      if ((event as CustomEvent<string>).detail !== "typography") setOpen(false);
+      const ownMenu = embedded ? "account-typography" : "typography";
+      if ((event as CustomEvent<string>).detail !== ownMenu) setOpen(false);
     };
     window.addEventListener("aduvia:toolbar-menu", closeOtherMenus);
     return () => window.removeEventListener("aduvia:toolbar-menu", closeOtherMenus);
-  }, []);
+  }, [embedded]);
 
   function toggleMenu() {
     if (open) setOpen(false);
     else {
-      window.dispatchEvent(new CustomEvent("aduvia:toolbar-menu", { detail: "typography" }));
+      window.dispatchEvent(new CustomEvent("aduvia:toolbar-menu", { detail: embedded ? "account-typography" : "typography" }));
       setOpen(true);
     }
   }

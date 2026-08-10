@@ -13,7 +13,7 @@ const palettes = [
 
 type PaletteId = (typeof palettes)[number]["id"];
 
-export function PaletteChooser() {
+export function PaletteChooser({ embedded = false }: { embedded?: boolean } = {}) {
   const [selected, setSelected] = useState<PaletteId>(() => {
     if (typeof window === "undefined") return "forest";
     try {
@@ -30,11 +30,12 @@ export function PaletteChooser() {
 
   useEffect(() => {
     const closeOtherMenus = (event: Event) => {
-      if ((event as CustomEvent<string>).detail !== "palette") setOpen(false);
+      const ownMenu = embedded ? "account-palette" : "palette";
+      if ((event as CustomEvent<string>).detail !== ownMenu) setOpen(false);
     };
     window.addEventListener("aduvia:toolbar-menu", closeOtherMenus);
     return () => window.removeEventListener("aduvia:toolbar-menu", closeOtherMenus);
-  }, []);
+  }, [embedded]);
 
   function choose(palette: PaletteId) {
     setSelected(palette);
@@ -44,7 +45,7 @@ export function PaletteChooser() {
   function toggleMenu() {
     if (open) setOpen(false);
     else {
-      window.dispatchEvent(new CustomEvent("aduvia:toolbar-menu", { detail: "palette" }));
+      window.dispatchEvent(new CustomEvent("aduvia:toolbar-menu", { detail: embedded ? "account-palette" : "palette" }));
       setOpen(true);
     }
   }
