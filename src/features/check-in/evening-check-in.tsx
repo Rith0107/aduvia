@@ -51,7 +51,7 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
         <div className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col px-5 pb-6 sm:px-9 sm:pb-8">
           <header className="premium-toolbar sticky top-0 z-40 mb-6 flex items-center justify-between py-5 sm:mb-8">
             <BrandLogo />
-            <div className="flex items-center gap-2"><PaletteChooser /><Link className="evening-exit-pill" href="/today"><span aria-hidden="true">←</span><span className="hidden sm:inline">Back to Today</span><span className="sm:hidden">Exit</span></Link><span className="evening-mode-pill"><span aria-hidden="true">☾</span><span className="hidden sm:inline">Evening mode</span></span></div>
+            <div className="flex items-center gap-2"><PaletteChooser /><Link className="evening-exit-pill" href="/today"><span aria-hidden="true">←</span><span className="hidden sm:inline">Back to Today</span><span className="sm:hidden">Exit</span></Link></div>
           </header>
           <div className="evening-intro">
             <div>

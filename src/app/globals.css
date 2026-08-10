@@ -427,11 +427,12 @@ h3 {
 .soft-quest-percentage span { margin-left: .08em; color: var(--soft-accent); font-size: .35em; letter-spacing: -.03em; }
 .soft-quest-feature h2 { max-width: 23rem; margin-top: .55rem; font-size: clamp(1.65rem, 3vw, 2.7rem); font-weight: 650; letter-spacing: -.05em; line-height: 1.02; }
 .soft-orbit-mark { position: absolute; top: 18%; right: -7%; width: 14rem; aspect-ratio: 1; border-radius: 50%; }
-.soft-orbit-mark span { position: absolute; inset: calc(var(--orbit-index) * 11%); border: 1px solid color-mix(in srgb, var(--soft-accent) 18%, transparent); border-radius: inherit; animation: quest-orbit-spin calc(12s + var(--orbit-index) * 4s) linear infinite; }
+.soft-orbit-mark span { position: absolute; inset: calc(var(--orbit-index) * 11%); border: 1px solid color-mix(in srgb, var(--soft-accent) 18%, transparent); border-radius: inherit; transform: rotate(calc(var(--orbit-index) * 72deg + 18deg)); }
 .soft-orbit-mark span::after { content: ""; position: absolute; top: 50%; left: -7px; width: 14px; aspect-ratio: 1; border: 2px solid color-mix(in srgb, var(--soft-accent) 70%, white); border-radius: 50%; background: var(--soft-surface); box-shadow: 0 5px 15px color-mix(in srgb, var(--soft-accent) 28%, transparent); }
+.soft-orbit-mark span.complete { animation: quest-orbit-complete .72s cubic-bezier(.22,.82,.2,1) 1; }
 .soft-orbit-mark span.complete::after { background: var(--soft-accent); }
-@keyframes quest-orbit-spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .soft-orbit-mark span { animation: none; transform: rotate(calc(var(--orbit-index) * 72deg + 18deg)); } }
+@keyframes quest-orbit-complete { from { transform: rotate(calc(var(--orbit-index) * 72deg + 18deg)); } to { transform: rotate(calc(var(--orbit-index) * 72deg + 378deg)); } }
+@media (prefers-reduced-motion: reduce) { .soft-orbit-mark span.complete { animation: none; } }
 .soft-quest-track { height: 4px; overflow: hidden; border-radius: 99px; background: rgb(73 61 53 / 9%); }
 .soft-quest-track span { display: block; height: 100%; border-radius: inherit; background: var(--soft-accent); }
 

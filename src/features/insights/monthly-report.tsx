@@ -24,18 +24,12 @@ type ShareFormat = "square" | "story";
 type ReportHabit = {
   id: string;
   name: string;
+  category: string;
   color: string;
   days: CellState[];
 };
 
-const completedQuests = ["Created a monthly budget", "Shipped my portfolio homepage"];
-
-const categoryBalance = [
-  { name: "Growth", value: 34, color: "var(--chart-green)" },
-  { name: "Wellbeing", value: 28, color: "var(--chart-primary)" },
-  { name: "Career", value: 23, color: "var(--chart-blue)" },
-  { name: "Creative", value: 15, color: "var(--chart-rust)" },
-];
+const fallbackCompletedQuests = ["Created a monthly budget", "Shipped my portfolio homepage"];
 
 function TrendActiveDot({ cx = 0, cy = 0, payload }: { cx?: number; cy?: number; payload?: { label: string; score: number } }) {
   if (!payload) return null;
@@ -82,10 +76,10 @@ function buildDays(seed: number, weekdaysOnly = false, year = 2026, month = 7): 
 
 function createReportHabits(year: number, month: number): ReportHabit[] {
   return [
-    { id: "walk", name: "Morning walk", color: "var(--chart-green)", days: buildDays(1, false, year, month) },
-    { id: "deep-work", name: "Deep work", color: "var(--chart-blue)", days: buildDays(2, true, year, month) },
-    { id: "read", name: "Read 20 pages", color: "var(--chart-ink)", days: buildDays(3, false, year, month) },
-    { id: "meditate", name: "Meditate", color: "var(--chart-rust)", days: buildDays(4, false, year, month) },
+    { id: "walk", name: "Morning walk", category: "Fitness", color: "var(--chart-green)", days: buildDays(1, false, year, month) },
+    { id: "deep-work", name: "Deep work", category: "Career", color: "var(--chart-blue)", days: buildDays(2, true, year, month) },
+    { id: "read", name: "Read 20 pages", category: "Learning", color: "var(--chart-ink)", days: buildDays(3, false, year, month) },
+    { id: "meditate", name: "Meditate", category: "Mindfulness", color: "var(--chart-rust)", days: buildDays(4, false, year, month) },
   ];
 }
 
@@ -102,7 +96,7 @@ function cardDimensions(format: ShareFormat) {
   return format === "story" ? { width: 1080, height: 1920 } : { width: 1080, height: 1080 };
 }
 
-async function renderShareCard(format: ShareFormat, consistency: number, monthLabel: string) {
+async function renderShareCard(format: ShareFormat, consistency: number, monthLabel: string, completedQuestTitles: string[]) {
   const { width, height } = cardDimensions(format);
   const canvas = document.createElement("canvas");
   canvas.width = width;
@@ -146,7 +140,7 @@ async function renderShareCard(format: ShareFormat, consistency: number, monthLa
   context.fillText("SIDE QUESTS COMPLETED", margin + 48, questTop + 70);
   context.fillStyle = ink;
   context.font = "600 38px system-ui";
-  completedQuests.forEach((quest, index) => {
+  completedQuestTitles.slice(0, 4).forEach((quest, index) => {
     context.fillText(`✓  ${quest}`, margin + 48, questTop + 150 + index * 78);
   });
   context.fillStyle = "rgba(255,250,240,0.5)";
@@ -178,6 +172,7 @@ export function MonthlyReport() {
     return appData.habits.map((habit, habitIndex) => ({
       id: habit.id,
       name: habit.name,
+      category: habit.category,
       color: colorByIndex[habitIndex % colorByIndex.length],
       days: Array.from({ length: daysInMonth }, (_, index): CellState => {
         const date = new Date(reportMonth.year, reportMonth.month, index + 1);
@@ -208,6 +203,36 @@ export function MonthlyReport() {
       return { day: name.slice(0, 1), name, score: points.length ? Math.round(points.reduce((sum, point) => sum + point.score, 0) / points.length) : 0 };
     });
   }, [dailyConsistency, reportMonth.month, reportMonth.year]);
+  const bestDay = weekdayReport.reduce((best, day) => day.score > best.score ? day : best, weekdayReport[0]);
+  const daysShownUp = dailyConsistency.filter((point) => point.score > 0).length;
+  const completedQuestTitles = appData ? appData.quests.filter((quest) => quest.status === "completed").map((quest) => quest.title) : fallbackCompletedQuests;
+  const categoryBalance = useMemo(() => {
+    const totals = habits.reduce<Record<string, number>>((result, habit) => {
+      result[habit.category] = (result[habit.category] ?? 0) + habit.days.filter((day) => day === "done").length;
+      return result;
+    }, {});
+    const total = Object.values(totals).reduce((sum, value) => sum + value, 0);
+    const colors = ["var(--chart-green)", "var(--chart-primary)", "var(--chart-blue)", "var(--chart-rust)"];
+    return Object.entries(totals).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([name, value], index) => ({ name, value: total ? Math.round((value / total) * 100) : 0, color: colors[index] }));
+  }, [habits]);
+  const previousMonthConsistency = useMemo(() => {
+    if (!appData) return overallConsistency;
+    const previous = new Date(reportMonth.year, reportMonth.month - 1, 1);
+    const count = new Date(previous.getFullYear(), previous.getMonth() + 1, 0).getDate();
+    let scheduled = 0;
+    let completed = 0;
+    appData.habits.forEach((habit) => {
+      for (let day = 1; day <= count; day += 1) {
+        const date = new Date(previous.getFullYear(), previous.getMonth(), day);
+        const weekday = (["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const)[date.getDay()];
+        if (!scheduledDaysFor(habit).includes(weekday)) continue;
+        scheduled += 1;
+        if (appData.completions[dateStorageKey(previous.getFullYear(), previous.getMonth(), day)]?.[habit.id] === "complete") completed += 1;
+      }
+    });
+    return scheduled ? Math.round((completed / scheduled) * 100) : 0;
+  }, [appData, overallConsistency, reportMonth.month, reportMonth.year]);
+  const consistencyDelta = overallConsistency - previousMonthConsistency;
 
   function changeMonth(offset: number) {
     const next = new Date(reportMonth.year, reportMonth.month + offset, 1);
@@ -218,7 +243,7 @@ export function MonthlyReport() {
   }
 
   async function downloadCard() {
-    const blob = await renderShareCard(format, overallConsistency, monthLabel);
+    const blob = await renderShareCard(format, overallConsistency, monthLabel, completedQuestTitles);
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -229,7 +254,7 @@ export function MonthlyReport() {
   }
 
   async function shareCard() {
-    const blob = await renderShareCard(format, overallConsistency, monthLabel);
+    const blob = await renderShareCard(format, overallConsistency, monthLabel, completedQuestTitles);
     const file = new File([blob], `aduvia-${monthName.toLowerCase()}-${reportMonth.year}-${format}.png`, { type: "image/png" });
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
       await navigator.share({ files: [file], title: "My Aduvia monthly report" });
@@ -248,7 +273,7 @@ export function MonthlyReport() {
             <article className="relative overflow-hidden rounded-[44px_44px_96px_44px] bg-[var(--chart-deep)] p-6 text-white shadow-[0_28px_70px_-30px_rgba(20,61,49,0.55)] sm:p-8">
               <div className="absolute -right-20 -top-20 size-64 rounded-full border-[46px] border-[color-mix(in_srgb,var(--chart-primary)_12%,transparent)]" />
               <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-                <div><p className="text-xs font-semibold uppercase tracking-[0.17em] text-[var(--chart-primary)]">Consistency signal</p><p className="mt-4 text-6xl font-semibold tracking-[-0.065em]">{overallConsistency}%</p><p className="mt-1 text-sm text-white/50">Up 8 points from July</p><p className="mt-5 inline-flex rounded-full bg-white/[0.08] px-3 py-2 text-xs font-medium text-white/70">You showed up on 24 days this month</p></div>
+                <div><p className="text-xs font-semibold uppercase tracking-[0.17em] text-[var(--chart-primary)]">Consistency signal</p><p className="mt-4 text-6xl font-semibold tracking-[-0.065em]">{overallConsistency}%</p><p className="mt-1 text-sm text-white/50">{consistencyDelta === 0 ? "Level with last month" : `${consistencyDelta > 0 ? "Up" : "Down"} ${Math.abs(consistencyDelta)} points from last month`}</p><p className="mt-5 inline-flex rounded-full bg-white/[0.08] px-3 py-2 text-xs font-medium text-white/70">You showed up on {daysShownUp} {daysShownUp === 1 ? "day" : "days"} this month</p></div>
                 <div className="grid grid-cols-7 gap-1.5 rounded-2xl bg-white/[0.08] p-4" aria-label={`${monthName} activity heatmap`}>{Array.from({ length: Math.ceil(daysInMonth / 7) * 7 }, (_, index) => { const point = dailyConsistency[index]; const state = !point ? "" : point.score >= 75 ? "high activity" : point.score >= 50 ? "partial activity" : "low activity"; return <span aria-label={point ? `${monthName} ${point.day}: ${state}` : undefined} className={`size-3 rounded-[4px] ${!point ? "bg-transparent" : point.score >= 75 ? "bg-[var(--heatmap-high)]" : point.score >= 50 ? "bg-[var(--heatmap-mid)]" : "bg-[var(--heatmap-low)]"}`} key={index} title={point ? `${monthName} ${point.day} · ${point.score}%` : undefined} />; })}</div>
               </div>
               <div className="relative mt-7"><p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/45">Daily consistency trend · month to date</p></div>
@@ -270,14 +295,14 @@ export function MonthlyReport() {
               <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">Life balance</p><h2 className="mt-2 text-xl font-semibold tracking-[-0.03em]">Where your effort went</h2><p className="mt-2 text-xs text-stone-400">Share of completed activity this month</p></div>
               <div className="relative mx-auto mt-3 h-56 max-w-[280px]">
                 <ResponsiveContainer height="100%" width="100%"><PieChart><Pie cx="50%" cy="50%" data={categoryBalance} dataKey="value" innerRadius={62} nameKey="name" outerRadius={91} paddingAngle={4} stroke="none">{categoryBalance.map((entry) => <Cell fill={entry.color} key={entry.name} />)}</Pie></PieChart></ResponsiveContainer>
-                <div className="pointer-events-none absolute inset-0 grid place-items-center text-center"><div><p className="text-3xl font-semibold">4</p><p className="text-[10px] uppercase tracking-[0.12em] text-stone-400">focus areas</p></div></div>
+                <div className="pointer-events-none absolute inset-0 grid place-items-center text-center"><div><p className="text-3xl font-semibold">{categoryBalance.length}</p><p className="text-[10px] uppercase tracking-[0.12em] text-stone-400">focus areas</p></div></div>
               </div>
               <div className="grid grid-cols-2 gap-x-4 gap-y-3">{categoryBalance.map((item) => <div className="flex items-center gap-2 text-xs" key={item.name}><span className="size-2.5 rounded-full" style={{ backgroundColor: item.color }} /><span className="text-stone-500">{item.name}</span><span className="ml-auto font-semibold">{item.value}%</span></div>)}</div>
             </article>
           </section>
 
           <section className="mt-6 grid items-center gap-7 lg:grid-cols-[0.5fr_1.5fr]">
-            <article className="relative mx-auto flex aspect-square w-full max-w-[310px] flex-col items-center justify-center overflow-hidden rounded-full bg-[var(--soft-tint-c)] p-10 text-center text-[var(--soft-icon-blue)] shadow-[0_26px_60px_-34px_rgba(40,79,97,.5)] lg:mx-0"><div className="absolute -right-10 -top-10 size-36 rounded-full border-[26px] border-white/25" /><p className="absolute left-1/2 top-12 -translate-x-1/2 whitespace-nowrap text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Best day</p><div className="relative -translate-y-1"><p className="text-4xl font-semibold tracking-[-0.05em]">Wednesday</p><p className="mx-auto mt-2 max-w-[230px] text-sm leading-5 opacity-60">Your midweek momentum peak.</p></div><span className="absolute bottom-9 left-1/2 grid size-11 -translate-x-1/2 place-items-center rounded-full bg-[var(--soft-icon-blue)] text-xl text-white">↗</span></article>
+            <article className="relative mx-auto flex aspect-square w-full max-w-[310px] flex-col items-center justify-center overflow-hidden rounded-full bg-[var(--soft-tint-c)] p-10 text-center text-[var(--soft-icon-blue)] shadow-[0_26px_60px_-34px_rgba(40,79,97,.5)] lg:mx-0"><div className="absolute -right-10 -top-10 size-36 rounded-full border-[26px] border-white/25" /><p className="absolute left-1/2 top-12 -translate-x-1/2 whitespace-nowrap text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Best day</p><div className="relative -translate-y-1"><p className="text-4xl font-semibold tracking-[-0.05em]">{bestDay.name}</p><p className="mx-auto mt-2 max-w-[230px] text-sm leading-5 opacity-60">Your strongest rhythm at {bestDay.score}% consistency.</p></div><span className="absolute bottom-9 left-1/2 grid size-11 -translate-x-1/2 place-items-center rounded-full bg-[var(--soft-icon-blue)] text-xl text-white">↗</span></article>
             <article className="overflow-hidden rounded-[52px] bg-[var(--chart-surface)] p-6 text-[var(--chart-ink)] shadow-[0_28px_65px_-42px_rgba(110,91,60,.55)] sm:p-8"><div><p className="text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Weekly rhythm</p><p className="mt-2 text-xl font-semibold">Completion by weekday</p></div><div className="mt-4 h-36"><ResponsiveContainer height="100%" width="100%"><BarChart data={weekdayReport} margin={{ top: 42 }}><XAxis axisLine={false} dataKey="day" tick={{ fill: "var(--chart-ink)", fontSize: 10 }} tickLine={false} /><Tooltip content={() => null} cursor={false} /><Bar activeBar={<RhythmActiveBar />} dataKey="score" fill="var(--chart-ink)" radius={[18, 18, 18, 18]} /></BarChart></ResponsiveContainer></div></article>
           </section>
 
@@ -327,10 +352,10 @@ export function MonthlyReport() {
 
                   <div className="relative mt-8 flex items-center gap-5">
                     <div className="grid size-32 shrink-0 place-items-center rounded-full p-[9px]" style={{ background: `conic-gradient(var(--chart-primary) ${overallConsistency * 3.6}deg, rgba(255,255,255,.1) 0deg)` }}><div className="grid size-full place-items-center rounded-full bg-[var(--chart-deep)] text-center"><div><p className="text-4xl font-semibold tracking-[-0.06em]">{overallConsistency}%</p><p className="mt-1 text-[8px] uppercase tracking-[0.16em] text-white/45">consistent</p></div></div></div>
-                    <div><p className="text-xs uppercase tracking-[0.13em] text-white/40">You showed up</p><p className="mt-1 text-3xl font-semibold tracking-[-0.04em]">24 days</p><p className="mt-2 max-w-[180px] text-xs leading-5 text-white/45">A month built one quiet check-in at a time.</p></div>
+                    <div><p className="text-xs uppercase tracking-[0.13em] text-white/40">You showed up</p><p className="mt-1 text-3xl font-semibold tracking-[-0.04em]">{daysShownUp} days</p><p className="mt-2 max-w-[180px] text-xs leading-5 text-white/45">A month built one quiet check-in at a time.</p></div>
                   </div>
 
-                  <div className="relative mt-9 border-t border-white/10 pt-6"><div className="flex items-end justify-between"><div><p className="text-[9px] font-semibold uppercase tracking-[0.17em] text-[var(--chart-primary)]">Side quests cleared</p><p className="mt-1 text-2xl font-semibold">{completedQuests.length} wins</p></div><span className="text-xs text-white/35">{monthLabel}</span></div><div className="mt-5 space-y-3">{completedQuests.map((quest, index) => <div className="flex items-center gap-3 border-b border-white/10 pb-3" key={quest}><span className="grid size-8 shrink-0 place-items-center rounded-full bg-[var(--chart-primary)] text-[var(--chart-deep)]"><Check size={15} strokeWidth={2.4} /></span><div><p className="text-[9px] uppercase tracking-[0.13em] text-white/35">Quest 0{index + 1}</p><p className="mt-0.5 text-sm font-semibold">{quest}</p></div></div>)}</div></div>
+                  <div className="relative mt-9 border-t border-white/10 pt-6"><div className="flex items-end justify-between"><div><p className="text-[9px] font-semibold uppercase tracking-[0.17em] text-[var(--chart-primary)]">Side quests cleared</p><p className="mt-1 text-2xl font-semibold">{completedQuestTitles.length} wins</p></div><span className="text-xs text-white/35">{monthLabel}</span></div><div className="mt-5 space-y-3">{completedQuestTitles.map((quest, index) => <div className="flex items-center gap-3 border-b border-white/10 pb-3" key={quest}><span className="grid size-8 shrink-0 place-items-center rounded-full bg-[var(--chart-primary)] text-[var(--chart-deep)]"><Check size={15} strokeWidth={2.4} /></span><div><p className="text-[9px] uppercase tracking-[0.13em] text-white/35">Quest 0{index + 1}</p><p className="mt-0.5 text-sm font-semibold">{quest}</p></div></div>)}</div></div>
                   <div className="absolute bottom-7 left-8 right-8 flex items-center justify-between text-[9px] uppercase tracking-[0.14em] text-white/30"><span>Small steps, visible proof.</span><span>aduvia</span></div>
                 </div>
               </div>
