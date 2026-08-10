@@ -13,6 +13,13 @@ describe("AuthScreen", () => {
   it("links the login screen to account creation", () => {
     render(<AuthScreen mode="login" />);
     expect(screen.getByRole("link", { name: "Create an account" })).toHaveAttribute("href", "/signup");
+    expect(screen.getByRole("link", { name: "Preview with demo data" })).toHaveAttribute("href", "/today");
+  });
+
+  it("asks for an email before password recovery", () => {
+    render(<AuthScreen mode="login" />);
+    fireEvent.click(screen.getByRole("button", { name: "Forgot password?" }));
+    expect(screen.getByRole("status")).toHaveTextContent("Enter your email first");
   });
 
   it("reveals the password and links back to login", () => {

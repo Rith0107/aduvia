@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { scheduledDaysFor, useAppData } from "@/lib/app-data";
-import { Check, Download, Share2, Smartphone, Square } from "lucide-react";
+import { Download, Share2, Smartphone, Square } from "lucide-react";
 import {
   Area,
   AreaChart,
@@ -140,9 +140,17 @@ async function renderShareCard(format: ShareFormat, consistency: number, monthLa
   context.fillText("SIDE QUESTS COMPLETED", margin + 48, questTop + 70);
   context.fillStyle = ink;
   context.font = "600 38px system-ui";
-  completedQuestTitles.slice(0, 4).forEach((quest, index) => {
+  const questLimit = format === "square" ? 3 : 5;
+  const visibleQuests = completedQuestTitles.slice(0, questLimit);
+  visibleQuests.forEach((quest, index) => {
     context.fillText(`✓  ${quest}`, margin + 48, questTop + 150 + index * 78);
   });
+  const remaining = completedQuestTitles.length - visibleQuests.length;
+  if (remaining > 0) {
+    context.fillStyle = primary;
+    context.font = "600 28px system-ui";
+    context.fillText(`+ ${remaining} more ${remaining === 1 ? "win" : "wins"}`, margin + 48, questTop + 150 + visibleQuests.length * 78);
+  }
   context.fillStyle = "rgba(255,250,240,0.5)";
   context.font = "500 26px system-ui";
   context.fillText("Small steps. A month of proof.", margin, height - 90);
@@ -265,6 +273,9 @@ export function MonthlyReport() {
   }
 
   const viewingCurrentMonth = reportMonth.year === now.getFullYear() && reportMonth.month === now.getMonth();
+  const shareQuestLimit = format === "square" ? 3 : 5;
+  const visibleShareQuests = completedQuestTitles.slice(0, shareQuestLimit);
+  const remainingShareQuests = completedQuestTitles.length - visibleShareQuests.length;
 
   return (
     <AppShell active="Insights" eyebrow="Monthly review" title={<>Your month,<br />in motion.</>} action={<div className="flex items-center gap-2 rounded-full bg-white/45 p-1 text-xs font-bold"><button aria-label="Previous month" className="rounded-full px-3 py-2 transition hover:bg-white/60" onClick={() => changeMonth(-1)} type="button">←</button><span className="min-w-28 px-2 text-center">{monthLabel}</span><button aria-label="Next month" className="rounded-full px-3 py-2 transition hover:bg-white/60 disabled:cursor-not-allowed disabled:opacity-30" disabled={viewingCurrentMonth} onClick={() => changeMonth(1)} type="button">→</button></div>}>
@@ -345,7 +356,7 @@ export function MonthlyReport() {
               </div>
 
               <div className="grid min-h-[620px] place-items-center overflow-hidden rounded-[26px] bg-[linear-gradient(145deg,var(--soft-tint-a),var(--soft-surface))] p-5 sm:p-8">
-                <div className={`relative overflow-hidden bg-[var(--chart-deep)] text-white shadow-[0_30px_70px_rgba(20,61,49,.28)] transition-all duration-500 ${format === "story" ? "aspect-[9/16] w-full max-w-[310px] rounded-[34px] p-7" : "aspect-square w-full max-w-[560px] rounded-[38px] p-8 sm:p-10"}`}>
+                <div className={`relative overflow-hidden bg-[var(--chart-deep)] pb-16 text-white shadow-[0_30px_70px_rgba(20,61,49,.28)] transition-all duration-500 ${format === "story" ? "aspect-[9/16] w-full max-w-[310px] rounded-[34px] p-7 pb-14" : "aspect-square w-full max-w-[560px] rounded-[38px] p-8 pb-16 sm:p-10 sm:pb-16"}`}>
                   <div className="absolute -right-24 -top-24 size-64 rounded-full border-[42px] border-[color:color-mix(in_srgb,var(--chart-primary)_18%,transparent)]" />
                   <div className="absolute -bottom-32 -left-28 size-72 rounded-full bg-[color:color-mix(in_srgb,var(--chart-blue)_14%,transparent)] blur-2xl" />
                   <div className="relative flex items-center justify-between"><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--chart-primary)]">Aduvia · {monthName}</p><span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[9px] uppercase tracking-[0.13em] text-white/55">Monthly proof</span></div>
@@ -355,7 +366,7 @@ export function MonthlyReport() {
                     <div><p className="text-xs uppercase tracking-[0.13em] text-white/40">You showed up</p><p className="mt-1 text-3xl font-semibold tracking-[-0.04em]">{daysShownUp} days</p><p className="mt-2 max-w-[180px] text-xs leading-5 text-white/45">A month built one quiet check-in at a time.</p></div>
                   </div>
 
-                  <div className="relative mt-9 border-t border-white/10 pt-6"><div className="flex items-end justify-between"><div><p className="text-[9px] font-semibold uppercase tracking-[0.17em] text-[var(--chart-primary)]">Side quests cleared</p><p className="mt-1 text-2xl font-semibold">{completedQuestTitles.length} wins</p></div><span className="text-xs text-white/35">{monthLabel}</span></div><div className="mt-5 space-y-3">{completedQuestTitles.map((quest, index) => <div className="flex items-center gap-3 border-b border-white/10 pb-3" key={quest}><span className="grid size-8 shrink-0 place-items-center rounded-full bg-[var(--chart-primary)] text-[var(--chart-deep)]"><Check size={15} strokeWidth={2.4} /></span><div><p className="text-[9px] uppercase tracking-[0.13em] text-white/35">Quest 0{index + 1}</p><p className="mt-0.5 text-sm font-semibold">{quest}</p></div></div>)}</div></div>
+                  <div className="relative mt-7 border-t border-white/10 pt-5"><div className="flex items-end justify-between"><div><p className="text-[9px] font-semibold uppercase tracking-[0.17em] text-[var(--chart-primary)]">Side quests cleared</p><p className="mt-1 text-2xl font-semibold">{completedQuestTitles.length} wins</p></div><span className="text-xs text-white/35">{monthLabel}</span></div><div className="relative mt-4 space-y-2.5 before:absolute before:bottom-4 before:left-4 before:top-4 before:w-px before:bg-white/10">{visibleShareQuests.map((quest, index) => <div className="relative flex items-center gap-3" key={quest}><span className="z-10 grid size-8 shrink-0 place-items-center rounded-full bg-[var(--chart-primary)] text-[10px] font-black text-[var(--chart-deep)]">{String(index + 1).padStart(2, "0")}</span><div className="min-w-0 flex-1 rounded-2xl bg-white/[0.055] px-3 py-2.5"><p className="truncate text-sm font-semibold">{quest}</p></div></div>)}{remainingShareQuests > 0 && <div className="ml-11 inline-flex rounded-full border border-[var(--chart-primary)]/25 bg-[var(--chart-primary)]/10 px-3 py-1.5 text-[10px] font-semibold text-[var(--chart-primary)]">+{remainingShareQuests} more {remainingShareQuests === 1 ? "win" : "wins"}</div>}</div></div>
                   <div className="absolute bottom-7 left-8 right-8 flex items-center justify-between text-[9px] uppercase tracking-[0.14em] text-white/30"><span>Small steps, visible proof.</span><span>aduvia</span></div>
                 </div>
               </div>
