@@ -124,8 +124,10 @@ export function todaysHabits(habits: HabitSummary[], completions: CompletionMap,
 }
 
 export function AppDataProvider({ children }: { children: ReactNode }) {
-  const [habits, setHabits] = useState(sampleHabitSummaries);
-  const [quests, setQuests] = useState(sampleQuests);
+  // Sample content is only for an unconfigured local design preview. A real
+  // account must render empty until its own Supabase rows have loaded.
+  const [habits, setHabits] = useState(() => hasRemoteConfiguration() ? [] : sampleHabitSummaries);
+  const [quests, setQuests] = useState(() => hasRemoteConfiguration() ? [] : sampleQuests);
   const [completions, setCompletions] = useState<CompletionMap>({});
   const [reflections, setReflections] = useState<Record<string, string>>({});
   const [hydrated, setHydrated] = useState(false);
