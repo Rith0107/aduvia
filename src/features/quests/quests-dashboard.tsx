@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
-import { ChartNoAxesColumnIncreasing, Check, ChevronDown, CircleCheckBig, Flag } from "lucide-react";
+import { ChartNoAxesColumnIncreasing, Check, ChevronDown, CircleCheckBig, Flag, Pencil, Trash2 } from "lucide-react";
 import { createPortal } from "react-dom";
 
 import { AppShell } from "@/components/app-shell";
@@ -50,6 +50,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
   const [isCreating, setIsCreating] = useState(false);
   const [title, setTitle] = useState("");
   const [openStatusId, setOpenStatusId] = useState<string | null>(null);
+  const [editingQuest, setEditingQuest] = useState<QuestSummary | null>(null);
 
   const visibleQuests = useMemo(
     () => quests.filter((quest) => filter === "all" || quest.status === filter),
@@ -107,6 +108,32 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
     setIsCreating(false);
   }
 
+  function openQuestEditor(quest: QuestSummary) {
+    setEditingQuest(quest);
+    setTitle(quest.title);
+  }
+
+  function closeQuestEditor() {
+    setEditingQuest(null);
+    setTitle("");
+  }
+
+  function saveQuest(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const cleanTitle = title.trim();
+    if (!editingQuest || !cleanTitle) return;
+    setQuests((current) => current.map((quest) => quest.id === editingQuest.id
+      ? { ...quest, title: cleanTitle, category: inferQuestCategory(cleanTitle) }
+      : quest));
+    closeQuestEditor();
+  }
+
+  async function deleteQuest() {
+    if (!editingQuest || !window.confirm(`Delete “${editingQuest.title}”? This cannot be undone.`)) return;
+    const removed = appData ? await appData.deleteQuest(editingQuest.id) : (setQuests((current) => current.filter((quest) => quest.id !== editingQuest.id)), true);
+    if (removed) closeQuestEditor();
+  }
+
   return (
     <AppShell active="Quests" eyebrow={`${monthContext.monthName} · ${monthContext.countdownLabel}`} title={<>A few things worth<br />finishing.</>} action={<button className="rounded-full bg-[var(--soft-ink)] px-6 py-4 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5" onClick={() => setIsCreating(true)} type="button">+ New quest</button>}>
           <section className="mt-12 grid border-y border-black/[0.09] sm:grid-cols-[1fr_1fr_1.4fr]">
@@ -127,7 +154,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
                 return (
                   <article className={`grid min-h-40 gap-5 border border-white/50 p-5 md:grid-cols-[56px_minmax(0,1fr)_170px_auto] md:items-center md:p-6 ${openStatusId === quest.id ? "!z-30 !overflow-visible" : ""}`} key={quest.id}>
                     <span className="grid size-11 place-items-center"><ActivityIcon activity={`${quest.title} ${quest.category}`} className="size-7" /></span>
-                    <div><div className="flex flex-wrap items-center gap-3"><span className="text-[10px] font-black uppercase tracking-[0.13em] text-[var(--soft-accent)]">{quest.category}</span><span className="text-xs text-[var(--soft-muted)]">{quest.dueLabel}</span></div><h3 className={`mt-2 text-xl font-bold tracking-[-0.025em] ${isComplete ? "text-[var(--soft-muted)] line-through" : ""}`}>{quest.title}</h3><p className="mt-1 text-xs text-[var(--soft-muted)]">{statusLabels[quest.status]}</p></div>
+                    <div><div className="flex flex-wrap items-center gap-3"><span className="text-[10px] font-black uppercase tracking-[0.13em] text-[var(--soft-accent)]">{quest.category}</span><span className="text-xs text-[var(--soft-muted)]">{quest.dueLabel}</span><button aria-label={`Edit ${quest.title}`} className="inline-flex items-center gap-1 rounded-full bg-white/45 px-2.5 py-1 text-[9px] font-black uppercase tracking-[.1em] text-[var(--soft-icon-green)] transition hover:bg-white/75" onClick={() => openQuestEditor(quest)} type="button"><Pencil className="size-3" />Edit</button></div><h3 className={`mt-2 text-xl font-bold tracking-[-0.025em] ${isComplete ? "text-[var(--soft-muted)] line-through" : ""}`}>{quest.title}</h3><p className="mt-1 text-xs text-[var(--soft-muted)]">{statusLabels[quest.status]}</p></div>
                     <div className="relative"><button aria-expanded={openStatusId === quest.id} aria-haspopup="menu" aria-label={`Change status for ${quest.title}`} className="flex min-h-12 w-full items-center gap-2 rounded-full border border-black/[0.08] bg-white/60 px-4 text-left text-xs font-bold text-[var(--soft-ink)] shadow-[inset_0_1px_0_rgba(255,255,255,.8)] transition hover:bg-white/80 focus:outline-none focus:ring-4 focus:ring-[color:color-mix(in_srgb,var(--soft-icon-green)_12%,transparent)]" onClick={() => setOpenStatusId((current) => current === quest.id ? null : quest.id)} type="button"><span className={`size-2 rounded-full ${statusColors[quest.status]}`} /><span className="flex-1">{statusLabels[quest.status]}</span><ChevronDown className={`size-3.5 transition ${openStatusId === quest.id ? "rotate-180" : ""}`} /></button>{openStatusId === quest.id && <div aria-label={`Status options for ${quest.title}`} className="absolute right-0 top-[calc(100%+8px)] z-50 w-full min-w-48 rounded-[20px] border border-white/80 bg-[color:color-mix(in_srgb,var(--theme-paper)_95%,transparent)] p-2 text-[var(--soft-ink)] shadow-[0_22px_60px_-18px_rgba(24,43,35,.45)] backdrop-blur-2xl" role="menu">{(Object.keys(statusLabels) as QuestStatus[]).map((status) => <button className={`flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-left text-xs font-bold transition hover:bg-[var(--soft-tint-a)] ${quest.status === status ? "bg-[color:color-mix(in_srgb,var(--soft-tint-a)_82%,white)]" : ""}`} key={status} onClick={() => updateQuestStatus(quest.id, status)} role="menuitem" type="button"><span className={`size-2 rounded-full ${statusColors[status]}`} /><span className="flex-1">{statusLabels[status]}</span>{quest.status === status && <Check className="size-3.5 text-[var(--soft-icon-green)]" strokeWidth={2.5} />}</button>)}</div>}</div>
                     <button className={`min-h-12 rounded-full px-5 text-xs font-bold transition ${isComplete ? "bg-white/55 text-[var(--soft-muted)]" : "bg-[var(--soft-ink)] text-white"}`} onClick={() => toggleQuestCompletion(quest.id)} type="button">{isComplete ? "Mark incomplete" : "Mark complete"}</button>
                   </article>
@@ -153,6 +180,27 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
               <div><p className="creation-field-label">A little inspiration</p><div className="creation-presets creation-presets-quest">{["Finish a course", "Publish my portfolio", "Read one book"].map((preset) => <button aria-pressed={title === preset} key={preset} onClick={() => setTitle(preset)} type="button"><ActivityIcon activity={preset} className="size-4" />{preset}</button>)}</div></div>
               <div className="creation-guidance"><span aria-hidden>◇</span><p><strong>One finish line.</strong> When the outcome exists, the quest is complete.</p></div>
               <div className="creation-actions"><button onClick={() => setIsCreating(false)} type="button">Cancel</button><button disabled={!title.trim()} type="submit"><span>Create quest</span><span aria-hidden>→</span></button></div>
+            </div>
+          </form>
+        </div>,
+        document.body,
+      )}
+      {editingQuest && createPortal(
+        <div aria-modal="true" className="creation-overlay" role="dialog">
+          <form className="creation-sheet" onSubmit={saveQuest}>
+            <button aria-label="Close edit quest" className="creation-close" onClick={closeQuestEditor} type="button">×</button>
+            <aside className="creation-aside creation-aside-quest">
+              <p className="soft-kicker">Edit quest</p>
+              <div className="creation-preview"><ActivityIcon activity={`${title} ${inferQuestCategory(title)}`} className="size-9" /></div>
+              <div><h2>Keep the finish<br />line clear.</h2><p>Rename the outcome without losing its status or history.</p></div>
+              <span className="creation-step">Quest details</span>
+            </aside>
+            <div className="creation-form">
+              <div><p className="soft-kicker text-[var(--soft-accent)]">Edit quest</p><h3>Refine the outcome.</h3><p>The category will adjust automatically when the title changes.</p></div>
+              <label className="creation-field-label" htmlFor="edit-quest-title">Quest title</label>
+              <input autoFocus className="creation-field" id="edit-quest-title" maxLength={160} onChange={(event) => setTitle(event.target.value)} value={title} />
+              <div className="flex items-center justify-between rounded-[16px] bg-[var(--soft-tint-a)] px-4 py-3 text-xs"><span className="font-semibold text-[var(--soft-muted)]">Category detected automatically</span><span className="rounded-full bg-white/70 px-3 py-1.5 font-black text-[var(--soft-icon-green)]">{inferQuestCategory(title)}</span></div>
+              <div className="creation-actions"><button className="!text-[var(--soft-icon-clay)]" onClick={() => void deleteQuest()} type="button"><Trash2 className="size-4" />Delete quest</button><button disabled={!title.trim()} type="submit"><span>Save changes</span><span aria-hidden>→</span></button></div>
             </div>
           </form>
         </div>,

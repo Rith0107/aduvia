@@ -3,7 +3,7 @@
 import "@testing-library/jest-dom/vitest";
 
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { QuestsDashboard } from "./quests-dashboard";
 import { sampleQuests } from "./sample-data";
@@ -43,5 +43,24 @@ describe("QuestsDashboard", () => {
     fireEvent.click(screen.getByRole("button", { name: /^Create quest$/ }));
     expect(screen.getByText("Publish a short story")).toBeInTheDocument();
     expect(screen.getByText("Publish a short story").closest("article")).toHaveTextContent("Creative");
+  });
+
+  it("renames a quest and updates its inferred category", () => {
+    render(<QuestsDashboard initialQuests={sampleQuests} />);
+    fireEvent.click(screen.getByRole("button", { name: "Edit Build portfolio homepage" }));
+    fireEvent.change(screen.getByLabelText("Quest title"), { target: { value: "Read a design book" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    const quest = screen.getByText("Read a design book").closest("article");
+    expect(quest).toHaveTextContent("Learning");
+    expect(quest).toHaveTextContent("In progress");
+  });
+
+  it("deletes a quest after confirmation", () => {
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
+    render(<QuestsDashboard initialQuests={sampleQuests} />);
+    fireEvent.click(screen.getByRole("button", { name: "Edit Hike a new trail" }));
+    fireEvent.click(screen.getByRole("button", { name: "Delete quest" }));
+    expect(screen.queryByText("Hike a new trail")).not.toBeInTheDocument();
+    confirm.mockRestore();
   });
 });

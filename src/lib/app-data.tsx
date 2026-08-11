@@ -20,6 +20,7 @@ type AppData = {
   reflections: Record<string, string>;
   syncError: string | null;
   deleteHabit: (habitId: string) => Promise<boolean>;
+  deleteQuest: (questId: string) => Promise<boolean>;
   setHabitStatus: (habitId: string, status: "pending" | "complete" | "skipped", date?: Date) => void;
   saveReflection: (note: string, date?: Date) => Promise<boolean>;
 };
@@ -267,6 +268,17 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         delete nextDay[habitId];
         return [date, nextDay];
       })));
+      return true;
+    },
+    async deleteQuest(questId) {
+      if (remoteUserId) {
+        const { error } = await createBrowserSupabaseClient().from("side_quests").delete().eq("user_id", remoteUserId).eq("id", questId);
+        if (error) {
+          setSyncError(error.message);
+          return false;
+        }
+      }
+      setQuests((current) => current.filter((quest) => quest.id !== questId));
       return true;
     },
     async saveReflection(note, date = new Date()) {
