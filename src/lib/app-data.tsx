@@ -21,6 +21,7 @@ type AppData = {
   syncError: string | null;
   deleteHabit: (habitId: string) => Promise<boolean>;
   deleteQuest: (questId: string) => Promise<boolean>;
+  completeOnboarding: (newHabits: HabitSummary[], newQuests: QuestSummary[]) => Promise<boolean>;
   setHabitStatus: (habitId: string, status: "pending" | "complete" | "skipped", date?: Date) => void;
   saveReflection: (note: string, date?: Date) => Promise<boolean>;
 };
@@ -280,6 +281,40 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       }
       setQuests((current) => current.filter((quest) => quest.id !== questId));
       return true;
+    },
+    async completeOnboarding(newHabits, newQuests) {
+      try {
+        if (hasRemoteConfiguration()) {
+          const supabase = createBrowserSupabaseClient();
+          const userId = remoteUserId ?? (await supabase.auth.getUser()).data.user?.id;
+          if (!userId) throw new Error("Your session has expired. Please log in again.");
+          const categoryNames = [...new Set([...newHabits.map((habit) => habit.category), ...newQuests.map((quest) => quest.category)])];
+          const { data: categories, error: categoryError } = await supabase.from("categories").upsert(categoryNames.map((name) => ({ user_id: userId, name })), { onConflict: "user_id,name" }).select("id,name");
+          if (categoryError) throw categoryError;
+          const ids = Object.fromEntries(((categories ?? []) as Pick<RemoteCategory, "id" | "name">[]).map((category) => [category.name, category.id]));
+          if (newHabits.length) {
+            const { error } = await supabase.from("habits").upsert(newHabits.map((habit) => ({ id: habit.id, user_id: userId, category_id: ids[habit.category] ?? null, name: habit.name, schedule: scheduleForRemote(habit), priority: habit.isAnchor ? 3 : 2, status: habit.state })));
+            if (error) throw error;
+          }
+          if (newQuests.length) {
+            const month = new Date();
+            const targetMonth = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}-01`;
+            const { error } = await supabase.from("side_quests").upsert(newQuests.map((quest) => ({ id: quest.id, user_id: userId, category_id: ids[quest.category] ?? null, title: quest.title, target_month: targetMonth, estimated_minutes: quest.effortHours * 60, progress: 0, status: questStatusForRemote(quest.status) })));
+            if (error) throw error;
+          }
+          const { error: profileError } = await supabase.from("profiles").update({ onboarding_completed: true }).eq("id", userId);
+          if (profileError) throw profileError;
+          setRemoteUserId(userId);
+          setCategoryIds((current) => ({ ...current, ...ids }));
+        }
+        setHabits(newHabits);
+        setQuests(newQuests);
+        setSyncError(null);
+        return true;
+      } catch (error) {
+        setSyncError(errorMessage(error, "Unable to finish setup."));
+        return false;
+      }
     },
     async saveReflection(note, date = new Date()) {
       const key = dateKey(date);

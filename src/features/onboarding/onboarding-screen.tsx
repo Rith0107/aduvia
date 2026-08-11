@@ -10,7 +10,6 @@ import type { HabitDay, HabitSummary } from "@/features/habits/types";
 import { inferHabitCategory } from "@/features/habits/infer-category";
 import type { QuestSummary } from "@/features/quests/types";
 import { useAppData } from "@/lib/app-data";
-import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
 const starters: Array<Omit<HabitSummary, "id" | "consistency" | "streak" | "state" | "isAnchor"> & { description: string }> = [
   { name: "Morning walk", category: "Fitness", frequency: "Daily", color: "green", description: "A gentle start, every day" },
@@ -60,14 +59,6 @@ export function OnboardingScreen() {
     setCustomDays((current) => current.includes(day) ? current.filter((item) => item !== day) : [...current, day]);
   }
 
-  async function markOnboardingComplete() {
-    const supabase = createBrowserSupabaseClient();
-    const { data } = await supabase.auth.getUser();
-    if (!data.user) throw new Error("Your session has expired. Please log in again.");
-    const { error } = await supabase.from("profiles").update({ onboarding_completed: true }).eq("id", data.user.id);
-    if (error) throw error;
-  }
-
   async function finish(includeQuest = true) {
     if (!canContinue) return;
     setFinishing(true);
@@ -88,16 +79,18 @@ export function OnboardingScreen() {
       const inferred = inferHabitCategory(customHabit);
       selectedHabits.push({ id: crypto.randomUUID(), isAnchor: customHabit === selectedAnchor, name: customHabit, category: inferred.category, frequency: customDays.length === 7 ? "Daily" : "Custom", scheduledDays: customDays, color: inferred.color, consistency: 0, streak: 0, state: "active" });
     }
-    appData?.setHabits(selectedHabits);
     const cleanQuestTitle = includeQuest ? questTitle.trim() : "";
+    const selectedQuests: QuestSummary[] = [];
     if (cleanQuestTitle) {
       const month = new Date();
       const monthEnd = new Date(month.getFullYear(), month.getMonth() + 1, 0);
       const quest: QuestSummary = { id: crypto.randomUUID(), title: cleanQuestTitle, category: "Personal", status: "not-started", dueLabel: monthEnd.toLocaleDateString("en-US", { month: "short", day: "numeric" }), effortHours: 1, color: "amber" };
-      appData?.setQuests([quest]);
+      selectedQuests.push(quest);
     }
     try {
-      await markOnboardingComplete();
+      if (!appData) throw new Error("Your Aduvia space is still loading. Please try again in a moment.");
+      const completed = await appData.completeOnboarding(selectedHabits, selectedQuests);
+      if (!completed) throw new Error(appData.syncError ?? "We could not finish setup. Please try again.");
       router.replace("/today");
       router.refresh();
     } catch (error) {
