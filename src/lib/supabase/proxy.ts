@@ -29,6 +29,16 @@ export async function updateSession(request: NextRequest) {
   const signedIn = Boolean(data.user);
   const pathname = request.nextUrl.pathname;
 
+  let onboardingCompleted = false;
+  if (data.user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("onboarding_completed")
+      .eq("id", data.user.id)
+      .maybeSingle();
+    onboardingCompleted = profile?.onboarding_completed === true;
+  }
+
   if (!signedIn && protectedRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`))) {
     const destination = request.nextUrl.clone();
     destination.pathname = "/login";
@@ -36,9 +46,23 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(destination);
   }
 
-  if (signedIn && authRoutes.includes(pathname)) {
+  if (signedIn && !onboardingCompleted && pathname !== "/onboarding") {
+    const destination = request.nextUrl.clone();
+    destination.pathname = "/onboarding";
+    destination.search = "";
+    return NextResponse.redirect(destination);
+  }
+
+  if (signedIn && onboardingCompleted && pathname === "/onboarding") {
     const destination = request.nextUrl.clone();
     destination.pathname = "/today";
+    destination.search = "";
+    return NextResponse.redirect(destination);
+  }
+
+  if (signedIn && authRoutes.includes(pathname)) {
+    const destination = request.nextUrl.clone();
+    destination.pathname = onboardingCompleted ? "/today" : "/onboarding";
     destination.search = "";
     return NextResponse.redirect(destination);
   }
