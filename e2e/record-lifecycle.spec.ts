@@ -40,3 +40,36 @@ test("a quest can move through every status and persists", async ({ page }) => {
   await page.reload();
   await expect(page.getByRole("article").filter({ hasText: "Publish launch notes" })).toContainText("Completed");
 });
+
+test("Today and Evening mode share check-ins and private reflections", async ({ page }) => {
+  await page.goto("/habits");
+  await page.getByRole("button", { name: "+ New habit" }).click();
+  await page.getByLabel("Habit name").fill("Nightly proof");
+  await page.getByRole("button", { name: "Create habit", exact: true }).click();
+
+  await page.goto("/today");
+  await page.getByRole("button", { name: "Complete Nightly proof" }).click();
+  await expect(page.getByRole("button", { name: "Undo Nightly proof" })).toBeVisible();
+
+  await page.goto("/check-in");
+  const eveningHabit = page.getByRole("article").filter({ hasText: "Nightly proof" });
+  await eveningHabit.getByRole("button", { name: "Not today" }).click();
+  await expect(eveningHabit).toContainText("Incomplete");
+
+  await page.goto("/today");
+  await expect(page.getByRole("button", { name: "Complete Nightly proof" })).toBeVisible();
+  await page.goto("/check-in");
+  await page.getByRole("article").filter({ hasText: "Nightly proof" }).getByRole("button", { name: "✓ Done" }).click();
+
+  await page.goto("/today");
+  await expect(page.getByRole("button", { name: "Undo Nightly proof" })).toBeVisible();
+  await page.getByLabel("One-line reflection").fill("I kept one small promise.");
+  await page.getByRole("button", { name: "Save note" }).click();
+  await expect(page.getByRole("button", { name: "Save note" })).toContainText("Note kept");
+  await page.reload();
+  await expect(page.getByLabel("One-line reflection")).toHaveValue("I kept one small promise.");
+
+  await page.getByRole("button", { name: "Undo Nightly proof" }).click();
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Complete Nightly proof" })).toBeVisible();
+});
