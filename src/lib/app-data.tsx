@@ -19,6 +19,7 @@ type AppData = {
   completions: CompletionMap;
   reflections: Record<string, string>;
   syncError: string | null;
+  deleteHabit: (habitId: string) => Promise<boolean>;
   setHabitStatus: (habitId: string, status: "pending" | "complete" | "skipped", date?: Date) => void;
   saveReflection: (note: string, date?: Date) => Promise<boolean>;
 };
@@ -252,6 +253,22 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AppData>(() => ({
     habits, setHabits: updateHabits, quests, setQuests: updateQuests, completions, reflections, syncError,
+    async deleteHabit(habitId) {
+      if (remoteUserId) {
+        const { error } = await createBrowserSupabaseClient().from("habits").delete().eq("user_id", remoteUserId).eq("id", habitId);
+        if (error) {
+          setSyncError(error.message);
+          return false;
+        }
+      }
+      setHabits((current) => current.filter((habit) => habit.id !== habitId));
+      setCompletions((current) => Object.fromEntries(Object.entries(current).map(([date, day]) => {
+        const nextDay = { ...day };
+        delete nextDay[habitId];
+        return [date, nextDay];
+      })));
+      return true;
+    },
     async saveReflection(note, date = new Date()) {
       const key = dateKey(date);
       const cleanNote = note.trim();

@@ -82,4 +82,27 @@ describe("HabitsDashboard", () => {
     expect(screen.getByLabelText("Thursday: rest day")).toBeInTheDocument();
     expect(screen.getByLabelText("Sunday: rest day")).toBeInTheDocument();
   });
+
+  it("edits a habit name, inferred category, schedule, and anchor", () => {
+    render(<HabitsDashboard initialHabits={sampleHabitSummaries} />);
+    fireEvent.click(screen.getByRole("button", { name: "Edit Morning walk" }));
+    fireEvent.change(screen.getByLabelText("Habit name"), { target: { value: "Study Spanish" } });
+    fireEvent.click(screen.getByRole("button", { name: "Custom" }));
+    fireEvent.click(screen.getByRole("button", { name: "Monday: not selected" }));
+    fireEvent.click(screen.getByRole("button", { name: "Friday: not selected" }));
+    fireEvent.click(screen.getByRole("button", { name: /Make this my anchor/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    expect(screen.getByText("Study Spanish")).toBeInTheDocument();
+    expect(screen.getByText(/Learning · Mon · Fri/)).toBeInTheDocument();
+    expect(screen.getAllByText("Anchor")).toHaveLength(1);
+  });
+
+  it("requires explicit confirmation before deleting a habit", () => {
+    render(<HabitsDashboard initialHabits={sampleHabitSummaries} />);
+    fireEvent.click(screen.getByRole("button", { name: "Edit Morning walk" }));
+    fireEvent.click(screen.getByRole("button", { name: "Delete habit" }));
+    expect(screen.getByText("Delete this habit and its check-in history?")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Delete permanently" }));
+    expect(screen.queryByText("Morning walk")).not.toBeInTheDocument();
+  });
 });
