@@ -23,8 +23,10 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  const { data } = await supabase.auth.getClaims();
-  const signedIn = Boolean(data?.claims?.sub);
+  // Validate with Supabase Auth so revoked or deleted users cannot keep using a
+  // locally valid access token until its expiry time.
+  const { data } = await supabase.auth.getUser();
+  const signedIn = Boolean(data.user);
   const pathname = request.nextUrl.pathname;
 
   if (!signedIn && protectedRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`))) {
