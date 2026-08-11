@@ -6,11 +6,17 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { sampleHabits, sampleSideQuest } from "./sample-data";
-import { TodayDashboard } from "./today-dashboard";
+import { TodayDashboard, toggleQuestCompletionState } from "./today-dashboard";
 
 afterEach(cleanup);
 
 describe("TodayDashboard", () => {
+  it("restores an undone quest to the current month end instead of a fixed demo date", () => {
+    const quest = { id: "quest", title: "Finish the draft", category: "Creative", status: "completed" as const, dueLabel: "Completed", effortHours: 2, color: "green" as const };
+    expect(toggleQuestCompletionState(quest, "Feb 29")).toMatchObject({ status: "in-progress", dueLabel: "Feb 29" });
+    expect(toggleQuestCompletionState({ ...quest, status: "in-progress" }, "Apr 30")).toMatchObject({ status: "completed", dueLabel: "Completed" });
+  });
+
   it("updates completion and efficiency when a habit is checked in", () => {
     render(
       <TodayDashboard

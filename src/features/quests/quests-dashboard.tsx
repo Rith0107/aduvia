@@ -168,7 +168,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
           <form className="creation-sheet" onSubmit={createQuest}>
             <button aria-label="Close create quest" className="creation-close" onClick={() => setIsCreating(false)} type="button">×</button>
             <aside className="creation-aside creation-aside-quest">
-              <p className="soft-kicker">August quest</p>
+              <p className="soft-kicker">{monthContext.monthName} quest</p>
               <div className="creation-preview"><ActivityIcon activity={title || "goal target"} className="size-9" /></div>
               <div><h2>Choose one<br />clear finish.</h2><p>A quest is an outcome you can point to—not another routine to maintain.</p></div>
               <span className="creation-step">01 · Define the outcome</span>
