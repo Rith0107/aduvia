@@ -37,6 +37,7 @@ Replace the site URL and add the exact production callback URLs when the hosting
 
 - Supabase Auth settings endpoint accepts the configured browser key.
 - Anonymous REST access reaches the API but returns no profile rows under RLS.
+- A production smoke test with two temporary confirmed users verified owner-only habit reads and owner persistence. The temporary users and cascading test data were removed afterward.
 - Unauthenticated access to `/today` redirects to `/login?next=%2Ftoday`.
 
 ## Remaining production checks

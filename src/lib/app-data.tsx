@@ -37,6 +37,12 @@ function hasRemoteConfiguration() {
   return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY));
 }
 
+function errorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error) return error.message;
+  if (error && typeof error === "object" && "message" in error && typeof error.message === "string") return error.message;
+  return fallback;
+}
+
 function scheduleForRemote(habit: HabitSummary) {
   if (habit.frequency === "Daily") return { type: "daily" };
   if (habit.frequency === "Weekdays") return { type: "weekdays", days: [1, 2, 3, 4, 5] };
@@ -173,7 +179,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       setQuests([]);
       setCompletions({});
       setReflections({});
-      setSyncError(error instanceof Error ? error.message : "Unable to load your Aduvia data.");
+      setSyncError(errorMessage(error, "Unable to load your Aduvia data."));
       setHydrated(true);
     });
     return () => { active = false; };
@@ -220,7 +226,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         const categories = await ensureCategories(next.map((habit) => habit.category));
         const { error } = await createBrowserSupabaseClient().from("habits").upsert(next.map((habit) => ({ id: habit.id, user_id: remoteUserId, category_id: categories[habit.category] ?? null, name: habit.name, schedule: scheduleForRemote(habit), priority: habit.isAnchor ? 3 : 2, status: habit.state })));
         if (error) throw error;
-      })().catch((error: unknown) => setSyncError(error instanceof Error ? error.message : "Unable to save habit changes."));
+      })().catch((error: unknown) => setSyncError(errorMessage(error, "Unable to save habit changes.")));
       return next;
     });
   }
@@ -234,7 +240,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         const targetMonth = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}-01`;
         const { error } = await createBrowserSupabaseClient().from("side_quests").upsert(next.map((quest) => ({ id: quest.id, user_id: remoteUserId, category_id: categories[quest.category] ?? null, title: quest.title, target_month: targetMonth, estimated_minutes: quest.effortHours * 60, progress: quest.status === "completed" ? 1 : 0, status: questStatusForRemote(quest.status) })));
         if (error) throw error;
-      })().catch((error: unknown) => setSyncError(error instanceof Error ? error.message : "Unable to save quest changes."));
+      })().catch((error: unknown) => setSyncError(errorMessage(error, "Unable to save quest changes.")));
       return next;
     });
   }

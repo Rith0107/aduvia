@@ -6,13 +6,14 @@
 - [x] Apply migrations in timestamp order.
 - [x] Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in the hosting environment.
 - [x] Configure the production site URL and allowed Auth redirect URLs while retaining localhost for development.
-- [ ] Enable email confirmation and verify the confirmation template.
+- [x] Enable mandatory email confirmation for new accounts.
+- [ ] Verify the production confirmation email template and link journey.
 - [x] Deploy with Vercel and connect the GitHub production branch.
 
 ## Security and privacy
 
-- [ ] Run the complete product journey with two independent test users.
-- [ ] Confirm neither user can read, update, or delete the other's rows.
+- [x] Confirm a habit created by one test user is invisible to a second user and persists for its owner.
+- [ ] Confirm neither user can update or delete the other's rows through direct API requests.
 - [ ] Confirm account deletion removes the Auth user and all cascading application data.
 - [ ] Confirm exported JSON contains only the current user's records.
 - [ ] Document backup retention and deletion timing in the privacy policy.
