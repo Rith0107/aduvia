@@ -43,6 +43,7 @@ export async function updateSession(request: NextRequest) {
     const destination = request.nextUrl.clone();
     destination.pathname = "/login";
     destination.searchParams.set("next", pathname);
+    destination.searchParams.set("reason", "session_required");
     return NextResponse.redirect(destination);
   }
 

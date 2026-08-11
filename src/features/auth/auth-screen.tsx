@@ -8,6 +8,12 @@ import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import { BrandLogo } from "@/components/brand-logo";
 
 type AuthMode = "login" | "signup";
+type AuthNotice = "confirmation_failed" | "session_required";
+
+const noticeMessages: Record<AuthNotice, string> = {
+  confirmation_failed: "That confirmation link is invalid or has expired. Log in if you already confirmed, or create your account again to receive a fresh link.",
+  session_required: "Please log in to continue. We’ll take you back to the page you requested.",
+};
 
 const commonPasswords = new Set(["password", "password123", "12345678", "qwerty123", "letmein123", "admin123"]);
 
@@ -22,7 +28,7 @@ function passwordStrength(password: string) {
   return { label: "Too short", score: 1 };
 }
 
-export function AuthScreen({ mode, nextPath = "/today" }: { mode: AuthMode; nextPath?: string }) {
+export function AuthScreen({ mode, nextPath = "/today", notice }: { mode: AuthMode; nextPath?: string; notice?: AuthNotice }) {
   const router = useRouter();
   const isSignup = mode === "signup";
   const [name, setName] = useState("");
@@ -31,7 +37,7 @@ export function AuthScreen({ mode, nextPath = "/today" }: { mode: AuthMode; next
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(() => notice ? noticeMessages[notice] : "");
   const [submitting, setSubmitting] = useState(false);
   const [recoverySending, setRecoverySending] = useState(false);
   const strength = passwordStrength(password);

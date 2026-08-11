@@ -21,6 +21,17 @@ describe("AuthScreen", () => {
     expect(screen.getByRole("button", { name: "Enter Aduvia" })).toBeInTheDocument();
   });
 
+  it("explains when a protected page requires a fresh login", () => {
+    render(<AuthScreen mode="login" nextPath="/insights" notice="session_required" />);
+    expect(screen.getByRole("status")).toHaveTextContent("Please log in to continue");
+  });
+
+  it("provides a recovery path for an expired confirmation link", () => {
+    render(<AuthScreen mode="login" notice="confirmation_failed" />);
+    expect(screen.getByRole("status")).toHaveTextContent("confirmation link is invalid or has expired");
+    expect(screen.getByRole("link", { name: "Create an account" })).toHaveAttribute("href", "/signup");
+  });
+
   it("asks for an email before password recovery", () => {
     render(<AuthScreen mode="login" />);
     fireEvent.click(screen.getByRole("button", { name: "Forgot password?" }));
