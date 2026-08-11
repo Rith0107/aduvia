@@ -2,7 +2,7 @@
 
 import "@testing-library/jest-dom/vitest";
 
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { HabitsDashboard } from "./habits-dashboard";
@@ -41,11 +41,16 @@ describe("HabitsDashboard", () => {
     fireEvent.change(screen.getByLabelText("Habit name"), { target: { value: "Practice guitar" } });
     fireEvent.click(screen.getByRole("button", { name: "Custom" }));
     expect(screen.getByRole("button", { name: "Create habit" })).toBeDisabled();
-    fireEvent.click(screen.getByRole("button", { name: "Monday" }));
-    fireEvent.click(screen.getByRole("button", { name: "Wednesday" }));
+    fireEvent.click(screen.getByRole("button", { name: "Monday: not selected" }));
+    fireEvent.click(screen.getByRole("button", { name: "Wednesday: not selected" }));
     fireEvent.click(screen.getByRole("button", { name: "Create habit" }));
     expect(screen.getByText("Practice guitar")).toBeInTheDocument();
     expect(screen.getByText(/Mon · Wed/)).toBeInTheDocument();
+    const createdHabit = screen.getByText("Practice guitar").closest("article");
+    expect(createdHabit).not.toBeNull();
+    expect(within(createdHabit!).getByLabelText("Monday: scheduled")).toBeInTheDocument();
+    expect(within(createdHabit!).getByLabelText("Tuesday: rest day")).toBeInTheDocument();
+    expect(within(createdHabit!).getByLabelText("Wednesday: scheduled")).toBeInTheDocument();
   });
 
   it("requires exactly three selected days for a three-times-weekly habit", () => {
@@ -54,12 +59,12 @@ describe("HabitsDashboard", () => {
     fireEvent.change(screen.getByLabelText("Habit name"), { target: { value: "Practice guitar" } });
     fireEvent.click(screen.getByRole("button", { name: "3× weekly" }));
     const create = screen.getByRole("button", { name: "Create habit" });
-    fireEvent.click(screen.getByRole("button", { name: "Monday" }));
-    fireEvent.click(screen.getByRole("button", { name: "Wednesday" }));
+    fireEvent.click(screen.getByRole("button", { name: "Monday: not selected" }));
+    fireEvent.click(screen.getByRole("button", { name: "Wednesday: not selected" }));
     expect(create).toBeDisabled();
-    fireEvent.click(screen.getByRole("button", { name: "Friday" }));
+    fireEvent.click(screen.getByRole("button", { name: "Friday: not selected" }));
     expect(create).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Sunday" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Sunday: not selected" })).toBeDisabled();
     fireEvent.click(create);
     expect(screen.getByText(/3× · Mon · Wed · Fri/)).toBeInTheDocument();
   });
