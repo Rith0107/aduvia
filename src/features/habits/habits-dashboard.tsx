@@ -7,6 +7,7 @@ import { Flag, Flame, Gauge, ListChecks } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { ActivityIcon } from "@/components/activity-icon";
 import { scheduledDaysFor, useAppData } from "@/lib/app-data";
+import { inferHabitCategory } from "./infer-category";
 import type { HabitDay, HabitFrequency, HabitSummary } from "./types";
 
 type HabitsDashboardProps = { initialHabits: HabitSummary[] };
@@ -65,19 +66,20 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
     event.preventDefault();
     if (!name.trim()) return;
 
+    const inferred = inferHabitCategory(name.trim());
     setHabits((current) => [
       ...current.map((habit) => isAnchor ? { ...habit, isAnchor: false } : habit),
       {
         id: crypto.randomUUID(),
         name: name.trim(),
-        category: "Personal",
+        category: inferred.category,
         frequency,
         scheduledDays: frequency === "Custom" || frequency === "3× weekly" ? selectedDays : undefined,
         isAnchor,
         consistency: 0,
         streak: 0,
         state: "active",
-        color: "green",
+        color: inferred.color,
       },
     ]);
     setName("");

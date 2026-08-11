@@ -4,6 +4,7 @@ import { createContext, type ReactNode, useContext, useEffect, useMemo, useState
 
 import { sampleHabitSummaries } from "@/features/habits/sample-data";
 import type { HabitDay, HabitSummary } from "@/features/habits/types";
+import { inferHabitCategory } from "@/features/habits/infer-category";
 import { sampleQuests } from "@/features/quests/sample-data";
 import type { QuestSummary } from "@/features/quests/types";
 import type { TodayHabit } from "@/features/today/types";
@@ -159,7 +160,9 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       setCategoryIds(Object.fromEntries(categories.map((category) => [category.name, category.id])));
       setHabits(((habitRows ?? []) as RemoteHabit[]).map((row) => {
         const category = row.category_id ? categoryById.get(row.category_id) : undefined;
-        return { id: row.id, name: row.name, category: category?.name ?? "Personal", ...scheduleFromRemote(row.schedule), isAnchor: row.priority === 3, ...metricsForHabit(row.id, checks), state: row.status === "paused" ? "paused" : "active", color: (category?.color as HabitSummary["color"]) ?? "green" };
+        const inferred = inferHabitCategory(row.name);
+        const useInferred = !category || category.name === "Personal";
+        return { id: row.id, name: row.name, category: useInferred ? inferred.category : category.name, ...scheduleFromRemote(row.schedule), isAnchor: row.priority === 3, ...metricsForHabit(row.id, checks), state: row.status === "paused" ? "paused" : "active", color: useInferred ? inferred.color : (category.color as HabitSummary["color"]) ?? inferred.color };
       }));
       setQuests(((questRows ?? []) as RemoteQuest[]).map((row) => {
         const status = questStatusFromRemote(row.status);
