@@ -25,7 +25,9 @@ type AppShellProps = {
 };
 
 export function AppShell({ active, children, eyebrow, title, action }: AppShellProps) {
-  const syncError = useAppData()?.syncError;
+  const appData = useAppData();
+  const syncError = appData?.syncError;
+  const isLoading = appData?.isLoading === true;
   return (
     <main className="soft-canvas min-h-screen text-[var(--soft-ink)]">
       <a className="skip-link" href="#main-content">Skip to main content</a>
@@ -52,9 +54,9 @@ export function AppShell({ active, children, eyebrow, title, action }: AppShellP
               <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[var(--soft-accent)]">{eyebrow}</p>
               <h1 className="mt-3 max-w-4xl text-4xl font-semibold leading-[0.95] tracking-[-0.06em] sm:text-6xl lg:text-7xl">{title}</h1>
             </div>
-            {action}
+            {!isLoading && action}
           </header>
-          {children}
+          {isLoading ? <AppLoadingState /> : children}
         </div>
 
         <nav aria-label="Mobile navigation" className="fixed bottom-3 left-3 right-3 z-40 grid grid-cols-4 rounded-[22px] bg-[var(--soft-ink)] p-2 text-white shadow-2xl md:hidden">
@@ -63,4 +65,8 @@ export function AppShell({ active, children, eyebrow, title, action }: AppShellP
       </div>
     </main>
   );
+}
+
+function AppLoadingState() {
+  return <section aria-busy="true" aria-live="polite" className="mt-12 overflow-hidden rounded-[34px] border border-white/65 bg-white/30 p-7 shadow-[0_24px_70px_-48px_rgba(28,43,35,.55)] sm:p-10"><div className="flex items-center gap-4"><span className="relative grid size-12 place-items-center rounded-2xl bg-[var(--soft-ink)]"><span className="size-3 animate-pulse rounded-full bg-[var(--chart-primary)]" /></span><div><p className="text-sm font-bold">Opening your Aduvia space…</p><p className="mt-1 text-xs text-[var(--soft-muted)]">Syncing your habits, quests, and recent check-ins.</p></div></div><div aria-hidden="true" className="mt-9 grid gap-3 sm:grid-cols-2"><span className="h-36 animate-pulse rounded-[26px] bg-[var(--soft-tint-a)]/70" /><span className="h-36 animate-pulse rounded-[26px] bg-[var(--soft-tint-b)]/70" /><span className="h-20 animate-pulse rounded-[22px] bg-white/45 sm:col-span-2" /></div></section>;
 }

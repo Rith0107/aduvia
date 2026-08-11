@@ -30,6 +30,10 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
     else setLocalHabits((current) => current.map((habit) => habit.id === id ? { ...habit, status: completed ? "complete" : "skipped", completion: completed ? 1 : 0 } : habit));
   }
 
+  if (appData?.isLoading) {
+    return <main className="soft-canvas grid min-h-screen place-items-center px-5 text-[var(--soft-ink)]"><section aria-busy="true" aria-live="polite" className="w-full max-w-lg rounded-[34px] border border-white/65 bg-white/35 p-9 text-center shadow-[0_26px_70px_-45px_rgba(28,43,35,.55)]"><span className="mx-auto grid size-14 place-items-center rounded-full bg-[var(--soft-ink)]"><span className="size-3 animate-pulse rounded-full bg-[var(--chart-primary)]" /></span><h1 className="mt-6 text-3xl font-semibold tracking-[-.04em]">Preparing tonight’s check-in…</h1><p className="mt-3 text-sm text-[var(--soft-muted)]">We’re finding only the habits scheduled for today.</p></section></main>;
+  }
+
   if (isFinished) {
     return (
       <main className="soft-canvas grid min-h-screen place-items-center text-[var(--soft-ink)]">

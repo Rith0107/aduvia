@@ -18,6 +18,7 @@ type AppData = {
   setQuests: React.Dispatch<React.SetStateAction<QuestSummary[]>>;
   completions: CompletionMap;
   reflections: Record<string, string>;
+  isLoading: boolean;
   syncError: string | null;
   deleteHabit: (habitId: string) => Promise<boolean>;
   deleteQuest: (questId: string) => Promise<boolean>;
@@ -254,7 +255,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   }
 
   const value = useMemo<AppData>(() => ({
-    habits, setHabits: updateHabits, quests, setQuests: updateQuests, completions, reflections, syncError,
+    habits, setHabits: updateHabits, quests, setQuests: updateQuests, completions, reflections, isLoading: !hydrated, syncError,
     async deleteHabit(habitId) {
       if (remoteUserId) {
         const { error } = await createBrowserSupabaseClient().from("habits").delete().eq("user_id", remoteUserId).eq("id", habitId);
@@ -349,7 +350,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     },
   // The dispatcher functions intentionally use the latest render's remote identity and category map.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [categoryIds, completions, habits, quests, reflections, remoteUserId, syncError]);
+  }), [categoryIds, completions, habits, hydrated, quests, reflections, remoteUserId, syncError]);
 
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;
 }
