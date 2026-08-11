@@ -22,7 +22,7 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
   const completedCount = habits.filter((habit) => habit.status === "complete").length;
   const answeredCount = habits.filter((habit) => habit.status !== "pending").length;
   const efficiency = useMemo(() => calculateRoutineEfficiency(habits.map(({ completion, priority }) => ({ completion, priority }))), [habits]);
-  const allAnswered = habits.every((habit) => habit.status !== "pending");
+  const allAnswered = habits.length > 0 && habits.every((habit) => habit.status !== "pending");
   const completionRatio = habits.length ? completedCount / habits.length : 0;
 
   function setHabitStatus(id: string, completed: boolean) {
@@ -59,7 +59,7 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
           <div className="evening-intro">
             <div>
               <p className="soft-kicker text-[var(--soft-accent)]">Your evening reset · under a minute</p>
-              <h1>Four choices.<br />Then rest.</h1>
+              <h1>{habits.length ? <>{habits.length} {habits.length === 1 ? "choice" : "choices"}.<br />Then rest.</> : <>Nothing due.<br />Simply rest.</>}</h1>
             </div>
             <div className="evening-progress-dial" style={{ "--check-progress": `${completionRatio * 360}deg` } as React.CSSProperties}>
               <div><strong>{completedCount}</strong><span>of {habits.length} done</span></div>
@@ -84,6 +84,7 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
                 </div>
               </article>
             ))}
+            {!habits.length && <div className="col-span-full flex min-h-48 flex-col items-center justify-center rounded-[32px] border border-white/60 bg-white/35 px-6 text-center"><p className="soft-kicker text-[var(--soft-accent)]">Your evening is clear</p><h2 className="mt-3 text-2xl font-semibold">No habits were scheduled today.</h2><p className="mt-2 max-w-sm text-sm text-[var(--soft-muted)]">There is nothing to score or explain. Head home and let today be complete.</p><Link className="mt-6 rounded-full bg-[var(--soft-ink)] px-5 py-3 text-sm font-bold text-white" href="/today">Return home</Link></div>}
           </section>
 
           <div className="evening-finish-dock">

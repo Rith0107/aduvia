@@ -39,4 +39,10 @@ describe("EveningCheckIn", () => {
     expect(screen.getByText("0")).toBeInTheDocument();
     expect(completedProgress).toHaveAttribute("aria-valuenow", "0");
   });
+
+  it("does not allow an empty schedule to be submitted as a completed day", () => {
+    render(<EveningCheckIn initialHabits={[]} />);
+    expect(screen.getByText("No habits were scheduled today.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Finish my day" })).toBeDisabled();
+  });
 });

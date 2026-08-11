@@ -42,4 +42,11 @@ describe("TodayDashboard", () => {
     });
     expect(save).toBeEnabled();
   });
+
+  it("treats an unscheduled day as rest instead of a completed routine", () => {
+    render(<TodayDashboard dateLabel="Sunday, August 9" initialHabits={[]} sideQuest={sampleSideQuest} />);
+    expect(screen.getByText("No habits are scheduled today.")).toBeInTheDocument();
+    expect(screen.getByText("Rest is part of the rhythm.")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Close the day" })).not.toBeInTheDocument();
+  });
 });

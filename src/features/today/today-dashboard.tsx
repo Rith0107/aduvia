@@ -48,7 +48,7 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
   }
 
   return (
-    <AppShell active="Today" eyebrow={dateLabel} title={<>A softer way<br />to show up.</>} action={<div className="max-w-xs border-l border-black/[0.12] pl-5"><p className="text-sm leading-6 text-[var(--soft-muted)]">You’ve already done {completedCount === 0 ? "the hard part: starting" : `${completedCount} of ${habits.length}`}. The rest can be light.</p></div>}>
+    <AppShell active="Today" eyebrow={dateLabel} title={<>A softer way<br />to show up.</>} action={<div className="max-w-xs border-l border-black/[0.12] pl-5"><p className="text-sm leading-6 text-[var(--soft-muted)]">{habits.length ? <>You’ve already done {completedCount === 0 ? "the hard part: starting" : `${completedCount} of ${habits.length}`}. The rest can be light.</> : "Nothing is scheduled today. Your rhythm can include rest."}</p></div>}>
       <section className="mt-12">
         <div className="soft-flow soft-task-cards grid gap-3 sm:grid-cols-2">
           {habits.map((habit) => (
@@ -59,6 +59,7 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
               <button aria-label={`${habit.status === "complete" ? "Undo" : "Complete"} ${habit.name}`} className={`completion-control grid size-13 shrink-0 place-items-center rounded-full border-2 text-lg ${habit.status === "complete" ? "border-[var(--soft-ink)] bg-[var(--soft-ink)] text-white" : "border-[color:color-mix(in_srgb,var(--soft-ink)_15%,transparent)] text-transparent hover:border-[var(--soft-ink)]"}`} onClick={() => toggleHabit(habit.id)} type="button">✓</button>
             </article>
           ))}
+          {!habits.length && <div className="sm:col-span-2 flex min-h-48 flex-col items-center justify-center rounded-[32px] border border-white/60 bg-white/35 px-6 py-10 text-center shadow-[0_22px_60px_-42px_rgba(28,43,35,.5)]"><p className="text-[10px] font-black uppercase tracking-[.2em] text-[var(--soft-accent)]">A clear day</p><h2 className="mt-3 text-3xl font-semibold tracking-[-.04em]">No habits are scheduled today.</h2><p className="mt-2 max-w-md text-sm leading-6 text-[var(--soft-muted)]">Enjoy the breathing room, or adjust a habit’s weekly cadence if something belongs here.</p><Link className="mt-6 rounded-full bg-[var(--soft-ink)] px-5 py-3 text-sm font-bold text-white" href="/habits">Review my habits</Link></div>}
         </div>
       </section>
 
@@ -69,10 +70,10 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
           </div>
           <div className="soft-signal-copy">
             <p className="soft-kicker">Today’s signal</p>
-            <h2>{completedCount === habits.length ? "You kept your word today." : "A gentle finish is still a finish."}</h2>
-            <p>{completedCount} of {habits.length} rituals complete. Take a breath, leave one thought, and let today be enough.</p>
+            <h2>{!habits.length ? "Rest is part of the rhythm." : completedCount === habits.length ? "You kept your word today." : "A gentle finish is still a finish."}</h2>
+            <p>{habits.length ? <>{completedCount} of {habits.length} rituals complete. Take a breath, leave one thought, and let today be enough.</> : "There is nothing to check off today. You can still leave one quiet note, or simply return tomorrow."}</p>
             <span className="sr-only">{completedCount} of {habits.length} complete</span>
-            <Link className="soft-close-action" href="/check-in"><span>Close the day</span><span aria-hidden="true">↗</span></Link>
+            {habits.length > 0 && <Link className="soft-close-action" href="/check-in"><span>Close the day</span><span aria-hidden="true">↗</span></Link>}
           </div>
         </div>
 
