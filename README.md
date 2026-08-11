@@ -37,4 +37,4 @@ Run the quality checks with `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnp
 
 ## Before production
 
-Apply every Supabase migration, configure the public Supabase environment variables, verify row-level security with two independent users, and complete the launch checklist. GitHub Actions runs typecheck, lint, tests, and the production build on every push and pull request.
+The production Supabase project and migrations are configured. Before deployment, add the public Supabase environment variables to the hosting provider, configure the production Auth URLs, verify row-level security with two independent users, and complete the launch checklist. GitHub Actions runs typecheck, lint, tests, and the production build on every push and pull request.
