@@ -31,7 +31,7 @@ export function AppShell({ active, children, eyebrow, title, action }: AppShellP
       <a className="skip-link" href="#main-content">Skip to main content</a>
       <div className="soft-shell min-h-screen overflow-hidden">
         <header className="premium-toolbar sticky top-0 z-40 mx-auto flex max-w-[1800px] items-center justify-between px-5 py-5 sm:px-9 lg:px-14">
-          <BrandLogo />
+          <BrandLogo href="/today" />
           <nav aria-label="Primary" className="hidden rounded-full bg-white/45 p-1 shadow-[inset_0_0_0_1px_rgba(31,45,38,0.05)] backdrop-blur-xl md:flex">
             {navItems.map((item) => (
               <Link className={`rounded-full px-5 py-2.5 text-xs font-bold transition ${active === item.label ? "bg-[var(--soft-ink)] text-white shadow-sm" : "text-[var(--soft-muted)] hover:text-[var(--soft-ink)]"}`} href={item.href} key={item.label}>{item.label}</Link>
