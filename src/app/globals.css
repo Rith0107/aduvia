@@ -618,10 +618,13 @@ h3 {
 }
 
 /* The onboarding quest field is intentionally an underlined editorial input. */
+#first-quest:focus,
 #first-quest:focus-visible {
-  outline: none;
+  outline: 0 !important;
   outline-offset: 0;
-  box-shadow: 0 2px 0 color-mix(in srgb, var(--soft-accent) 72%, transparent);
+  box-shadow: none;
+  border-bottom-color: var(--soft-accent);
+  border-bottom-width: 2px;
 }
 
 .skip-link {
