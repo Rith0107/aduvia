@@ -37,4 +37,4 @@ Run the quality checks with `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnp
 
 ## Before production
 
-Apply every Supabase migration, configure the public Supabase environment variables, verify row-level security with two independent users, and complete the launch checklist. The prepared quality workflow in `docs/quality-workflow.yml` runs typecheck, lint, tests, and the production build; move it into `.github/workflows/` after the repository token receives workflow permission.
+Apply every Supabase migration, configure the public Supabase environment variables, verify row-level security with two independent users, and complete the launch checklist. GitHub Actions runs typecheck, lint, tests, and the production build on every push and pull request.
