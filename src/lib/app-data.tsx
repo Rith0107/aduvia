@@ -11,6 +11,11 @@ import type { TodayHabit } from "@/features/today/types";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 
 type CompletionMap = Record<string, Record<string, "complete" | "skipped">>;
+type PendingMutation =
+  | { key: "habits"; kind: "habits"; habits: HabitSummary[] }
+  | { key: "quests"; kind: "quests"; quests: QuestSummary[] }
+  | { key: string; kind: "check-in"; habitId: string; date: string; status: "pending" | "complete" | "skipped" }
+  | { key: string; kind: "reflection"; date: string; note: string };
 type AppData = {
   habits: HabitSummary[];
   setHabits: React.Dispatch<React.SetStateAction<HabitSummary[]>>;
@@ -19,7 +24,10 @@ type AppData = {
   completions: CompletionMap;
   reflections: Record<string, string>;
   isLoading: boolean;
+  isSyncing: boolean;
   syncError: string | null;
+  pendingSyncCount: number;
+  retrySync: () => Promise<boolean>;
   deleteHabit: (habitId: string) => Promise<boolean>;
   deleteQuest: (questId: string) => Promise<boolean>;
   completeOnboarding: (newHabits: HabitSummary[], newQuests: QuestSummary[]) => Promise<boolean>;
@@ -28,9 +36,14 @@ type AppData = {
 };
 
 const STORAGE_KEY = "aduvia-app-data-v1";
+const PENDING_SYNC_KEY = "aduvia-pending-sync-v1";
 const AppDataContext = createContext<AppData | null>(null);
 const weekdayKeys: HabitDay[] = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const dayNumbers: Record<HabitDay, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+
+export function mergePendingMutation<T extends { key: string }>(current: T[], mutation: T) {
+  return [...current.filter((item) => item.key !== mutation.key), mutation];
+}
 
 type RemoteCategory = { id: string; name: string; color: string | null };
 type RemoteHabit = { id: string; created_at: string; name: string; schedule: unknown; priority: number; status: "active" | "paused" | "archived"; category_id: string | null };
@@ -145,6 +158,45 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [remoteUserId, setRemoteUserId] = useState<string | null>(null);
   const [categoryIds, setCategoryIds] = useState<Record<string, string>>({});
   const [syncError, setSyncError] = useState<string | null>(null);
+  const [pendingMutations, setPendingMutations] = useState<PendingMutation[]>([]);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  useEffect(() => {
+    if (!hasRemoteConfiguration()) return;
+    const timer = window.setTimeout(() => {
+      try {
+        const saved = window.localStorage.getItem(PENDING_SYNC_KEY);
+        if (saved) setPendingMutations(JSON.parse(saved) as PendingMutation[]);
+      } catch { /* A malformed retry queue must not block the app. */ }
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!hasRemoteConfiguration()) return;
+    try {
+      if (pendingMutations.length) window.localStorage.setItem(PENDING_SYNC_KEY, JSON.stringify(pendingMutations));
+      else window.localStorage.removeItem(PENDING_SYNC_KEY);
+    } catch { /* The current session can still retry even if storage is unavailable. */ }
+  }, [pendingMutations]);
+
+  useEffect(() => {
+    if (!hydrated || !remoteUserId || !pendingMutations.length) return;
+    const timer = window.setTimeout(() => {
+      for (const mutation of pendingMutations) {
+        if (mutation.kind === "habits") setHabits(mutation.habits);
+        else if (mutation.kind === "quests") setQuests(mutation.quests);
+        else if (mutation.kind === "reflection") setReflections((current) => ({ ...current, [mutation.date]: mutation.note }));
+        else setCompletions((current) => {
+          const day = { ...(current[mutation.date] ?? {}) };
+          if (mutation.status === "pending") delete day[mutation.habitId];
+          else day[mutation.habitId] = mutation.status;
+          return { ...current, [mutation.date]: day };
+        });
+      }
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [hydrated, pendingMutations, remoteUserId]);
 
   useEffect(() => {
     if (!hasRemoteConfiguration()) return;
@@ -234,14 +286,48 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     return next;
   }
 
+  function queueMutation(mutation: PendingMutation) {
+    setPendingMutations((current) => mergePendingMutation(current, mutation));
+    setSyncError("Your change is saved on this device and waiting to sync.");
+  }
+
+  async function saveHabitsRemote(next: HabitSummary[]) {
+    if (!remoteUserId) throw new Error("Your session is unavailable.");
+    const categories = await ensureCategories(next.map((habit) => habit.category));
+    const { error } = await createBrowserSupabaseClient().from("habits").upsert(next.map((habit) => ({ id: habit.id, user_id: remoteUserId, category_id: categories[habit.category] ?? null, name: habit.name, schedule: scheduleForRemote(habit), priority: habit.isAnchor ? 3 : 2, status: habit.state })));
+    if (error) throw error;
+  }
+
+  async function saveQuestsRemote(next: QuestSummary[]) {
+    if (!remoteUserId) throw new Error("Your session is unavailable.");
+    const categories = await ensureCategories(next.map((quest) => quest.category));
+    const month = new Date();
+    const targetMonth = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}-01`;
+    const { error } = await createBrowserSupabaseClient().from("side_quests").upsert(next.map((quest) => ({ id: quest.id, user_id: remoteUserId, category_id: categories[quest.category] ?? null, title: quest.title, target_month: targetMonth, estimated_minutes: quest.effortHours * 60, progress: quest.status === "completed" ? 1 : 0, status: questStatusForRemote(quest.status) })));
+    if (error) throw error;
+  }
+
+  async function applyPendingMutation(mutation: PendingMutation) {
+    if (!remoteUserId) throw new Error("Your session is unavailable.");
+    if (mutation.kind === "habits") return saveHabitsRemote(mutation.habits);
+    if (mutation.kind === "quests") return saveQuestsRemote(mutation.quests);
+    const supabase = createBrowserSupabaseClient();
+    if (mutation.kind === "reflection") {
+      const { error } = await supabase.from("daily_reflections").upsert({ user_id: remoteUserId, reflection_date: mutation.date, note: mutation.note }, { onConflict: "user_id,reflection_date" });
+      if (error) throw error;
+      return;
+    }
+    const request = mutation.status === "pending"
+      ? supabase.from("habit_check_ins").delete().eq("user_id", remoteUserId).eq("habit_id", mutation.habitId).eq("scheduled_date", mutation.date)
+      : supabase.from("habit_check_ins").upsert({ user_id: remoteUserId, habit_id: mutation.habitId, scheduled_date: mutation.date, status: mutation.status === "complete" ? "complete" : "skipped", completion: mutation.status === "complete" ? 1 : 0, completed_at: mutation.status === "complete" ? new Date().toISOString() : null }, { onConflict: "habit_id,scheduled_date" });
+    const { error } = await request;
+    if (error) throw error;
+  }
+
   function updateHabits(update: React.SetStateAction<HabitSummary[]>) {
     setHabits((current) => {
       const next = typeof update === "function" ? update(current) : update;
-      if (remoteUserId) void (async () => {
-        const categories = await ensureCategories(next.map((habit) => habit.category));
-        const { error } = await createBrowserSupabaseClient().from("habits").upsert(next.map((habit) => ({ id: habit.id, user_id: remoteUserId, category_id: categories[habit.category] ?? null, name: habit.name, schedule: scheduleForRemote(habit), priority: habit.isAnchor ? 3 : 2, status: habit.state })));
-        if (error) throw error;
-      })().catch((error: unknown) => setSyncError(errorMessage(error, "Unable to save habit changes.")));
+      if (remoteUserId) void saveHabitsRemote(next).then(() => setPendingMutations((items) => items.filter((item) => item.key !== "habits"))).catch(() => queueMutation({ key: "habits", kind: "habits", habits: next }));
       return next;
     });
   }
@@ -249,19 +335,32 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   function updateQuests(update: React.SetStateAction<QuestSummary[]>) {
     setQuests((current) => {
       const next = typeof update === "function" ? update(current) : update;
-      if (remoteUserId) void (async () => {
-        const categories = await ensureCategories(next.map((quest) => quest.category));
-        const month = new Date();
-        const targetMonth = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}-01`;
-        const { error } = await createBrowserSupabaseClient().from("side_quests").upsert(next.map((quest) => ({ id: quest.id, user_id: remoteUserId, category_id: categories[quest.category] ?? null, title: quest.title, target_month: targetMonth, estimated_minutes: quest.effortHours * 60, progress: quest.status === "completed" ? 1 : 0, status: questStatusForRemote(quest.status) })));
-        if (error) throw error;
-      })().catch((error: unknown) => setSyncError(errorMessage(error, "Unable to save quest changes.")));
+      if (remoteUserId) void saveQuestsRemote(next).then(() => setPendingMutations((items) => items.filter((item) => item.key !== "quests"))).catch(() => queueMutation({ key: "quests", kind: "quests", quests: next }));
       return next;
     });
   }
 
   const value = useMemo<AppData>(() => ({
-    habits, setHabits: updateHabits, quests, setQuests: updateQuests, completions, reflections, isLoading: !hydrated, syncError,
+    habits, setHabits: updateHabits, quests, setQuests: updateQuests, completions, reflections, isLoading: !hydrated, isSyncing, syncError, pendingSyncCount: pendingMutations.length,
+    async retrySync() {
+      if (!remoteUserId || !pendingMutations.length || isSyncing) return pendingMutations.length === 0;
+      setIsSyncing(true);
+      let remaining = [...pendingMutations];
+      for (const mutation of pendingMutations) {
+        try {
+          await applyPendingMutation(mutation);
+          remaining = remaining.filter((item) => item.key !== mutation.key);
+          setPendingMutations(remaining);
+        } catch (error) {
+          setSyncError(errorMessage(error, "Aduvia is still unable to sync. Your changes remain saved on this device."));
+          setIsSyncing(false);
+          return false;
+        }
+      }
+      setSyncError(null);
+      setIsSyncing(false);
+      return true;
+    },
     async deleteHabit(habitId) {
       if (remoteUserId) {
         const { error } = await createBrowserSupabaseClient().from("habits").delete().eq("user_id", remoteUserId).eq("id", habitId);
@@ -330,9 +429,10 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       if (!remoteUserId) return true;
       const { error } = await createBrowserSupabaseClient().from("daily_reflections").upsert({ user_id: remoteUserId, reflection_date: key, note: cleanNote }, { onConflict: "user_id,reflection_date" });
       if (error) {
-        setSyncError(error.message);
+        queueMutation({ key: `reflection:${key}`, kind: "reflection", date: key, note: cleanNote });
         return false;
       }
+      setPendingMutations((items) => items.filter((item) => item.key !== `reflection:${key}`));
       return true;
     },
     setHabitStatus(habitId, status, date = new Date()) {
@@ -350,13 +450,15 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           : supabase.from("habit_check_ins").upsert({ user_id: remoteUserId, habit_id: habitId, scheduled_date: key, status: status === "complete" ? "complete" : "skipped", completion: status === "complete" ? 1 : 0, completed_at: status === "complete" ? new Date().toISOString() : null }, { onConflict: "habit_id,scheduled_date" });
         void (async () => {
           const result = await request;
-          if (result.error) setSyncError(result.error.message);
+          const mutationKey = `check-in:${key}:${habitId}`;
+          if (result.error) queueMutation({ key: mutationKey, kind: "check-in", habitId, date: key, status });
+          else setPendingMutations((items) => items.filter((item) => item.key !== mutationKey));
         })();
       }
     },
   // The dispatcher functions intentionally use the latest render's remote identity and category map.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [categoryIds, completions, habits, hydrated, quests, reflections, remoteUserId, syncError]);
+  }), [categoryIds, completions, habits, hydrated, isSyncing, pendingMutations, quests, reflections, remoteUserId, syncError]);
 
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;
 }

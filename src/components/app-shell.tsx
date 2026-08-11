@@ -27,6 +27,7 @@ type AppShellProps = {
 export function AppShell({ active, children, eyebrow, title, action }: AppShellProps) {
   const appData = useAppData();
   const syncError = appData?.syncError;
+  const pendingSyncCount = appData?.pendingSyncCount ?? 0;
   const isLoading = appData?.isLoading === true;
   return (
     <main className="soft-canvas min-h-screen text-[var(--soft-ink)]">
@@ -48,7 +49,7 @@ export function AppShell({ active, children, eyebrow, title, action }: AppShellP
         </header>
 
         <div className="mx-auto max-w-[1800px] px-5 pb-24 pt-9 sm:px-9 lg:px-14 lg:pb-14" id="main-content">
-          {syncError && <div className="mb-6 rounded-2xl border border-[var(--soft-icon-clay)]/25 bg-white/55 px-4 py-3 text-sm text-[var(--soft-ink)]" role="status"><strong>Changes are not syncing.</strong> {syncError}</div>}
+          {syncError && <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-[var(--soft-icon-clay)]/25 bg-white/55 px-4 py-3 text-sm text-[var(--soft-ink)] sm:flex-row sm:items-center sm:justify-between" role="status"><span><strong>{pendingSyncCount ? `${pendingSyncCount} ${pendingSyncCount === 1 ? "change is" : "changes are"} waiting.` : "Changes are not syncing."}</strong> {syncError}</span>{pendingSyncCount > 0 && <button className="shrink-0 rounded-full bg-[var(--soft-ink)] px-4 py-2 text-xs font-bold text-white disabled:cursor-wait disabled:opacity-50" disabled={appData?.isSyncing} onClick={() => void appData?.retrySync()} type="button">{appData?.isSyncing ? "Retrying…" : "Retry sync"}</button>}</div>}
           <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[var(--soft-accent)]">{eyebrow}</p>
