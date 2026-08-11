@@ -55,4 +55,11 @@ describe("MonthlyReport", () => {
     render(<MonthlyReport />);
     expect(screen.getByRole("button", { name: "Next month" })).toBeDisabled();
   });
+
+  it("centers status cells beneath their date and marks the real current date", () => {
+    render(<MonthlyReport />);
+    const currentDate = new Date().getDate();
+    expect(screen.getByRole("columnheader", { name: String(currentDate) })).toHaveAttribute("aria-current", "date");
+    expect(screen.getByLabelText(`Morning walk, August 1: done`)).toHaveClass("mx-auto");
+  });
 });
