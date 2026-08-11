@@ -100,6 +100,7 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
     }) : [
       ...current.map((habit) => isAnchor ? { ...habit, isAnchor: false } : habit), {
         id: crypto.randomUUID(),
+        createdAt: new Date().toISOString(),
         name: name.trim(),
         category: inferred.category,
         frequency,

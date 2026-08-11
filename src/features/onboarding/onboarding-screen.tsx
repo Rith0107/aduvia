@@ -65,6 +65,7 @@ export function OnboardingScreen() {
     setMessage("");
     const selectedHabits = starters.filter((starter) => selected.includes(starter.name)).map((starter) => ({
       id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
       isAnchor: starter.name === selectedAnchor,
       name: starter.name,
       category: starter.category,
@@ -77,7 +78,7 @@ export function OnboardingScreen() {
     } satisfies HabitSummary));
     if (customHabit) {
       const inferred = inferHabitCategory(customHabit);
-      selectedHabits.push({ id: crypto.randomUUID(), isAnchor: customHabit === selectedAnchor, name: customHabit, category: inferred.category, frequency: customDays.length === 7 ? "Daily" : "Custom", scheduledDays: customDays, color: inferred.color, consistency: 0, streak: 0, state: "active" });
+      selectedHabits.push({ id: crypto.randomUUID(), createdAt: new Date().toISOString(), isAnchor: customHabit === selectedAnchor, name: customHabit, category: inferred.category, frequency: customDays.length === 7 ? "Daily" : "Custom", scheduledDays: customDays, color: inferred.color, consistency: 0, streak: 0, state: "active" });
     }
     const cleanQuestTitle = includeQuest ? questTitle.trim() : "";
     const selectedQuests: QuestSummary[] = [];

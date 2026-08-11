@@ -33,7 +33,7 @@ const weekdayKeys: HabitDay[] = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
 const dayNumbers: Record<HabitDay, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
 
 type RemoteCategory = { id: string; name: string; color: string | null };
-type RemoteHabit = { id: string; name: string; schedule: unknown; priority: number; status: "active" | "paused" | "archived"; category_id: string | null };
+type RemoteHabit = { id: string; created_at: string; name: string; schedule: unknown; priority: number; status: "active" | "paused" | "archived"; category_id: string | null };
 type RemoteQuest = { id: string; title: string; target_date: string | null; estimated_minutes: number | null; status: string; category_id: string | null };
 type RemoteCheckIn = { habit_id: string; scheduled_date: string; status: string };
 type RemoteReflection = { reflection_date: string; note: string | null };
@@ -103,7 +103,13 @@ export function scheduledDaysFor(habit: HabitSummary): HabitDay[] {
 }
 
 export function isHabitScheduledOn(habit: HabitSummary, date: Date) {
-  return habit.state === "active" && scheduledDaysFor(habit).includes(weekdayKeys[date.getDay()]);
+  return habit.state === "active" && isHabitAvailableOn(habit, date) && scheduledDaysFor(habit).includes(weekdayKeys[date.getDay()]);
+}
+
+export function isHabitAvailableOn(habit: HabitSummary, date: Date) {
+  if (!habit.createdAt) return true;
+  const created = new Date(habit.createdAt);
+  return !Number.isNaN(created.getTime()) && dateKey(date) >= dateKey(created);
 }
 
 function targetFor(habit: HabitSummary) {
@@ -150,7 +156,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       const userId = authData.user.id;
       const [{ data: categoryRows, error: categoryError }, { data: habitRows, error: habitError }, { data: questRows, error: questError }, { data: checkInRows, error: checkInError }, { data: reflectionRows, error: reflectionError }] = await Promise.all([
         supabase.from("categories").select("id,name,color").eq("user_id", userId),
-        supabase.from("habits").select("id,name,schedule,priority,status,category_id").eq("user_id", userId),
+        supabase.from("habits").select("id,created_at,name,schedule,priority,status,category_id").eq("user_id", userId),
         supabase.from("side_quests").select("id,title,target_date,estimated_minutes,status,category_id").eq("user_id", userId),
         supabase.from("habit_check_ins").select("habit_id,scheduled_date,status").eq("user_id", userId),
         supabase.from("daily_reflections").select("reflection_date,note").eq("user_id", userId),
@@ -166,7 +172,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         const category = row.category_id ? categoryById.get(row.category_id) : undefined;
         const inferred = inferHabitCategory(row.name);
         const useInferred = !category || category.name === "Personal";
-        return { id: row.id, name: row.name, category: useInferred ? inferred.category : category.name, ...scheduleFromRemote(row.schedule), isAnchor: row.priority === 3, ...metricsForHabit(row.id, checks), state: row.status === "paused" ? "paused" : "active", color: useInferred ? inferred.color : (category.color as HabitSummary["color"]) ?? inferred.color };
+        return { id: row.id, createdAt: row.created_at, name: row.name, category: useInferred ? inferred.category : category.name, ...scheduleFromRemote(row.schedule), isAnchor: row.priority === 3, ...metricsForHabit(row.id, checks), state: row.status === "paused" ? "paused" : "active", color: useInferred ? inferred.color : (category.color as HabitSummary["color"]) ?? inferred.color };
       }));
       setQuests(((questRows ?? []) as RemoteQuest[]).map((row) => {
         const status = questStatusFromRemote(row.status);

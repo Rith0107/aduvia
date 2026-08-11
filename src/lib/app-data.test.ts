@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { HabitSummary } from "@/features/habits/types";
-import { isHabitScheduledOn, todaysHabits } from "./app-data";
+import { isHabitAvailableOn, isHabitScheduledOn, todaysHabits } from "./app-data";
 
 const habits: HabitSummary[] = [
   { id: "daily", name: "Walk 20 minutes", category: "Fitness", frequency: "Daily", consistency: 0, streak: 0, state: "active", color: "green" },
@@ -22,5 +22,12 @@ describe("shared app scheduling", () => {
     const sunday = new Date(2026, 7, 9);
     const result = todaysHabits(habits, { "2026-08-09": { daily: "complete", custom: "skipped" } }, sunday);
     expect(result.map(({ id, status }) => [id, status])).toEqual([["daily", "complete"], ["custom", "skipped"], ["three-times", "pending"]]);
+  });
+
+  it("does not schedule a habit before the day it was created", () => {
+    const newHabit = { ...habits[0], createdAt: "2026-08-11T18:00:00.000Z" };
+    expect(isHabitAvailableOn(newHabit, new Date(2026, 7, 10))).toBe(false);
+    expect(isHabitScheduledOn(newHabit, new Date(2026, 7, 10))).toBe(false);
+    expect(isHabitAvailableOn(newHabit, new Date(2026, 7, 11))).toBe(true);
   });
 });

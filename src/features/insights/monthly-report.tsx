@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
-import { scheduledDaysFor, useAppData } from "@/lib/app-data";
+import { isHabitAvailableOn, scheduledDaysFor, useAppData } from "@/lib/app-data";
 import { Download, Share2, Smartphone, Square } from "lucide-react";
 import {
   Area,
@@ -318,6 +318,7 @@ export function MonthlyReport() {
       color: colorByIndex[habitIndex % colorByIndex.length],
       days: Array.from({ length: daysInMonth }, (_, index): CellState => {
         const date = new Date(reportMonth.year, reportMonth.month, index + 1);
+        if (!isHabitAvailableOn(habit, date)) return "off";
         const weekday = (["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const)[date.getDay()];
         if (!scheduledDaysFor(habit).includes(weekday)) return "off";
         if (index + 1 > evaluatedDays) return "pending";
@@ -370,6 +371,7 @@ export function MonthlyReport() {
     appData.habits.forEach((habit) => {
       for (let day = 1; day <= count; day += 1) {
         const date = new Date(previous.getFullYear(), previous.getMonth(), day);
+        if (!isHabitAvailableOn(habit, date)) continue;
         const weekday = (["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const)[date.getDay()];
         if (!scheduledDaysFor(habit).includes(weekday)) continue;
         scheduled += 1;

@@ -4,6 +4,7 @@ export type HabitState = "active" | "paused";
 
 export type HabitSummary = {
   id: string;
+  createdAt?: string;
   name: string;
   category: string;
   frequency: HabitFrequency;
