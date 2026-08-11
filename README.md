@@ -8,6 +8,8 @@ The name blends the Telugu word **adugu** (అడుగు, “step”) with **v
 
 The working application uses Next.js, TypeScript, Tailwind CSS, Supabase, and Recharts. Authenticated accounts persist habits, schedules, daily check-ins, side quests, and private reflections in Supabase; an unconfigured local environment falls back to browser-local preview data. GitHub is the source of truth.
 
+Production: https://aduvia-chi.vercel.app
+
 ## Product areas
 
 - **Today:** habits scheduled for today, quick check-ins, and daily reflection.
@@ -35,6 +37,6 @@ pnpm dev
 
 Run the quality checks with `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build`.
 
-## Before production
+## Before launch
 
-The production Supabase project and migrations are configured. Before deployment, add the public Supabase environment variables to the hosting provider, configure the production Auth URLs, verify row-level security with two independent users, and complete the launch checklist. GitHub Actions runs typecheck, lint, tests, and the production build on every push and pull request.
+The application is deployed through Vercel and connected to the production Supabase project. Before public launch, verify row-level security with two independent users, test signup confirmation and password recovery, and complete the remaining launch checklist. GitHub Actions runs typecheck, lint, tests, and the production build on every push and pull request.

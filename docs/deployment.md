@@ -8,6 +8,7 @@
 - Framework preset: Next.js
 - Root directory: `./`
 - Production branch: `design/soft-digital`
+- Production URL: https://aduvia-chi.vercel.app
 
 The following browser-safe variables are configured for Production and Preview:
 
@@ -16,4 +17,9 @@ The following browser-safe variables are configured for Production and Preview:
 
 Never add Supabase secret or service-role keys to Vercel client environment variables.
 
-After Vercel assigns the production domain, add it as the Supabase Auth site URL and allow the exact callback paths before testing signup, confirmation, and password recovery.
+Supabase Auth uses the production URL as its site URL and allows both:
+
+- `https://aduvia-chi.vercel.app/**`
+- `http://localhost:3000/**`
+
+The localhost entry remains available for development. Verify signup confirmation and password recovery before launch.

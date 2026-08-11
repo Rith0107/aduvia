@@ -4,10 +4,10 @@
 
 - [x] Create the production Supabase project.
 - [x] Apply migrations in timestamp order.
-- [ ] Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in the hosting environment.
-- [ ] Configure the production site URL and allowed Auth redirect URLs. Localhost is configured; add the deployment URL after hosting is selected.
+- [x] Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in the hosting environment.
+- [x] Configure the production site URL and allowed Auth redirect URLs while retaining localhost for development.
 - [ ] Enable email confirmation and verify the confirmation template.
-- [ ] Choose the hosting provider and connect the GitHub production branch.
+- [x] Deploy with Vercel and connect the GitHub production branch.
 
 ## Security and privacy
 
