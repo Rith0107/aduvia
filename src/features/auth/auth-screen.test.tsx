@@ -16,6 +16,11 @@ describe("AuthScreen", () => {
     expect(screen.queryByText(/demo data/i)).not.toBeInTheDocument();
   });
 
+  it("accepts a safe protected destination after login", () => {
+    render(<AuthScreen mode="login" nextPath="/insights" />);
+    expect(screen.getByRole("button", { name: "Enter Aduvia" })).toBeInTheDocument();
+  });
+
   it("asks for an email before password recovery", () => {
     render(<AuthScreen mode="login" />);
     fireEvent.click(screen.getByRole("button", { name: "Forgot password?" }));

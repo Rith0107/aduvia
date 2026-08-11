@@ -22,7 +22,7 @@ function passwordStrength(password: string) {
   return { label: "Too short", score: 1 };
 }
 
-export function AuthScreen({ mode }: { mode: AuthMode }) {
+export function AuthScreen({ mode, nextPath = "/today" }: { mode: AuthMode; nextPath?: string }) {
   const router = useRouter();
   const isSignup = mode === "signup";
   const [name, setName] = useState("");
@@ -68,7 +68,7 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
       if (isSignup && !result.data.session) {
         setMessage("Check your inbox to confirm your account.");
       } else {
-        router.push(isSignup ? "/onboarding" : "/today");
+        router.push(isSignup ? "/onboarding" : nextPath);
       }
     } catch (error) {
       setMessage(error instanceof Error && !error.message.includes("environment variables") ? error.message : "Authentication is ready once Supabase keys are added.");
@@ -86,7 +86,7 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
     setRecoverySending(true);
     try {
       const supabase = createBrowserSupabaseClient();
-      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/login` });
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/callback?next=/reset-password` });
       if (error) throw error;
       setMessage("Password reset link sent. Check your inbox.");
     } catch (error) {
