@@ -5,7 +5,7 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { consistencyFromHabits, MonthlyReport } from "./monthly-report";
+import { consistencyFromHabits, dailyConsistencyFromHabits, MonthlyReport } from "./monthly-report";
 
 afterEach(cleanup);
 
@@ -68,5 +68,16 @@ describe("MonthlyReport", () => {
       { id: "daily", name: "Daily", category: "Wellness", color: "green", days: ["done", "done", "done", "missed", "pending"] },
       { id: "weekly", name: "Weekly", category: "Fitness", color: "blue", days: ["off", "off", "missed", "off", "pending"] },
     ])).toBe(60);
+  });
+
+  it("excludes pending and unscheduled cells from daily consistency", () => {
+    expect(dailyConsistencyFromHabits([
+      { id: "one", name: "One", category: "Wellness", color: "green", days: ["done", "pending"] },
+      { id: "two", name: "Two", category: "Fitness", color: "blue", days: ["missed", "pending"] },
+      { id: "three", name: "Three", category: "Learning", color: "amber", days: ["off", "off"] },
+    ], 2, "August")).toEqual([
+      { day: 1, label: "Aug 1", score: 50, completed: 1, scheduled: 2 },
+      { day: 2, label: "Aug 2", score: 0, completed: 0, scheduled: 0 },
+    ]);
   });
 });
