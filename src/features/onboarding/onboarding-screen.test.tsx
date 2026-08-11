@@ -15,8 +15,12 @@ describe("OnboardingScreen", () => {
     fireEvent.change(screen.getByLabelText("Custom habit name"), { target: { value: "Call my parents" } });
     fireEvent.click(screen.getByRole("button", { name: "Add my habit" }));
     expect(screen.getByText("Call my parents")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Monday selected" })).toHaveAttribute("aria-pressed", "true");
-    fireEvent.click(screen.getByRole("button", { name: "Sunday selected" }));
+    expect(screen.getByRole("button", { name: "Monday not selected" })).toHaveAttribute("aria-pressed", "false");
+    for (const day of ["Monday", "Tuesday", "Wednesday", "Friday", "Saturday"]) {
+      fireEvent.click(screen.getByRole("button", { name: `${day} not selected` }));
+      expect(screen.getByRole("button", { name: `${day} selected` })).toHaveAttribute("aria-pressed", "true");
+    }
+    expect(screen.getByRole("button", { name: "Thursday not selected" })).toHaveAttribute("aria-pressed", "false");
     expect(screen.getByRole("button", { name: "Sunday not selected" })).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(screen.getByRole("button", { name: "Make Call my parents my anchor" }));
     expect(screen.getByRole("button", { name: "Make Call my parents my anchor" })).toHaveAttribute("aria-pressed", "true");
@@ -28,6 +32,8 @@ describe("OnboardingScreen", () => {
     expect(next).toBeDisabled();
     fireEvent.change(screen.getByLabelText("Custom habit name"), { target: { value: "Prepare tomorrow's clothes" } });
     fireEvent.click(screen.getByRole("button", { name: "Add my habit" }));
+    expect(next).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "Monday not selected" }));
     expect(next).toBeEnabled();
     fireEvent.click(next);
     expect(screen.getByRole("heading", { name: "Add a side quest." })).toBeInTheDocument();

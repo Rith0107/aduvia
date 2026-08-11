@@ -28,7 +28,7 @@ export function OnboardingScreen() {
   const [anchor, setAnchor] = useState("");
   const [customName, setCustomName] = useState("");
   const [customHabit, setCustomHabit] = useState("");
-  const [customDays, setCustomDays] = useState<HabitDay[]>(weekDays);
+  const [customDays, setCustomDays] = useState<HabitDay[]>([]);
   const [questTitle, setQuestTitle] = useState("");
   const [finishing, setFinishing] = useState(false);
   const [message, setMessage] = useState("");
@@ -51,6 +51,7 @@ export function OnboardingScreen() {
 
   function removeCustomHabit() {
     setCustomHabit("");
+    setCustomDays([]);
     if (anchor === customHabit) setAnchor(selected[0] ?? "");
   }
 
