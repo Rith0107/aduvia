@@ -612,19 +612,17 @@ h3 {
   }
 }
 
-:where(a, button, input, select, textarea):focus-visible {
+:where(a, button, select, input[type="checkbox"], input[type="radio"]):focus-visible {
   outline: 3px solid color-mix(in srgb, var(--soft-accent, #a86550) 72%, white);
   outline-offset: 3px;
 }
 
-/* The onboarding quest field is intentionally an underlined editorial input. */
-#first-quest:focus,
-#first-quest:focus-visible {
+/* Text-entry fields use their designed border or underline instead of a second box. */
+:where(input:not([type="checkbox"]):not([type="radio"]), textarea):focus,
+:where(input:not([type="checkbox"]):not([type="radio"]), textarea):focus-visible {
   outline: 0 !important;
   outline-offset: 0;
   box-shadow: none;
-  border-bottom-color: var(--soft-accent);
-  border-bottom-width: 2px;
 }
 
 .skip-link {
