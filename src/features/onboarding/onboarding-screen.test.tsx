@@ -18,4 +18,16 @@ describe("OnboardingScreen", () => {
     fireEvent.click(screen.getByRole("button", { name: "Make Call my parents my anchor" }));
     expect(screen.getByRole("button", { name: "Make Call my parents my anchor" })).toHaveAttribute("aria-pressed", "true");
   });
+
+  it("requires a user-created task before offering an optional side quest", () => {
+    render(<OnboardingScreen />);
+    const next = screen.getByRole("button", { name: /Next: add a side quest/i });
+    expect(next).toBeDisabled();
+    fireEvent.change(screen.getByLabelText("Custom habit name"), { target: { value: "Prepare tomorrow's clothes" } });
+    fireEvent.click(screen.getByRole("button", { name: "Add my habit" }));
+    expect(next).toBeEnabled();
+    fireEvent.click(next);
+    expect(screen.getByRole("heading", { name: "Add a side quest." })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "I’ll add one later" })).toBeInTheDocument();
+  });
 });
