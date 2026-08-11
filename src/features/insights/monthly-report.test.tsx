@@ -5,7 +5,7 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { MonthlyReport } from "./monthly-report";
+import { consistencyFromHabits, MonthlyReport } from "./monthly-report";
 
 afterEach(cleanup);
 
@@ -61,5 +61,12 @@ describe("MonthlyReport", () => {
     const currentDate = new Date().getDate();
     expect(screen.getByRole("columnheader", { name: String(currentDate) })).toHaveAttribute("aria-current", "date");
     expect(screen.getByLabelText(`Morning walk, August 1: done`)).toHaveClass("mx-auto");
+  });
+
+  it("weights monthly consistency by scheduled check-ins and ignores pending days", () => {
+    expect(consistencyFromHabits([
+      { id: "daily", name: "Daily", category: "Wellness", color: "green", days: ["done", "done", "done", "missed", "pending"] },
+      { id: "weekly", name: "Weekly", category: "Fitness", color: "blue", days: ["off", "off", "missed", "off", "pending"] },
+    ])).toBe(60);
   });
 });
