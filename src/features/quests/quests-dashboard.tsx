@@ -7,6 +7,7 @@ import { createPortal } from "react-dom";
 import { AppShell } from "@/components/app-shell";
 import { ActivityIcon } from "@/components/activity-icon";
 import { useAppData } from "@/lib/app-data";
+import { getMonthContext } from "@/lib/month-context";
 import type { QuestStatus, QuestSummary } from "./types";
 
 type QuestsDashboardProps = { initialQuests: QuestSummary[] };
@@ -40,6 +41,7 @@ const statusColors: Record<QuestStatus, string> = {
 };
 
 export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
+  const monthContext = getMonthContext();
   const appData = useAppData();
   const [localQuests, setLocalQuests] = useState(initialQuests);
   const quests = appData?.quests ?? localQuests;
@@ -63,7 +65,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
           ? {
               ...quest,
               status: quest.status === "completed" ? "in-progress" : "completed",
-              dueLabel: quest.status === "completed" ? "Aug 31" : "Completed",
+              dueLabel: quest.status === "completed" ? monthContext.monthEndLabel : "Completed",
             }
           : quest,
       ),
@@ -77,7 +79,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
           ? {
               ...quest,
               status,
-              dueLabel: status === "completed" ? "Completed" : quest.dueLabel === "Completed" ? "Aug 31" : quest.dueLabel,
+              dueLabel: status === "completed" ? "Completed" : quest.dueLabel === "Completed" ? monthContext.monthEndLabel : quest.dueLabel,
             }
           : quest,
       ),
@@ -95,7 +97,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
         title: title.trim(),
         category: inferQuestCategory(title),
         status: "not-started",
-        dueLabel: "Aug 31",
+        dueLabel: monthContext.monthEndLabel,
         effortHours: 6,
         color: "green",
       },
@@ -106,7 +108,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
   }
 
   return (
-    <AppShell active="Quests" eyebrow="August · 27 days left" title={<>A few things worth<br />finishing.</>} action={<button className="rounded-full bg-[var(--soft-ink)] px-6 py-4 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5" onClick={() => setIsCreating(true)} type="button">+ New quest</button>}>
+    <AppShell active="Quests" eyebrow={`${monthContext.monthName} · ${monthContext.countdownLabel}`} title={<>A few things worth<br />finishing.</>} action={<button className="rounded-full bg-[var(--soft-ink)] px-6 py-4 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5" onClick={() => setIsCreating(true)} type="button">+ New quest</button>}>
           <section className="mt-12 grid border-y border-black/[0.09] sm:grid-cols-[1fr_1fr_1.4fr]">
             <div className="py-6 sm:border-r sm:border-black/[0.09] sm:pr-6"><p className="metric-label"><Flag aria-hidden className="text-[var(--soft-icon-clay)]" />Committed</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{quests.length}</p></div>
             <div className="border-t border-black/[0.09] py-6 sm:border-r sm:border-t-0 sm:px-6"><p className="metric-label"><CircleCheckBig aria-hidden className="text-[var(--soft-icon-green)]" />Completed</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{completed}</p></div>
