@@ -15,6 +15,9 @@ describe("OnboardingScreen", () => {
     fireEvent.change(screen.getByLabelText("Custom habit name"), { target: { value: "Call my parents" } });
     fireEvent.click(screen.getByRole("button", { name: "Add my habit" }));
     expect(screen.getByText("Call my parents")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Monday selected" })).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Sunday selected" }));
+    expect(screen.getByRole("button", { name: "Sunday not selected" })).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(screen.getByRole("button", { name: "Make Call my parents my anchor" }));
     expect(screen.getByRole("button", { name: "Make Call my parents my anchor" })).toHaveAttribute("aria-pressed", "true");
   });
