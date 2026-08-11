@@ -63,4 +63,19 @@ describe("QuestsDashboard", () => {
     expect(screen.queryByText("Hike a new trail")).not.toBeInTheDocument();
     confirm.mockRestore();
   });
+
+  it("guides an empty account to its first quest", () => {
+    render(<QuestsDashboard initialQuests={[]} />);
+    expect(screen.getByText("Add one meaningful finish.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Create my first quest" }));
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByLabelText("Quest title")).toHaveFocus();
+  });
+
+  it("explains an empty filtered view without offering duplicate creation controls", () => {
+    render(<QuestsDashboard initialQuests={sampleQuests} />);
+    fireEvent.click(screen.getByRole("button", { name: "Paused" }));
+    expect(screen.getByText("No paused quests.")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Create my first quest" })).not.toBeInTheDocument();
+  });
 });

@@ -160,6 +160,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
                   </article>
                 );
               })}
+              {!visibleQuests.length && <div className="xl:col-span-2 flex min-h-64 flex-col items-center justify-center rounded-[34px] border border-dashed border-[var(--soft-accent)]/25 bg-white/30 px-6 py-12 text-center"><span className="grid size-14 place-items-center rounded-full bg-[var(--soft-tint-b)] text-[var(--soft-icon-clay)]"><Flag className="size-6" /></span><p className="mt-6 text-[10px] font-black uppercase tracking-[.2em] text-[var(--soft-accent)]">{quests.length ? "Nothing in this view" : "Your orbit is open"}</p><h3 className="mt-3 text-3xl font-semibold tracking-[-.04em]">{quests.length ? `No ${filter === "all" ? "" : statusLabels[filter].toLowerCase()} quests.` : "Add one meaningful finish."}</h3><p className="mt-3 max-w-md text-sm leading-6 text-[var(--soft-muted)]">{quests.length ? "Choose another status above to see the rest of your monthly board." : "A side quest is optional. When something feels worth finishing this month, give it a clear name and start from there."}</p>{!quests.length && <button className="mt-6 rounded-full bg-[var(--soft-ink)] px-6 py-3 text-sm font-bold text-white" onClick={() => setIsCreating(true)} type="button">Create my first quest</button>}</div>}
             </div>
           </section>
       {isCreating && createPortal(
