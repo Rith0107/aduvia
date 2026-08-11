@@ -114,9 +114,9 @@ export function AuthScreen({ mode, nextPath = "/today", notice }: { mode: AuthMo
           <div className="relative my-auto max-w-xl py-16">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#e2b96c]">{isSignup ? "Your first chapter" : "Welcome back to your rhythm"}</p>
             <h1 className="mt-6 text-6xl font-semibold leading-[.94] tracking-[-0.065em] xl:text-7xl">{isSignup ? <>Small steps.<br />A life you can see.</> : <>Keep becoming,<br />one day at a time.</>}</h1>
-            <p className="mt-7 max-w-lg text-lg leading-8 text-white/52">{isSignup ? "You do not need perfect days. Begin with one small promise, return to it gently, and watch your month take shape." : "Your routines, side quests, and every quiet win are here—ready for the next small step."}</p>
+            <p className="mt-7 max-w-lg text-lg leading-8 text-white/70">{isSignup ? "You do not need perfect days. Begin with one small promise, return to it gently, and watch your month take shape." : "Your routines, side quests, and every quiet win are here—ready for the next small step."}</p>
 
-            <div className="mt-12 grid max-w-md grid-cols-7 gap-2" aria-label="Example consistency calendar">
+            <div className="mt-12 grid max-w-md grid-cols-7 gap-2" aria-label="Example consistency calendar" role="img">
               {Array.from({ length: 28 }, (_, index) => <span className={`aspect-square rounded-[7px] ${isSignup && index < 7 ? "bg-white/10" : index % 8 === 0 ? "bg-[#d89a42]" : index % 5 === 0 ? "bg-[#a86550]/70" : "bg-[#8ab5a4]"}`} key={index} />)}
             </div>
             <div className="mt-5 flex items-center gap-3 text-xs text-white/42"><span className="h-px w-10 bg-white/20" />{isSignup ? "Your first month starts here" : "Your story is already in motion"}</div>
@@ -134,7 +134,7 @@ export function AuthScreen({ mode, nextPath = "/today", notice }: { mode: AuthMo
 
             <Link className="mt-8 flex w-fit items-center gap-2 text-[11px] font-semibold text-[#607168] transition hover:text-[#2f6f5e] lg:mt-10" href="/"><ArrowLeft size={14} />Back to Aduvia</Link>
 
-            <p className="mt-8 inline-flex rounded-full bg-[#f0ddd4] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9a5c48] lg:mt-9">{isSignup ? "Begin your rhythm" : "Welcome back"}</p>
+            <p className="mt-8 inline-flex rounded-full bg-[#f0ddd4] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#7f4939] lg:mt-9">{isSignup ? "Begin your rhythm" : "Welcome back"}</p>
             <h2 className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{isSignup ? "Create your space." : "Continue your story."}</h2>
             <p className="mt-4 text-sm leading-6 text-stone-500">{isSignup ? "A private home for your routines, monthly quests, and progress." : "Your routines and quests are waiting exactly where you left them."}</p>
 
