@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { HabitSummary } from "@/features/habits/types";
-import { isHabitAvailableOn, isHabitScheduledOn, mergePendingMutation, todaysHabits } from "./app-data";
+import { isHabitAvailableOn, isHabitScheduledOn, mergePendingMutation, shouldReloadForAuthEvent, todaysHabits } from "./app-data";
 
 const habits: HabitSummary[] = [
   { id: "daily", name: "Walk 20 minutes", category: "Fitness", frequency: "Daily", consistency: 0, streak: 0, state: "active", color: "green" },
@@ -40,5 +40,14 @@ describe("shared app scheduling", () => {
       { key: "reflection:2026-08-11", status: "first note" },
       { key: "check-in:2026-08-11:walk", status: "skipped" },
     ]);
+  });
+
+  it("reloads account data when authentication changes without requiring a page refresh", () => {
+    expect(shouldReloadForAuthEvent("SIGNED_IN")).toBe(true);
+    expect(shouldReloadForAuthEvent("TOKEN_REFRESHED")).toBe(true);
+    expect(shouldReloadForAuthEvent("USER_UPDATED")).toBe(true);
+    expect(shouldReloadForAuthEvent("SIGNED_OUT")).toBe(true);
+    expect(shouldReloadForAuthEvent("INITIAL_SESSION")).toBe(false);
+    expect(shouldReloadForAuthEvent("PASSWORD_RECOVERY")).toBe(false);
   });
 });

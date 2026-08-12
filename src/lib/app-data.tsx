@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
+import type { AuthChangeEvent } from "@supabase/supabase-js";
 
 import { sampleHabitSummaries } from "@/features/habits/sample-data";
 import type { HabitDay, HabitSummary } from "@/features/habits/types";
@@ -44,6 +45,10 @@ const dayNumbers: Record<HabitDay, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, T
 
 export function mergePendingMutation<T extends { key: string }>(current: T[], mutation: T) {
   return [...current.filter((item) => item.key !== mutation.key), mutation];
+}
+
+export function shouldReloadForAuthEvent(event: AuthChangeEvent) {
+  return event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED" || event === "SIGNED_OUT";
 }
 
 type RemoteCategory = { id: string; name: string; color: string | null };
@@ -198,10 +203,28 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!hasRemoteConfiguration()) return;
     let active = true;
-    void (async () => {
+    const supabase = createBrowserSupabaseClient();
+
+    const clearRemoteData = () => {
+      setHabits([]);
+      setQuests([]);
+      setCompletions({});
+      setReflections({});
+      setCategoryIds({});
+      setRemoteUserId(null);
+      setSyncError(null);
+    };
+
+    const loadRemoteData = async () => {
+      setHydrated(false);
       const supabase = createBrowserSupabaseClient();
       const { data: authData } = await supabase.auth.getUser();
-      if (!active || !authData.user) return;
+      if (!active) return;
+      if (!authData.user) {
+        clearRemoteData();
+        setHydrated(true);
+        return;
+      }
       const userId = authData.user.id;
       const detectedTimeZone = browserTimeZone();
       void supabase.from("profiles").update({ timezone: detectedTimeZone }).eq("id", userId);
@@ -238,17 +261,30 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       setCompletions(completionState);
       setReflections(Object.fromEntries(((reflectionRows ?? []) as RemoteReflection[]).map((reflection) => [reflection.reflection_date, reflection.note ?? ""])));
       setRemoteUserId(userId);
+      setSyncError(null);
       setHydrated(true);
-    })().catch((error: unknown) => {
+    };
+
+    const loadSafely = () => void loadRemoteData().catch((error: unknown) => {
       if (!active) return;
-      setHabits([]);
-      setQuests([]);
-      setCompletions({});
-      setReflections({});
+      clearRemoteData();
       setSyncError(errorMessage(error, "Unable to load your Aduvia data."));
       setHydrated(true);
     });
-    return () => { active = false; };
+
+    loadSafely();
+    const { data: authListener } = supabase.auth.onAuthStateChange((event: AuthChangeEvent) => {
+      if (shouldReloadForAuthEvent(event)) {
+        window.setTimeout(loadSafely, 0);
+      }
+    });
+    window.addEventListener("aduvia:session-changed", loadSafely);
+
+    return () => {
+      active = false;
+      authListener.subscription.unsubscribe();
+      window.removeEventListener("aduvia:session-changed", loadSafely);
+    };
   }, []);
 
   useEffect(() => {

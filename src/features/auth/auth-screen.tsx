@@ -74,7 +74,9 @@ export function AuthScreen({ mode, nextPath = "/today", notice }: { mode: AuthMo
       if (isSignup && !result.data.session) {
         setMessage("Check your inbox to confirm your account.");
       } else {
-        router.push(isSignup ? "/onboarding" : nextPath);
+        window.dispatchEvent(new Event("aduvia:session-changed"));
+        router.replace(isSignup ? "/onboarding" : nextPath);
+        router.refresh();
       }
     } catch (error) {
       setMessage(error instanceof Error && !error.message.includes("environment variables") ? error.message : "Authentication is ready once Supabase keys are added.");
