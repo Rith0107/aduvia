@@ -38,7 +38,8 @@
 - [x] Reduced-motion and increased-contrast preferences remain usable.
 - [x] Test Chrome, Firefox, WebKit/Safari-equivalent, and Edge-equivalent engines.
 - [x] Test representative small phone, large phone, tablet, laptop, and wide desktop widths.
-- [ ] Check slow network, offline interruption, empty data, and database error states.
+- [ ] Check slow network, empty data, and database error states.
+- [x] Verify offline interruption displays recovery guidance and clears after reconnecting.
 
 ## Web application readiness
 

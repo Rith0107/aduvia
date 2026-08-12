@@ -34,3 +34,13 @@ test("mobile navigation keeps every primary destination reachable", async ({ pag
     await expect(navigation.getByRole("link", { name: destination })).toBeVisible();
   }
 });
+
+test("an interrupted connection gives calm, immediate feedback", async ({ context, page }) => {
+  await page.goto("/today");
+  await context.setOffline(true);
+  await page.evaluate(() => window.dispatchEvent(new Event("offline")));
+  await expect(page.getByRole("status")).toContainText("You’re offline. Saved changes will sync when you reconnect.");
+  await context.setOffline(false);
+  await page.evaluate(() => window.dispatchEvent(new Event("online")));
+  await expect(page.getByText("You’re offline. Saved changes will sync when you reconnect.")).toBeHidden();
+});
