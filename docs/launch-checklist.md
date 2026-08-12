@@ -17,7 +17,7 @@
 - [ ] Confirm account deletion removes the Auth user and all cascading application data.
 - [ ] Confirm exported JSON contains only the current user's records.
 - [ ] Document backup retention and deletion timing in the privacy policy.
-- [ ] Confirm no Supabase service-role secret reaches the browser bundle.
+- [x] Confirm no Supabase service-role secret reaches the browser bundle (enforced after every CI build).
 
 ## Product journeys
 

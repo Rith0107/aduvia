@@ -16,6 +16,7 @@ The following browser-safe variables are configured for Production and Preview:
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
 Never add Supabase secret or service-role keys to Vercel client environment variables.
+The quality workflow runs `pnpm verify:client-secrets` after every production build and fails if a privileged Supabase variable or service-role marker appears in generated application output.
 
 Supabase Auth uses the production URL as its site URL and allows both:
 

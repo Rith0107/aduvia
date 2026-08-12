@@ -33,6 +33,8 @@ jobs:
         run: pnpm test
       - name: Build
         run: pnpm build
+      - name: Verify client bundle contains no privileged Supabase key
+        run: pnpm verify:client-secrets
       - name: Install browser
         run: pnpm exec playwright install --with-deps chromium firefox webkit
       - name: Browser smoke tests

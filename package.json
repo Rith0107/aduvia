@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "verify:client-secrets": "node scripts/verify-client-secrets.mjs"
   },
   "dependencies": {
     "@mdi/js": "^7.4.47",
