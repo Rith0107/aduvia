@@ -28,10 +28,9 @@ Only the browser-safe anonymous/publishable key belongs in a `NEXT_PUBLIC_` vari
 
 ## Authentication URLs
 
-- Current site URL: `http://localhost:3000`
-- Allowed local redirect: `http://localhost:3000/**`
-
-Replace the site URL and add the exact production callback URLs when the hosting domain is available.
+- Production site URL: `https://aduvia-chi.vercel.app`
+- Production redirect pattern: `https://aduvia-chi.vercel.app/**`
+- Local development redirect: `http://localhost:3000/**`
 
 ## Verified
 
@@ -42,8 +41,6 @@ Replace the site URL and add the exact production callback URLs when the hosting
 
 ## Remaining production checks
 
-- Add hosting environment variables.
-- Configure the deployed site URL and redirect URLs.
-- Verify email confirmation and password-recovery templates.
-- Run the complete product journey with two independent test users.
-- Confirm cross-user reads, writes, and deletes are rejected.
+- Run the complete product journey with two independent disposable test users.
+- Confirm cross-user writes and deletes are rejected through direct REST requests.
+- Confirm deletion of a disposable account removes its profile and cascading application data.

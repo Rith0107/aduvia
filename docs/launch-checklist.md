@@ -27,7 +27,7 @@
 - [ ] Complete and undo a daily check-in from Today and Evening mode.
 - [ ] Create and update every quest status.
 - [ ] Save and reload a private reflection.
-- [ ] Verify Insights across 28-, 29-, 30-, and 31-day months.
+- [x] Verify Insights across 28-, 29-, 30-, and 31-day months and month-to-date behavior.
 - [ ] Export account data and download/share a monthly image.
 
 ## Quality
@@ -55,4 +55,4 @@
 - [ ] Add error monitoring without capturing reflection text or other sensitive content.
 - [ ] Add privacy-conscious product analytics for signup and onboarding completion.
 - [ ] Configure uptime checks for the landing page and Auth callback.
-- [ ] Prepare rollback instructions and identify the last known-good release.
+- [x] Prepare rollback instructions and identify the last known-good release.

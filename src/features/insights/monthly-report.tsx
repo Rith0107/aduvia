@@ -132,6 +132,14 @@ export function heatmapState(point?: { completed: number; scheduled: number }) {
   return "none";
 }
 
+export function reportDayCount(reportYear: number, reportMonth: number, today = new Date()) {
+  const calendarDays = new Date(reportYear, reportMonth + 1, 0).getDate();
+  const reportStart = new Date(reportYear, reportMonth, 1);
+  const currentStart = new Date(today.getFullYear(), today.getMonth(), 1);
+  if (reportStart.getTime() === currentStart.getTime()) return today.getDate();
+  return reportStart < currentStart ? calendarDays : 0;
+}
+
 function cardDimensions(format: ShareFormat) {
   return format === "story" ? { width: 1080, height: 1920 } : { width: 1080, height: 1080 };
 }
@@ -328,10 +336,9 @@ export function MonthlyReport() {
   const [format, setFormat] = useState<ShareFormat>("square");
   const [shareTrim, setShareTrim] = useState<ShareTrim>("orbit");
   const [shareMessage, setShareMessage] = useState("");
-  const calendarDaysInMonth = new Date(reportMonth.year, reportMonth.month + 1, 0).getDate();
   const reportMonthStart = new Date(reportMonth.year, reportMonth.month, 1);
   const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const daysInMonth = reportMonthStart.getTime() === currentMonthStart.getTime() ? currentDay : reportMonthStart < currentMonthStart ? calendarDaysInMonth : 0;
+  const daysInMonth = reportDayCount(reportMonth.year, reportMonth.month, now);
   const currentDateKey = dateStorageKey(now.getFullYear(), now.getMonth(), currentDay);
   const todayScheduledHabits = appData?.habits.filter((habit) => isHabitScheduledOn(habit, now)) ?? [];
   const todayAnswers = appData?.completions[currentDateKey] ?? {};

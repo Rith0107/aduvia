@@ -5,7 +5,7 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { consistencyFromHabits, dailyConsistencyFromHabits, heatmapState, MonthlyReport, reportCellState } from "./monthly-report";
+import { consistencyFromHabits, dailyConsistencyFromHabits, heatmapState, MonthlyReport, reportCellState, reportDayCount } from "./monthly-report";
 
 afterEach(cleanup);
 
@@ -49,6 +49,16 @@ describe("MonthlyReport", () => {
     for (let index = 0; index < 30; index += 1) fireEvent.click(previous);
     expect(screen.getAllByText("February 2024").length).toBeGreaterThan(0);
     expect(screen.getByLabelText(/Morning walk, February 29/)).toBeInTheDocument();
+  });
+
+  it("handles every calendar month length and limits the current month to today", () => {
+    const futureToday = new Date(2030, 0, 1);
+    expect(reportDayCount(2026, 1, futureToday)).toBe(28);
+    expect(reportDayCount(2024, 1, futureToday)).toBe(29);
+    expect(reportDayCount(2026, 3, futureToday)).toBe(30);
+    expect(reportDayCount(2026, 7, futureToday)).toBe(31);
+    expect(reportDayCount(2026, 7, new Date(2026, 7, 12))).toBe(12);
+    expect(reportDayCount(2026, 8, new Date(2026, 7, 12))).toBe(0);
   });
 
   it("does not navigate into future months", () => {
