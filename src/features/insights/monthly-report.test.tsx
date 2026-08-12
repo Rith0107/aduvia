@@ -5,7 +5,7 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { consistencyFromHabits, dailyConsistencyFromHabits, MonthlyReport, reportCellState } from "./monthly-report";
+import { consistencyFromHabits, dailyConsistencyFromHabits, heatmapState, MonthlyReport, reportCellState } from "./monthly-report";
 
 afterEach(cleanup);
 
@@ -86,5 +86,12 @@ describe("MonthlyReport", () => {
     expect(reportCellState(habit, new Date(2026, 7, 4), "complete")).toBe("done");
     expect(reportCellState(habit, new Date(2026, 7, 5), "skipped")).toBe("missed");
     expect(reportCellState(habit, new Date(2026, 7, 6))).toBe("off");
+  });
+
+  it("colors calendar days by whole-day completion", () => {
+    expect(heatmapState({ completed: 3, scheduled: 3 })).toBe("complete");
+    expect(heatmapState({ completed: 1, scheduled: 3 })).toBe("partial");
+    expect(heatmapState({ completed: 0, scheduled: 3 })).toBe("none");
+    expect(heatmapState({ completed: 0, scheduled: 0 })).toBe("empty");
   });
 });

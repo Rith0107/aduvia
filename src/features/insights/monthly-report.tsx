@@ -125,6 +125,13 @@ export function dailyConsistencyFromHabits(habits: ReportHabit[], dayCount: numb
   });
 }
 
+export function heatmapState(point?: { completed: number; scheduled: number }) {
+  if (!point || point.scheduled === 0) return "empty";
+  if (point.completed === point.scheduled) return "complete";
+  if (point.completed > 0) return "partial";
+  return "none";
+}
+
 function cardDimensions(format: ShareFormat) {
   return format === "story" ? { width: 1080, height: 1920 } : { width: 1080, height: 1080 };
 }
@@ -443,7 +450,7 @@ export function MonthlyReport() {
               <div className="absolute -right-20 -top-20 size-64 rounded-full border-[46px] border-[color-mix(in_srgb,var(--chart-primary)_12%,transparent)]" />
               <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                 <div><p className="text-xs font-semibold uppercase tracking-[0.17em] text-[var(--chart-primary)]">Consistency signal</p><p className="mt-4 text-6xl font-semibold tracking-[-0.065em]">{overallConsistency}%</p><p className="mt-1 text-sm text-white/50">{consistencyDelta === 0 ? "Level with last month" : `${consistencyDelta > 0 ? "Up" : "Down"} ${Math.abs(consistencyDelta)} points from last month`}</p><p className="mt-5 inline-flex rounded-full bg-white/[0.08] px-3 py-2 text-xs font-medium text-white/70">You showed up on {daysShownUp} {daysShownUp === 1 ? "day" : "days"} this month</p></div>
-                <div className="grid grid-cols-7 gap-1.5 rounded-2xl bg-white/[0.08] p-4" aria-label={`${monthName} activity heatmap`} role="img">{Array.from({ length: Math.ceil(daysInMonth / 7) * 7 }, (_, index) => { const point = dailyConsistency[index]; return <span aria-hidden="true" className={`size-3 rounded-[4px] ${!point ? "bg-transparent" : point.score >= 75 ? "bg-[var(--heatmap-high)]" : point.score >= 50 ? "bg-[var(--heatmap-mid)]" : "bg-[var(--heatmap-low)]"}`} key={index} title={point ? `${monthName} ${point.day} · ${point.score}%` : undefined} />; })}</div>
+                <div className="grid grid-cols-7 gap-1.5 rounded-2xl bg-white/[0.08] p-4" aria-label={`${monthName} activity heatmap`} role="img">{Array.from({ length: Math.ceil(daysInMonth / 7) * 7 }, (_, index) => { const point = dailyConsistency[index]; const state = heatmapState(point); return <span aria-hidden="true" className={`size-3 rounded-[4px] ${state === "complete" ? "bg-[var(--heatmap-high)]" : state === "partial" ? "bg-[var(--heatmap-mid)]" : state === "none" ? "bg-[var(--heatmap-low)]" : "bg-transparent"}`} key={index} title={point ? `${monthName} ${point.day} · ${point.completed} of ${point.scheduled} completed` : undefined} />; })}</div>
               </div>
               <div className="relative mt-7"><p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/45">Daily consistency trend · month to date</p></div>
               <div className="relative mt-8 h-52 w-full">
