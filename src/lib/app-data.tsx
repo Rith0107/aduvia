@@ -9,6 +9,7 @@ import { sampleQuests } from "@/features/quests/sample-data";
 import type { QuestSummary } from "@/features/quests/types";
 import type { TodayHabit } from "@/features/today/types";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
+import { browserTimeZone, calendarKey, calendarParts } from "@/lib/calendar";
 
 type CompletionMap = Record<string, Record<string, "complete" | "skipped">>;
 type PendingMutation =
@@ -103,10 +104,6 @@ function metricsForHabit(habitId: string, checkIns: RemoteCheckIn[]) {
   return { consistency: records.length ? Math.round(complete / records.length * 100) : 0, streak };
 }
 
-function dateKey(date: Date) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-}
-
 export function scheduledDaysFor(habit: HabitSummary): HabitDay[] {
   if (habit.scheduledDays?.length) return habit.scheduledDays;
   if (habit.frequency === "Daily") return weekdayKeys;
@@ -116,13 +113,13 @@ export function scheduledDaysFor(habit: HabitSummary): HabitDay[] {
 }
 
 export function isHabitScheduledOn(habit: HabitSummary, date: Date) {
-  return habit.state === "active" && isHabitAvailableOn(habit, date) && scheduledDaysFor(habit).includes(weekdayKeys[date.getDay()]);
+  return habit.state === "active" && isHabitAvailableOn(habit, date) && scheduledDaysFor(habit).includes(calendarParts(date).weekday);
 }
 
 export function isHabitAvailableOn(habit: HabitSummary, date: Date) {
   if (!habit.createdAt) return true;
   const created = new Date(habit.createdAt);
-  return !Number.isNaN(created.getTime()) && dateKey(date) >= dateKey(created);
+  return !Number.isNaN(created.getTime()) && calendarKey(date) >= calendarKey(created);
 }
 
 function targetFor(habit: HabitSummary) {
@@ -131,7 +128,7 @@ function targetFor(habit: HabitSummary) {
 }
 
 export function todaysHabits(habits: HabitSummary[], completions: CompletionMap, date = new Date()): TodayHabit[] {
-  const dayCompletions = completions[dateKey(date)] ?? {};
+  const dayCompletions = completions[calendarKey(date)] ?? {};
   return habits.filter((habit) => isHabitScheduledOn(habit, date)).map((habit) => {
     const status = dayCompletions[habit.id] ?? "pending";
     const complete = status === "complete";
@@ -206,6 +203,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       const { data: authData } = await supabase.auth.getUser();
       if (!active || !authData.user) return;
       const userId = authData.user.id;
+      const detectedTimeZone = browserTimeZone();
+      void supabase.from("profiles").update({ timezone: detectedTimeZone }).eq("id", userId);
       const [{ data: categoryRows, error: categoryError }, { data: habitRows, error: habitError }, { data: questRows, error: questError }, { data: checkInRows, error: checkInError }, { data: reflectionRows, error: reflectionError }] = await Promise.all([
         supabase.from("categories").select("id,name,color").eq("user_id", userId),
         supabase.from("habits").select("id,created_at,name,schedule,priority,status,category_id").eq("user_id", userId),
@@ -423,7 +422,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       }
     },
     async saveReflection(note, date = new Date()) {
-      const key = dateKey(date);
+      const key = calendarKey(date);
       const cleanNote = note.trim();
       setReflections((current) => ({ ...current, [key]: cleanNote }));
       if (!remoteUserId) return true;
@@ -436,7 +435,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       return true;
     },
     setHabitStatus(habitId, status, date = new Date()) {
-      const key = dateKey(date);
+      const key = calendarKey(date);
       setCompletions((current) => {
         const day = { ...(current[key] ?? {}) };
         if (status === "pending") delete day[habitId];
