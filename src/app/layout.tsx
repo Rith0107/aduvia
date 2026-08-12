@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Archivo, Cormorant_Garamond, Inter, Lora, Manrope, STIX_Two_Text } from "next/font/google";
 import type { ReactNode } from "react";
+import { Analytics } from "@vercel/analytics/next";
 import { AppDataProvider } from "@/lib/app-data";
 import { ServiceWorkerRegistration } from "@/components/service-worker-registration";
 import { NetworkStatus } from "@/components/network-status";
@@ -30,7 +31,7 @@ export const viewport = { themeColor: "#143d31", colorScheme: "light" };
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`h-full antialiased ${inter.variable} ${cormorant.variable} ${manrope.variable} ${lora.variable} ${archivo.variable} ${stix.variable}`}>
-      <body className="min-h-full flex flex-col"><ServiceWorkerRegistration /><NetworkStatus /><AppDataProvider>{children}</AppDataProvider></body>
+      <body className="min-h-full flex flex-col"><ServiceWorkerRegistration /><NetworkStatus /><AppDataProvider>{children}</AppDataProvider><Analytics /></body>
     </html>
   );
 }

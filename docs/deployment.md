@@ -18,6 +18,12 @@ The following browser-safe variables are configured for Production and Preview:
 Never add Supabase secret or service-role keys to Vercel client environment variables.
 The quality workflow runs `pnpm verify:client-secrets` after every production build and fails if a privileged Supabase variable or service-role marker appears in generated application output.
 
+## Web Analytics
+
+Vercel Web Analytics is mounted once in the root layout through `@vercel/analytics/next`. It records page-level traffic and navigation only. Aduvia does not send custom events containing habit names, quest titles, reflection text, email addresses, or other user-entered content.
+
+After deployment, visit the production site and confirm a request to Vercel's `/_vercel/insights` route, then check the project's Analytics dashboard after processing completes. Content blockers can prevent a local browser from sending the request.
+
 Supabase Auth uses the production URL as its site URL and allows both:
 
 - `https://aduvia-chi.vercel.app/**`
