@@ -32,7 +32,7 @@
   --theme-highlight: #f3e7ca;
   --heatmap-high: #8eb5a6;
   --heatmap-mid: #d89a42;
-  --heatmap-low: #b96852;
+  --heatmap-low: #9c4b38;
 }
 
 :root[data-typography="soft-journal"] { --font-body: var(--type-inter), sans-serif; --font-display: var(--type-lora), Georgia, serif; }
@@ -65,9 +65,9 @@
   --theme-missed: #f3d8c8;
   --theme-muted-cell: #dce5e8;
   --theme-highlight: #dbe6f3;
-  --heatmap-high: #79ad9e;
-  --heatmap-mid: #d5a64d;
-  --heatmap-low: #bd6f72;
+  --heatmap-high: #79ada5;
+  --heatmap-mid: #6f95ad;
+  --heatmap-low: #d88467;
 }
 
 :root[data-palette="clay"] {
@@ -96,9 +96,9 @@
   --theme-missed: #eac7b5;
   --theme-muted-cell: #dedbce;
   --theme-highlight: #e5d8bd;
-  --heatmap-high: #91a76a;
-  --heatmap-mid: #d1a24c;
-  --heatmap-low: #b86c58;
+  --heatmap-high: #819064;
+  --heatmap-mid: #c09562;
+  --heatmap-low: #a85c45;
 }
 
 :root[data-palette="lavender"] {
@@ -126,9 +126,9 @@
   --theme-missed: #ead5df;
   --theme-muted-cell: #e2dfe9;
   --theme-highlight: #ddd6e9;
-  --heatmap-high: #91b5aa;
-  --heatmap-mid: #caaa63;
-  --heatmap-low: #b97786;
+  --heatmap-high: #858db3;
+  --heatmap-mid: #bd8eae;
+  --heatmap-low: #9b718f;
 }
 
 :root[data-palette="blue-hour"] {
@@ -156,9 +156,9 @@
   --theme-missed: #ead5d0;
   --theme-muted-cell: #d7e0e4;
   --theme-highlight: #d3deea;
-  --heatmap-high: #78aaa0;
-  --heatmap-mid: #c9a052;
-  --heatmap-low: #b96d76;
+  --heatmap-high: #6f9c99;
+  --heatmap-mid: #698da5;
+  --heatmap-low: #a06f69;
 }
 
 @theme inline {
