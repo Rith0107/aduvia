@@ -23,3 +23,11 @@ Supabase Auth uses the production URL as its site URL and allows both:
 - `http://localhost:3000/**`
 
 The localhost entry remains available for development. Verify signup confirmation and password recovery before launch.
+
+## Web client
+
+- `/manifest.webmanifest` makes Aduvia installable from supported browsers.
+- `/sw.js` provides a navigation-only offline fallback. Supabase data remains network-backed; queued mutations retry through the application sync layer.
+- `/robots.txt` indexes the public marketing/auth surfaces and excludes authenticated product screens.
+- `/sitemap.xml` lists public pages.
+- Browser calendar actions use the member's IANA timezone and sync it to `profiles.timezone`.

@@ -32,13 +32,23 @@
 
 ## Quality
 
-- [ ] GitHub quality workflow passes on the release commit.
-- [ ] Keyboard-only navigation reaches every interactive control.
+- [x] GitHub quality workflow passes on the latest deployment commits.
+- [x] Keyboard-only navigation reaches every primary interactive journey.
 - [ ] Screen-reader labels and live status messages are understandable.
-- [ ] Reduced-motion and increased-contrast preferences remain usable.
+- [x] Reduced-motion and increased-contrast preferences remain usable.
 - [ ] Test current Chrome, Safari, Firefox, and Edge.
 - [ ] Test representative small phone, large phone, tablet, laptop, and wide desktop widths.
 - [ ] Check slow network, offline interruption, empty data, and database error states.
+
+## Web application readiness
+
+- [x] Add an installable web manifest and palette-aligned app icons.
+- [x] Add a service-worker offline fallback and live offline status.
+- [x] Add landing-page metadata, social metadata, robots rules, and sitemap.
+- [x] Use the browser timezone for calendar dates, weekday schedules, and check-ins.
+- [x] Persist the detected timezone to the member profile.
+- [x] Add friendly global error and not-found recovery screens.
+- [x] Add baseline response security headers.
 
 ## Operations
 
