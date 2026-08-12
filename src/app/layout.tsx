@@ -3,6 +3,7 @@ import { Archivo, Cormorant_Garamond, Inter, Lora, Manrope, STIX_Two_Text } from
 import type { ReactNode } from "react";
 import { AppDataProvider } from "@/lib/app-data";
 import { ServiceWorkerRegistration } from "@/components/service-worker-registration";
+import { NetworkStatus } from "@/components/network-status";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--type-inter" });
@@ -29,7 +30,7 @@ export const viewport = { themeColor: "#143d31", colorScheme: "light" };
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`h-full antialiased ${inter.variable} ${cormorant.variable} ${manrope.variable} ${lora.variable} ${archivo.variable} ${stix.variable}`}>
-      <body className="min-h-full flex flex-col"><ServiceWorkerRegistration /><AppDataProvider>{children}</AppDataProvider></body>
+      <body className="min-h-full flex flex-col"><ServiceWorkerRegistration /><NetworkStatus /><AppDataProvider>{children}</AppDataProvider></body>
     </html>
   );
 }

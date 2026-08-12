@@ -194,6 +194,25 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--soft-accent) 80%, white);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root { --soft-muted: color-mix(in srgb, var(--soft-ink) 78%, transparent); }
+  .soft-panel, .public-surface { border-color: color-mix(in srgb, var(--soft-ink) 34%, transparent); }
+}
+
 button:not(:disabled):active,
 a:active {
   scale: 0.97;
