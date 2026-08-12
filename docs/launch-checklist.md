@@ -56,5 +56,5 @@
 - [ ] Add error monitoring without capturing reflection text or other sensitive content.
 - [x] Add privacy-conscious page-view analytics without custom events or user-entered content.
 - [ ] Add privacy-conscious custom analytics for signup and onboarding completion if the hosting plan supports custom events.
-- [ ] Configure uptime checks for the landing page and Auth callback.
+- [x] Configure scheduled uptime checks for the landing, login, and signup entry points.
 - [x] Prepare rollback instructions and identify the last known-good release.

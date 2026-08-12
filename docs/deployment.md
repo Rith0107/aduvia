@@ -24,6 +24,10 @@ Vercel Web Analytics is mounted once in the root layout through `@vercel/analyti
 
 After deployment, visit the production site and confirm a request to Vercel's `/_vercel/insights` route, then check the project's Analytics dashboard after processing completes. Content blockers can prevent a local browser from sending the request.
 
+## Uptime
+
+The `Production uptime` GitHub workflow checks `/`, `/login`, and `/signup` twice per hour and can also be run manually. A failed endpoint produces a failed workflow notification without sending or reading any member data. GitHub scheduled workflows may be delayed during periods of heavy Actions load, so this is a lightweight launch safeguard rather than a formal uptime SLA.
+
 Supabase Auth uses the production URL as its site URL and allows both:
 
 - `https://aduvia-chi.vercel.app/**`

@@ -1,0 +1,32 @@
+name: Production uptime
+
+on:
+  schedule:
+    - cron: "17,47 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-uptime
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check public and authentication entry points
+        shell: bash
+        run: |
+          set -euo pipefail
+          for path in / /login /signup; do
+            url="https://aduvia-chi.vercel.app${path}"
+            status="$(curl --fail-with-body --location --retry 2 --retry-all-errors --max-time 20 --silent --show-error --output /dev/null --write-out '%{http_code}' "$url")"
+            if [[ "$status" != "200" ]]; then
+              echo "::error title=Production endpoint unavailable::$url returned HTTP $status"
+              exit 1
+            fi
+            echo "$url returned HTTP $status"
+          done
