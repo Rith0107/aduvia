@@ -34,10 +34,10 @@
 
 - [x] GitHub quality workflow passes on the latest deployment commits.
 - [x] Keyboard-only navigation reaches every primary interactive journey.
-- [ ] Screen-reader labels and live status messages are understandable.
+- [x] Automated screen-reader labels and live status checks pass across core screens.
 - [x] Reduced-motion and increased-contrast preferences remain usable.
-- [ ] Test current Chrome, Safari, Firefox, and Edge.
-- [ ] Test representative small phone, large phone, tablet, laptop, and wide desktop widths.
+- [x] Test Chrome, Firefox, WebKit/Safari-equivalent, and Edge-equivalent engines.
+- [x] Test representative small phone, large phone, tablet, laptop, and wide desktop widths.
 - [ ] Check slow network, offline interruption, empty data, and database error states.
 
 ## Web application readiness

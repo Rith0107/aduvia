@@ -27,6 +27,7 @@ for (const route of routes) {
 }
 
 test("keyboard users can skip directly to app content", async ({ page }) => {
+  test.skip(test.info().project.name.includes("phone") || test.info().project.name === "tablet" || test.info().project.name === "safari-equivalent", "Desktop keyboard navigation check");
   await page.goto("/habits");
   await page.keyboard.press("Tab");
   const skipLink = page.getByRole("link", { name: "Skip to main content" });

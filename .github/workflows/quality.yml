@@ -34,6 +34,6 @@ jobs:
       - name: Build
         run: pnpm build
       - name: Install browser
-        run: pnpm exec playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
       - name: Browser smoke tests
         run: pnpm test:e2e

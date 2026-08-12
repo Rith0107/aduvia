@@ -43,7 +43,7 @@ export function AppShell({ active, children, eyebrow, title, action }: AppShellP
           <div className="flex items-center gap-2">
             <PaletteChooser />
             <TypographyChooser />
-            <Link className="flex min-h-10 items-center gap-2 rounded-full bg-white/45 px-3 text-xs font-bold text-[var(--soft-ink)] shadow-[inset_0_1px_0_rgba(255,255,255,.55)] backdrop-blur-xl sm:px-4" href="/check-in"><MoonStar aria-hidden className="size-4 text-[var(--soft-accent)]" strokeWidth={1.8} /><span className="hidden sm:inline">Evening mode</span></Link>
+            <Link aria-label="Evening mode" className="flex min-h-10 items-center gap-2 rounded-full bg-white/45 px-3 text-xs font-bold text-[var(--soft-ink)] shadow-[inset_0_1px_0_rgba(255,255,255,.55)] backdrop-blur-xl sm:px-4" href="/check-in"><MoonStar aria-hidden className="size-4 text-[var(--soft-accent)]" strokeWidth={1.8} /><span className="hidden sm:inline">Evening mode</span></Link>
             <AccountMenu />
           </div>
         </header>
