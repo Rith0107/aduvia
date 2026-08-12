@@ -5,7 +5,7 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { consistencyFromHabits, dailyConsistencyFromHabits, MonthlyReport } from "./monthly-report";
+import { consistencyFromHabits, dailyConsistencyFromHabits, MonthlyReport, reportCellState } from "./monthly-report";
 
 afterEach(cleanup);
 
@@ -79,5 +79,12 @@ describe("MonthlyReport", () => {
       { day: 1, label: "Aug 1", score: 50, completed: 1, scheduled: 2 },
       { day: 2, label: "Aug 2", score: 0, completed: 0, scheduled: 0 },
     ]);
+  });
+
+  it("shows a stored historical answer even when it predates the habit row", () => {
+    const habit = { id: "backfilled", createdAt: "2026-08-11T12:00:00.000Z", frequency: "Daily" as const, state: "active" as const };
+    expect(reportCellState(habit, new Date(2026, 7, 4), "complete")).toBe("done");
+    expect(reportCellState(habit, new Date(2026, 7, 5), "skipped")).toBe("missed");
+    expect(reportCellState(habit, new Date(2026, 7, 6))).toBe("off");
   });
 });

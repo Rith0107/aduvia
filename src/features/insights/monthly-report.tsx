@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { isHabitAvailableOn, isHabitScheduledOn, scheduledDaysFor, useAppData } from "@/lib/app-data";
+import type { HabitSummary } from "@/features/habits/types";
 import { Download, Share2, Smartphone, Square } from "lucide-react";
 import {
   Area,
@@ -29,6 +30,8 @@ type ReportHabit = {
   color: string;
   days: CellState[];
 };
+
+type HistoricalHabit = Pick<HabitSummary, "id" | "createdAt" | "frequency" | "scheduledDays" | "state">;
 
 const fallbackCompletedQuests = ["Created a monthly budget", "Shipped my portfolio homepage"];
 
@@ -86,6 +89,16 @@ function createReportHabits(year: number, month: number): ReportHabit[] {
 
 function dateStorageKey(year: number, month: number, day: number) {
   return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
+export function reportCellState(habit: HistoricalHabit, date: Date, answer?: "complete" | "skipped", todayPending = false): CellState {
+  // Imported or backfilled answers are authoritative even when they predate
+  // the habit row. This preserves real history created during onboarding or migration.
+  if (answer) return answer === "complete" ? "done" : "missed";
+  if (!isHabitAvailableOn(habit as HabitSummary, date)) return "off";
+  const weekday = (["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const)[date.getDay()];
+  if (!scheduledDaysFor(habit as HabitSummary).includes(weekday)) return "off";
+  return todayPending ? "pending" : "missed";
 }
 
 function habitConsistency(habit: ReportHabit) {
@@ -330,12 +343,8 @@ export function MonthlyReport() {
       color: colorByIndex[habitIndex % colorByIndex.length],
       days: Array.from({ length: daysInMonth }, (_, index): CellState => {
         const date = new Date(reportMonth.year, reportMonth.month, index + 1);
-        if (!isHabitAvailableOn(habit, date)) return "off";
-        const weekday = (["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const)[date.getDay()];
-        if (!scheduledDaysFor(habit).includes(weekday)) return "off";
         const answer = appData.completions[dateStorageKey(reportMonth.year, reportMonth.month, index + 1)]?.[habit.id];
-        if (isCurrentMonth && index + 1 === currentDay && !todayIsClosed && !answer) return "pending";
-        return answer === "complete" ? "done" : "missed";
+        return reportCellState(habit, date, answer, isCurrentMonth && index + 1 === currentDay && !todayIsClosed);
       }),
     }));
   }, [appData, currentDay, daysInMonth, fallbackHabits, isCurrentMonth, reportMonth.month, reportMonth.year, todayIsClosed]);
