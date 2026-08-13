@@ -169,6 +169,113 @@
   }
   footer strong { color: var(--page-ink); }
 
+  details { max-width: 1180px; margin: 0 auto; }
+  .earlier-summary {
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--page-muted);
+    padding: 4px;
+    list-style: none;
+  }
+  .earlier-summary::-webkit-details-marker { display: none; }
+  .earlier-summary::before { content: "▸ "; }
+  details[open] .earlier-summary::before { content: "▾ "; }
+  .earlier-body { margin-top: 32px; opacity: 0.82; }
+
+  /* ---------- Core Sample ----------
+     No frame, no gradient mood — the texture itself is the whole idea.
+     One slab per person; self-contained tokens for the same export reason
+     as the other directions. */
+  .specimen-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .specimen-slab {
+    position: relative;
+    width: 220px;
+    height: 400px;
+    overflow: hidden;
+    background: #0c0906;
+    box-shadow: 0 30px 60px -28px rgba(20, 12, 6, 0.55), 0 2px 0 rgba(255, 255, 255, 0.06) inset;
+    /* an asymmetric radius per corner reads as a tumbled stone edge, not a UI card */
+    border-radius: 46% 14% 38% 20% / 20% 42% 16% 44%;
+  }
+  .specimen-slab canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .specimen-sheen {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(128deg, rgba(255, 255, 255, 0.28) 0%, transparent 30%),
+      radial-gradient(70% 50% at 80% 8%, rgba(255, 255, 255, 0.18), transparent 60%);
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+  .specimen-tag {
+    text-align: center;
+  }
+  .specimen-tag .t1 {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.05em;
+    color: var(--page-ink);
+    font-weight: 700;
+  }
+  .specimen-tag .t2 {
+    margin-top: 3px;
+    font-size: 11.5px;
+    color: var(--page-muted);
+  }
+
+  /* ---------- Momentum Vessel ---------- */
+  .vessel-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .vessel-slab {
+    position: relative;
+    width: 190px;
+    height: 340px;
+    overflow: hidden;
+    background: #0a1210;
+    border-radius: 26px 26px 58px 58px / 26px 26px 40px 40px;
+    box-shadow: 0 30px 60px -28px rgba(10, 20, 16, 0.55), 0 2px 0 rgba(255, 255, 255, 0.06) inset;
+    border: 1px solid rgba(244, 241, 230, 0.1);
+  }
+  .vessel-slab canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .vessel-sheen {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0.2) 0%, transparent 26%);
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+  .vessel-tag {
+    text-align: center;
+  }
+  .vessel-tag .t1 {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--page-ink);
+  }
+  .vessel-tag .t2 {
+    margin-top: 2px;
+    font-size: 11.5px;
+    color: var(--page-muted);
+  }
+
   /* ---------- the card object ----------
      Deliberately theme-independent: a shared card is exported as one
      image and must look identical to whoever it's sent to, so its
@@ -628,6 +735,52 @@
 </style>
 
 <div class="intro">
+  <p class="eyebrow">New direction — not a reskin</p>
+  <h1 class="font-display">Core Sample</h1>
+  <p class="lede">
+    Every existing shareable format — streak flame, contribution grid, Wordle-style squares — is about
+    binary completion: did you or didn't you. Aduvia's whole argument is the opposite of that, so
+    borrowing one of those formats would contradict the product. This comes from Aduvia's own math
+    instead: a month rendered as a geological core sample, one sedimentary layer per day. A full day lays
+    down a thick, saturated band. A partial day lays down a thinner, paler one. There's no such thing as
+    an empty day — even a bad one still leaves a layer, nothing gets erased. A bright mineral vein traces
+    your highest-priority habit through the whole column, thickest where you showed up for the hard
+    thing. Stack thirty days and the banding is unique to that person, the way a real rock slice is.
+  </p>
+</div>
+<div class="section-head">
+  <h2 class="font-display">Same species, three real months</h2>
+  <p>An erratic month, a steady one, and a near-perfect one — same rendering rule, genuinely different
+    bandings, because the pattern <em>is</em> the data.</p>
+</div>
+<div class="stage" id="specimen-stage"></div>
+
+<hr class="rule" />
+
+<div class="intro" style="margin-bottom: 32px;">
+  <p class="eyebrow">New direction — companion piece</p>
+  <h1 class="font-display" style="font-size: clamp(26px, 3.6vw, 38px);">Momentum Vessel</h1>
+  <p class="lede">
+    Momentum's actual formula is a 70/30 blend of this week against last week — that's a mixture, not a
+    gauge. Rendered as two densities of liquid settling in one vessel: this week's reading pours in
+    brighter and heavier, last week's sits underneath, paler. The line between them is never straight —
+    it's still settling, the way an average always is. Fill height is the momentum score itself.
+  </p>
+</div>
+<div class="section-head">
+  <h2 class="font-display">Rising against fading</h2>
+  <p>Same vessel, two real weeks. You can read the direction of momentum from which layer is winning,
+    not just the number.</p>
+</div>
+<div class="stage" id="vessel-stage"></div>
+
+<hr class="rule" />
+
+<details>
+  <summary class="earlier-summary">Earlier passes — Step Cards &amp; Atmosphere (reskins, kept for reference only)</summary>
+  <div class="earlier-body">
+
+<div class="intro">
   <p class="eyebrow">Draft — sharable card system</p>
   <h1 class="font-display">Step Cards</h1>
   <p class="lede">
@@ -691,6 +844,20 @@
   Manrope/Inter pairing if brand consistency with the rest of the app matters more than the system-font
   read. Both directions use the same underlying rarity/consistency data — picking one over the other is
   a call about how loud the "collectible" feeling should be, not a data or engineering difference.
+</footer>
+
+  </div>
+</details>
+
+<footer>
+  <strong>Production notes — Core Sample &amp; Momentum Vessel.</strong> Both drafted at display size
+  (220×400 and 190×340); a real export would render 2–3× for social. The band/vein colors here are one
+  palette (rock-warm, gold vein) picked to prove the mechanic reads — production would very likely want
+  the mood-driven palette from Atmosphere applied to the same rendering rule, so a rough month reads in
+  duller, cooler minerals and a strong one in richer, warmer ones. The priority vein currently tracks
+  one habit; open question is whether that should be user-chosen (their own "main quest") or always the
+  highest-priority habit by definition. Both are built as pure canvas rendering rules over real daily
+  arrays — no illustration assets, so they scale to any month length without redrawing anything by hand.
 </footer>
 
 <script>
@@ -1121,5 +1288,169 @@
     atmosphereStage.appendChild(el);
     const canvas = el.querySelector("canvas");
     drawPosterCurve(canvas.getContext("2d"), canvas.width, canvas.height, pulseFor(m.consistency, m.wobble, m.seed), m.line);
+  });
+
+  // ---------- Core Sample ----------
+  function hexToRgbArr(hex) {
+    const clean = hex.replace("#", "").trim();
+    const full = clean.length === 3 ? clean.split("").map((c) => c + c).join("") : clean;
+    const v = parseInt(full, 16);
+    return [(v >> 16) & 255, (v >> 8) & 255, v & 255];
+  }
+  function lerpColor(hexA, hexB, t) {
+    const a = hexToRgbArr(hexA), b = hexToRgbArr(hexB);
+    const c = a.map((av, i) => Math.round(av + (b[i] - av) * Math.max(0, Math.min(1, t))));
+    return `rgb(${c[0]},${c[1]},${c[2]})`;
+  }
+
+  // Bottom-to-top sediment: oldest day at the base, like real geology. Band
+  // height is never zero — a bad day is thin, not absent, which is the
+  // entire point. A wavy bright vein tracks the priority habit separately.
+  function drawCoreSample(ctx, w, h, values, veinValues, baseColor, highColor, veinColor) {
+    ctx.clearRect(0, 0, w, h);
+    const n = values.length;
+    const minFrac = 0.45;
+    const raw = values.map((v) => minFrac + (1 - minFrac) * Math.max(0, Math.min(1, v)));
+    const totalRaw = raw.reduce((a, b) => a + b, 0);
+    const heights = raw.map((r) => (r / totalRaw) * h);
+
+    let y = h;
+    const centers = [];
+    for (let i = 0; i < n; i++) {
+      const bandH = heights[i];
+      y -= bandH;
+      centers.push(y + bandH / 2);
+      ctx.fillStyle = lerpColor(baseColor, highColor, values[i]);
+      ctx.fillRect(0, y - 0.5, w, bandH + 1);
+      ctx.globalAlpha = 0.08;
+      ctx.strokeStyle = "#000";
+      ctx.lineWidth = 1;
+      const streaks = 1 + Math.floor(Math.random() * 2);
+      for (let s = 0; s < streaks; s++) {
+        const sy = y + Math.random() * bandH;
+        ctx.beginPath();
+        ctx.moveTo(0, sy);
+        ctx.lineTo(w, sy + (Math.random() - 0.5) * 3);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    ctx.lineCap = "round";
+    for (let i = 0; i < centers.length - 1; i++) {
+      const x1 = w * 0.5 + Math.sin(i * 0.6) * w * 0.24;
+      const x2 = w * 0.5 + Math.sin((i + 1) * 0.6) * w * 0.24;
+      const strength = veinValues[i];
+      ctx.strokeStyle = hexToRgba(veinColor, 0.18 + 0.75 * strength);
+      ctx.lineWidth = 0.8 + strength * 2.4;
+      ctx.shadowColor = veinColor;
+      ctx.shadowBlur = 5 * strength;
+      ctx.beginPath();
+      ctx.moveTo(x1, centers[i]);
+      ctx.lineTo(x2, centers[i + 1]);
+      ctx.stroke();
+    }
+    ctx.shadowBlur = 0;
+  }
+
+  const specimenStage = document.getElementById("specimen-stage");
+  const specimenConfig = [
+    { label: "Erratic month", consistency: 52, wobble: 0.4, seed: 71 },
+    { label: "Steady month", consistency: 78, wobble: 0.18, seed: 72 },
+    { label: "Near-perfect month", consistency: 95, wobble: 0.06, seed: 73 },
+  ];
+  specimenConfig.forEach((s, i) => {
+    const values = synthesizeDaily(31, s.consistency / 100, s.wobble, s.seed);
+    const veinValues = synthesizeDaily(31, Math.min(0.97, s.consistency / 100 + 0.05), s.wobble * 0.7, s.seed + 500);
+    const wrap = document.createElement("div");
+    wrap.className = "specimen-wrap";
+    wrap.innerHTML = `
+      <div class="specimen-slab">
+        <canvas width="220" height="400"></canvas>
+        <div class="specimen-sheen"></div>
+      </div>
+      <div class="specimen-tag">
+        <div class="t1 font-mono">AUG 2026 · CORE NO. 0${i + 1}</div>
+        <div class="t2">${s.consistency}% density · ${s.label.toLowerCase()}</div>
+      </div>
+    `;
+    specimenStage.appendChild(wrap);
+    const canvas = wrap.querySelector("canvas");
+    drawCoreSample(canvas.getContext("2d"), canvas.width, canvas.height, values, veinValues, "#241a12", "#e8b869", "#fff1d6");
+  });
+
+  // ---------- Momentum Vessel ----------
+  function wavyEdge(ctx, xStart, xEnd, y, amplitude, cycles, phase) {
+    const steps = 44;
+    ctx.moveTo(xStart, y + Math.sin(phase) * amplitude);
+    for (let i = 1; i <= steps; i++) {
+      const x = xStart + (xEnd - xStart) * (i / steps);
+      const yy = y + Math.sin(phase + (i / steps) * Math.PI * 2 * cycles) * amplitude;
+      ctx.lineTo(x, yy);
+    }
+  }
+
+  // Layer heights are the actual 70/30 weights, not a decorative split —
+  // this week's reading physically outweighs last week's in the vessel.
+  function drawMomentumVessel(ctx, w, h, recentPct, priorPct, recentColor, priorColor) {
+    ctx.clearRect(0, 0, w, h);
+    const scaleH = h * 0.76;
+    const recentH = scaleH * 0.7 * recentPct;
+    const priorH = scaleH * 0.3 * priorPct;
+    const floor = h - h * 0.06;
+    const boundaryY = floor - priorH;
+    const topY = boundaryY - recentH;
+
+    ctx.beginPath();
+    wavyEdge(ctx, 0, w, boundaryY, 3, 1.6, 1.1);
+    ctx.lineTo(w, floor);
+    ctx.lineTo(0, floor);
+    ctx.closePath();
+    const gp = ctx.createLinearGradient(0, boundaryY, 0, floor);
+    gp.addColorStop(0, hexToRgba(priorColor, 0.9));
+    gp.addColorStop(1, hexToRgba(priorColor, 0.58));
+    ctx.fillStyle = gp;
+    ctx.fill();
+
+    ctx.beginPath();
+    wavyEdge(ctx, 0, w, topY, 4, 1.3, 0.4);
+    ctx.lineTo(w, boundaryY + 2);
+    ctx.lineTo(0, boundaryY + 2);
+    ctx.closePath();
+    const gr = ctx.createLinearGradient(0, topY, 0, boundaryY);
+    gr.addColorStop(0, hexToRgba(recentColor, 0.95));
+    gr.addColorStop(1, hexToRgba(recentColor, 0.72));
+    ctx.fillStyle = gr;
+    ctx.fill();
+
+    ctx.beginPath();
+    wavyEdge(ctx, 0, w, topY, 4, 1.3, 0.4);
+    ctx.strokeStyle = "rgba(255,255,255,0.45)";
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+  }
+
+  const vesselStage = document.getElementById("vessel-stage");
+  const vesselConfig = [
+    { label: "Rising", recentPct: 0.94, priorPct: 0.68 },
+    { label: "Fading", recentPct: 0.58, priorPct: 0.89 },
+  ];
+  vesselConfig.forEach((v) => {
+    const momentum = Math.round((0.7 * v.recentPct + 0.3 * v.priorPct) * 100);
+    const wrap = document.createElement("div");
+    wrap.className = "vessel-wrap";
+    wrap.innerHTML = `
+      <div class="vessel-slab">
+        <canvas width="190" height="340"></canvas>
+        <div class="vessel-sheen"></div>
+      </div>
+      <div class="vessel-tag">
+        <div class="t1 font-display">${momentum} · ${v.label}</div>
+        <div class="t2">Last 7d ${Math.round(v.recentPct * 100)}% · prior 7d ${Math.round(v.priorPct * 100)}%</div>
+      </div>
+    `;
+    vesselStage.appendChild(wrap);
+    const canvas = wrap.querySelector("canvas");
+    drawMomentumVessel(canvas.getContext("2d"), canvas.width, canvas.height, v.recentPct, v.priorPct, "#e8b869", "#4f6f63");
   });
 </script>
