@@ -1,11 +1,26 @@
 import type { Metadata } from "next";
 import { Archivo, Cormorant_Garamond, Inter, Lora, Manrope, STIX_Two_Text } from "next/font/google";
 import type { ReactNode } from "react";
+import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { AppDataProvider } from "@/lib/app-data";
 import { ServiceWorkerRegistration } from "@/components/service-worker-registration";
 import { NetworkStatus } from "@/components/network-status";
 import "./globals.css";
+
+// Keeps PaletteChooser/TypographyChooser's storage keys and fallbacks in sync.
+// Runs before hydration so a saved theme applies on first paint instead of
+// waiting for the account menu (the only place those components mount) to open.
+const THEME_INIT_SCRIPT = `(function () {
+  try {
+    var palettes = ["forest", "coastal", "clay", "lavender", "blue-hour"];
+    var typographies = ["modern", "soft-journal", "quiet-literary", "grounded-classic"];
+    var palette = window.localStorage.getItem("aduvia-palette");
+    document.documentElement.dataset.palette = palettes.indexOf(palette) !== -1 ? palette : "forest";
+    var typography = window.localStorage.getItem("aduvia-typography");
+    document.documentElement.dataset.typography = typographies.indexOf(typography) !== -1 ? typography : "modern";
+  } catch (error) {}
+})();`;
 
 const inter = Inter({ subsets: ["latin"], variable: "--type-inter" });
 const cormorant = Cormorant_Garamond({ subsets: ["latin"], variable: "--type-cormorant", weight: ["500", "600", "700"] });
@@ -30,8 +45,8 @@ export const viewport = { themeColor: "#143d31", colorScheme: "light" };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`h-full antialiased ${inter.variable} ${cormorant.variable} ${manrope.variable} ${lora.variable} ${archivo.variable} ${stix.variable}`}>
-      <body className="min-h-full flex flex-col"><ServiceWorkerRegistration /><NetworkStatus /><AppDataProvider>{children}</AppDataProvider><Analytics /></body>
+    <html lang="en" suppressHydrationWarning className={`h-full antialiased ${inter.variable} ${cormorant.variable} ${manrope.variable} ${lora.variable} ${archivo.variable} ${stix.variable}`}>
+      <body className="min-h-full flex flex-col"><Script id="theme-init" strategy="beforeInteractive">{THEME_INIT_SCRIPT}</Script><ServiceWorkerRegistration /><NetworkStatus /><AppDataProvider>{children}</AppDataProvider><Analytics /></body>
     </html>
   );
 }
