@@ -202,6 +202,16 @@
     flex-direction: column;
     border: 1px solid rgba(244, 241, 230, 0.14);
   }
+  /* a textured surface, not flat empty space — fine engraved dot grid */
+  .card-face::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(244, 241, 230, 0.5) 0.6px, transparent 0.6px);
+    background-size: 9px 9px;
+    opacity: 0.16;
+    pointer-events: none;
+  }
 
   .card-topbar {
     display: flex;
@@ -218,13 +228,22 @@
   }
   .card-taxonomy b { color: #f4f1e6; }
   .card-rarity-gem {
-    width: 15px;
-    height: 15px;
-    border-radius: 4px;
-    background: var(--gem);
-    box-shadow: 0 0 0 1px rgba(244, 241, 230, 0.35) inset, 0 2px 6px rgba(0, 0, 0, 0.35);
+    position: relative;
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    background: linear-gradient(135deg, #fff 0%, var(--gem) 38%, var(--gem) 62%, rgba(0, 0, 0, 0.45) 100%);
+    box-shadow: 0 0 0 1px rgba(244, 241, 230, 0.4) inset, 0 2px 7px rgba(0, 0, 0, 0.4), 0 0 10px var(--gem);
     transform: rotate(45deg);
     flex: none;
+  }
+  .card-rarity-gem::before {
+    /* facet highlight */
+    content: "";
+    position: absolute;
+    inset: 2px 2px 50% 2px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.75), transparent);
+    border-radius: 2px 2px 0 0;
   }
 
   .card-hero {
@@ -232,8 +251,9 @@
     margin: 8px 12px 0;
     height: 132px;
     border-radius: 10px;
-    background: rgba(0, 0, 0, 0.16);
-    border: 1px solid rgba(244, 241, 230, 0.1);
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid rgba(244, 241, 230, 0.14);
+    box-shadow: 0 1px 0 rgba(244, 241, 230, 0.12), inset 0 2px 10px rgba(0, 0, 0, 0.45);
     overflow: hidden;
   }
   .card-hero canvas {
@@ -319,7 +339,8 @@
     color: rgba(244, 241, 230, 0.8);
   }
 
-  /* holo sheen — a material, not a decoration; strength scales with rarity */
+  /* holo sheen — a material, not a decoration; strength scales with rarity.
+     This layer responds to the pointer (hover/focus tilt). */
   .card-face::after {
     content: "";
     position: absolute;
@@ -336,6 +357,31 @@
     mix-blend-mode: color-dodge;
     opacity: 0.85;
     pointer-events: none;
+  }
+  /* idle foil shimmer — the surface itself catches light at rest, the way
+     real foil does under any ambient lighting, not only on interaction. */
+  .card-foil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      115deg,
+      transparent 32%,
+      rgba(255, 255, 255, 0.95) 47%,
+      rgba(255, 255, 255, 0.95) 53%,
+      transparent 68%
+    );
+    background-size: 260% 260%;
+    mix-blend-mode: overlay;
+    opacity: var(--foil-opacity, 0.1);
+    animation: foil-drift var(--foil-duration, 8s) ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes foil-drift {
+    0%, 100% { background-position: 6% 8%; }
+    50% { background-position: 94% 92%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card-foil { animation: none; background-position: 40% 40%; }
   }
 
   .card-name {
@@ -370,6 +416,8 @@
     --face-glow: rgba(184, 132, 83, 0.22);
     --gem: #b98453;
     --sheen-strength: 0.05;
+    --foil-opacity: 0.05;
+    --foil-duration: 11s;
   }
   .rarity-silver {
     --frame-a: linear-gradient(155deg, #d7e0d9, #7f9187 55%, #384039);
@@ -377,6 +425,8 @@
     --face-glow: rgba(157, 178, 166, 0.22);
     --gem: #aebdb1;
     --sheen-strength: 0.12;
+    --foil-opacity: 0.09;
+    --foil-duration: 9.5s;
   }
   .rarity-gold {
     --frame-a: linear-gradient(155deg, #f3cf8e, #b8823c 55%, #6b4c22);
@@ -384,6 +434,8 @@
     --face-glow: rgba(216, 154, 66, 0.28);
     --gem: #e6b768;
     --sheen-strength: 0.22;
+    --foil-opacity: 0.16;
+    --foil-duration: 7.5s;
   }
   .rarity-prism {
     --frame-a: linear-gradient(155deg, #f3e3c4, #d89a42 30%, #a86f5b 60%, #7f97a0 85%);
@@ -391,6 +443,8 @@
     --face-glow: rgba(220, 200, 170, 0.3);
     --gem: #efd9a8;
     --sheen-strength: 0.38;
+    --foil-opacity: 0.26;
+    --foil-duration: 5.5s;
   }
 
   .card-wrap:hover .card,
@@ -450,45 +504,83 @@
 <script>
   const CARD_W = 268 * 2, CARD_H = 132 * 2; // draw at 2x for crisp canvases
 
-  function drawSteps(ctx, w, h, filled, total, color) {
+  function hexToRgba(hex, alpha) {
+    const clean = hex.replace("#", "").trim();
+    const full = clean.length === 3 ? clean.split("").map((c) => c + c).join("") : clean;
+    const value = parseInt(full, 16);
+    const r = (value >> 16) & 255, g = (value >> 8) & 255, b = value & 255;
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  // An actual staircase silhouette — tread, then riser, repeated — not a
+  // diagonal scatter of points standing in for one. Filled area beneath the
+  // achieved steps gives it the weight of a real climb.
+  function drawStaircase(ctx, w, h, filled, total, color) {
     ctx.clearRect(0, 0, w, h);
-    const padX = w * 0.12, padY = h * 0.16;
+    const padX = w * 0.1, padY = h * 0.15;
     const usableW = w - padX * 2, usableH = h - padY * 2;
-    const stepW = usableW / (total - 1);
-    const pts = [];
-    for (let i = 0; i < total; i++) {
-      const x = padX + stepW * i;
-      const y = h - padY - (usableH * (i / (total - 1)));
-      pts.push([x, y]);
+    const stepW = usableW / total, stepH = usableH / total;
+    const baseline = h - padY;
+    const xAt = (i) => padX + stepW * i;
+    const yAt = (i) => baseline - stepH * i;
+
+    const pts = [[xAt(0), yAt(0)]];
+    for (let i = 1; i <= total; i++) {
+      pts.push([xAt(i), yAt(i - 1)]); // tread
+      pts.push([xAt(i), yAt(i)]); // riser
     }
-    ctx.lineWidth = 2;
-    ctx.lineCap = "round";
+
+    // Filled area under the achieved run of the staircase.
+    if (filled > 0) {
+      const cutIdx = Math.min(filled, total) * 2 + 1;
+      const areaPts = pts.slice(0, cutIdx);
+      const last = areaPts[areaPts.length - 1];
+      ctx.beginPath();
+      ctx.moveTo(areaPts[0][0], areaPts[0][1]);
+      areaPts.slice(1).forEach(([x, y]) => ctx.lineTo(x, y));
+      ctx.lineTo(last[0], baseline);
+      ctx.lineTo(areaPts[0][0], baseline);
+      ctx.closePath();
+      const grad = ctx.createLinearGradient(0, yAt(total), 0, baseline);
+      grad.addColorStop(0, hexToRgba(color, 0.32));
+      grad.addColorStop(1, hexToRgba(color, 0));
+      ctx.fillStyle = grad;
+      ctx.fill();
+    }
+
+    // Stroke the full profile — achieved steps solid, the rest a ghost path ahead.
+    ctx.lineWidth = 2.4;
+    ctx.lineJoin = "round";
     for (let i = 0; i < pts.length - 1; i++) {
-      const on = i < filled - 1;
-      ctx.strokeStyle = on ? color : "rgba(244,241,230,0.18)";
-      ctx.setLineDash(on ? [] : [1, 6]);
+      const stepIndex = Math.ceil((i + 1) / 2);
+      const on = stepIndex <= filled;
+      ctx.strokeStyle = on ? color : "rgba(244,241,230,0.22)";
+      ctx.setLineDash(on ? [] : [1, 5]);
       ctx.beginPath();
       ctx.moveTo(pts[i][0], pts[i][1]);
       ctx.lineTo(pts[i + 1][0], pts[i + 1][1]);
       ctx.stroke();
     }
     ctx.setLineDash([]);
-    pts.forEach(([x, y], i) => {
-      const on = i < filled;
+
+    // Landing nodes at each step's outer corner.
+    for (let i = 1; i <= total; i++) {
+      const [x, y] = pts[2 * i];
+      const on = i <= filled;
       ctx.beginPath();
-      ctx.arc(x, y, on ? 5 : 3.4, 0, Math.PI * 2);
+      ctx.arc(x, y, on ? 5.5 : 3.2, 0, Math.PI * 2);
       if (on) {
         ctx.fillStyle = color;
         ctx.shadowColor = color;
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 12;
         ctx.fill();
         ctx.shadowBlur = 0;
       } else {
-        ctx.strokeStyle = "rgba(244,241,230,0.3)";
+        ctx.strokeStyle = "rgba(244,241,230,0.35)";
         ctx.lineWidth = 1.4;
         ctx.stroke();
       }
-    });
+    }
   }
 
   function drawMomentum(ctx, w, h, recentPct, prevPct, color) {
@@ -575,6 +667,7 @@
             <span class="card-serial font-mono">${serial}</span>
             <span class="card-mark font-display">ADUVIA</span>
           </div>
+          <div class="card-foil"></div>
         </div>
       </div>
       <div class="rarity-caption">
@@ -626,7 +719,7 @@
         { label: "Quests", pct: 75, val: "3/4" },
       ],
       serial: `NO. 0${i + 1} / SEASON 2026`,
-      draw: (ctx, w, h) => drawSteps(ctx, w, h, t.filled, 10, getComputedStyle(document.documentElement).getPropertyValue("--page-accent") || "#d89a42"),
+      draw: (ctx, w, h) => drawStaircase(ctx, w, h, t.filled, 10, getComputedStyle(document.documentElement).getPropertyValue("--page-accent") || "#d89a42"),
     }));
   });
   // give each rarity its own glyph color matching its gem, after mount
@@ -636,7 +729,7 @@
     const ctx = canvas.getContext("2d");
     const filledMap = { "rarity-bronze": 5, "rarity-silver": 7, "rarity-gold": 9, "rarity-prism": 10 };
     const key = [...card.classList].find(c => filledMap[c]);
-    drawSteps(ctx, canvas.width, canvas.height, filledMap[key], 10, gem);
+    drawStaircase(ctx, canvas.width, canvas.height, filledMap[key], 10, gem);
   });
 
   const speciesStage = document.getElementById("species-stage");
@@ -656,7 +749,7 @@
       { label: "Quests", pct: 75, val: "3/4" },
     ],
     serial: "NO. 01 / SEASON 2026",
-    draw: (ctx, w, h) => drawSteps(ctx, w, h, 9, 10, gold),
+    draw: (ctx, w, h) => drawStaircase(ctx, w, h, 9, 10, gold),
   }));
 
   speciesStage.appendChild(makeCard({
