@@ -474,15 +474,23 @@
   .poster-vignette {
     position: absolute;
     inset: 0;
-    background: radial-gradient(120% 90% at 50% 8%, transparent 40%, rgba(0, 0, 0, 0.28) 100%);
+    background: radial-gradient(115% 85% at 50% 100%, transparent 35%, rgba(0, 0, 0, 0.42) 100%);
+    pointer-events: none;
+  }
+  .poster-glass {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(122deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.05) 22%, transparent 40%);
+    mix-blend-mode: screen;
     pointer-events: none;
   }
   .poster-grain {
     position: absolute;
-    inset: -20%;
-    filter: url(#aduviaGrain);
-    opacity: 0.16;
+    inset: 0;
+    background-repeat: repeat;
+    background-size: 128px 128px;
     mix-blend-mode: overlay;
+    opacity: 0.5;
     pointer-events: none;
   }
   .poster-content {
@@ -490,36 +498,49 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    padding: 26px 24px 20px;
+    padding: 28px 26px 22px;
   }
   .poster-eyebrow {
     font-size: 10.5px;
     font-weight: 700;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: rgba(251, 247, 238, 0.72);
+    color: rgba(251, 247, 238, 0.68);
   }
   .poster-hero {
-    margin-top: 16px;
+    margin-top: 20px;
   }
   .poster-num {
+    display: flex;
+    align-items: flex-start;
+    gap: 3px;
+    text-shadow: 0 10px 50px var(--mood-glow);
+  }
+  .poster-num .num-main {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
-    font-size: 68px;
+    font-size: 104px;
     font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1;
+    letter-spacing: -0.048em;
+    line-height: 0.86;
     font-variant-numeric: tabular-nums;
-    text-shadow: 0 6px 40px var(--mood-glow);
+    color: #fffaf1;
+  }
+  .poster-num .num-unit {
+    margin-top: 12px;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--mood-line);
   }
   .poster-label {
-    margin-top: 6px;
-    font-size: 13px;
+    margin-top: 4px;
+    font-size: 13.5px;
     font-weight: 600;
-    color: rgba(251, 247, 238, 0.78);
+    color: rgba(251, 247, 238, 0.75);
   }
   .poster-curve {
     margin-top: auto;
-    height: 118px;
+    height: 128px;
   }
   .poster-curve canvas {
     width: 100%;
@@ -527,34 +548,33 @@
     display: block;
   }
   .poster-stats {
-    margin-top: 14px;
-    padding-top: 14px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    border-top: 1px solid rgba(251, 247, 238, 0.18);
+    margin-top: 18px;
+    padding-top: 16px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-top: 1px solid rgba(251, 247, 238, 0.14);
   }
   .poster-stat {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
-    border-left: 1px solid rgba(251, 247, 238, 0.14);
-    padding-left: 14px;
+    align-items: baseline;
+    gap: 6px;
   }
-  .poster-stat:first-child { border-left: none; padding-left: 0; }
   .poster-stat .v {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
-    font-size: 19px;
+    font-size: 18px;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
+    color: #fffaf1;
   }
   .poster-stat .l {
     font-size: 9.5px;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: rgba(251, 247, 238, 0.6);
+    color: rgba(251, 247, 238, 0.56);
   }
   .poster-footer {
-    margin-top: 16px;
+    margin-top: 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -562,13 +582,49 @@
     font-weight: 700;
     letter-spacing: 0.04em;
   }
-  .poster-footer .tier { color: rgba(251, 247, 238, 0.75); }
+  .poster-footer .tier { color: rgba(251, 247, 238, 0.72); }
   .poster-footer .mark { color: rgba(251, 247, 238, 0.92); }
 
-  .mood-bronze { background: linear-gradient(190deg, #3a2b1f 0%, #5a3d28 46%, #7a5236 78%, #8f6440 100%); --mood-glow: rgba(180, 130, 80, 0.35); --mood-line: #d9a06c; }
-  .mood-silver { background: linear-gradient(190deg, #1c2723 0%, #33443c 46%, #587266 78%, #7f9c8d 100%); --mood-glow: rgba(150, 190, 175, 0.32); --mood-line: #cfe3d8; }
-  .mood-gold   { background: linear-gradient(190deg, #241a10 0%, #6b4321 42%, #b8823c 74%, #f0c179 100%); --mood-glow: rgba(230, 175, 90, 0.4); --mood-line: #ffdca0; }
-  .mood-prism  { background: linear-gradient(190deg, #17202e 0%, #6b4c22 34%, #d89a42 58%, #a86f5b 78%, #7f97a0 100%); --mood-glow: rgba(240, 210, 170, 0.45); --mood-line: #fff1d6; }
+  /* Layered light blooms over a near-black base, not a flat linear sweep —
+     the depth comes from multiple overlapping sources, the way real light
+     falls in a room, not a single gradient ramp. */
+  .mood-bronze {
+    background:
+      radial-gradient(52% 40% at 22% 88%, rgba(214, 158, 104, 0.6), transparent 70%),
+      radial-gradient(46% 36% at 88% 12%, rgba(138, 92, 60, 0.55), transparent 72%),
+      radial-gradient(65% 52% at 52% 46%, rgba(107, 71, 48, 0.65), transparent 76%),
+      linear-gradient(175deg, #0f0a06 0%, #1d1309 55%, #281a0f 100%);
+    --mood-glow: rgba(196, 140, 86, 0.4);
+    --mood-line: #dba879;
+  }
+  .mood-silver {
+    background:
+      radial-gradient(52% 40% at 24% 86%, rgba(164, 202, 187, 0.55), transparent 70%),
+      radial-gradient(46% 36% at 86% 14%, rgba(110, 148, 136, 0.5), transparent 72%),
+      radial-gradient(65% 52% at 52% 46%, rgba(66, 96, 86, 0.62), transparent 76%),
+      linear-gradient(175deg, #060d0b 0%, #101c17 55%, #16261f 100%);
+    --mood-glow: rgba(150, 190, 175, 0.35);
+    --mood-line: #cdeadb;
+  }
+  .mood-gold {
+    background:
+      radial-gradient(52% 40% at 22% 88%, rgba(255, 214, 145, 0.68), transparent 70%),
+      radial-gradient(46% 36% at 88% 12%, rgba(216, 154, 66, 0.6), transparent 72%),
+      radial-gradient(65% 52% at 52% 46%, rgba(150, 95, 40, 0.65), transparent 76%),
+      linear-gradient(175deg, #0c0602 0%, #1c1005 55%, #2a1706 100%);
+    --mood-glow: rgba(240, 190, 110, 0.45);
+    --mood-line: #ffdca0;
+  }
+  .mood-prism {
+    background:
+      radial-gradient(48% 38% at 18% 84%, rgba(216, 154, 66, 0.55), transparent 70%),
+      radial-gradient(48% 38% at 84% 16%, rgba(127, 151, 160, 0.5), transparent 70%),
+      radial-gradient(55% 44% at 52% 48%, rgba(255, 231, 190, 0.5), transparent 72%),
+      radial-gradient(44% 34% at 38% 96%, rgba(168, 111, 91, 0.45), transparent 75%),
+      linear-gradient(175deg, #05070c 0%, #1a1006 45%, #2a1707 75%, #34200c 100%);
+    --mood-glow: rgba(250, 220, 175, 0.5);
+    --mood-line: #fff1d6;
+  }
 </style>
 
 <div class="intro">
@@ -636,13 +692,6 @@
   read. Both directions use the same underlying rarity/consistency data — picking one over the other is
   a call about how loud the "collectible" feeling should be, not a data or engineering difference.
 </footer>
-
-<svg height="0" width="0" style="position: absolute;">
-  <filter id="aduviaGrain">
-    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" result="noise" />
-    <feColorMatrix in="noise" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.5 0" />
-  </filter>
-</svg>
 
 <script>
   const CARD_W = 268 * 2, CARD_H = 132 * 2; // draw at 2x for crisp canvases
@@ -1022,6 +1071,24 @@
     ctx.shadowBlur = 0;
   }
 
+  // Real per-pixel film grain, not a faint SVG filter — generated once and
+  // tiled, so its contrast is something we actually control.
+  function installGrainTexture(size, alpha) {
+    const c = document.createElement("canvas");
+    c.width = size; c.height = size;
+    const gctx = c.getContext("2d");
+    const img = gctx.createImageData(size, size);
+    for (let i = 0; i < img.data.length; i += 4) {
+      const v = Math.random() * 255;
+      img.data[i] = v; img.data[i + 1] = v; img.data[i + 2] = v; img.data[i + 3] = alpha;
+    }
+    gctx.putImageData(img, 0, 0);
+    const style = document.createElement("style");
+    style.textContent = `.poster-grain{background-image:url(${c.toDataURL()});}`;
+    document.head.appendChild(style);
+  }
+  installGrainTexture(128, 26);
+
   const atmosphereStage = document.getElementById("atmosphere-stage");
   const moodConfig = [
     { mood: "mood-bronze", tier: "Bronze Step", consistency: 54, wobble: 0.34, seed: 11, line: "#e2b98a" },
@@ -1034,14 +1101,15 @@
     el.className = `poster ${m.mood}`;
     el.innerHTML = `
       <div class="poster-vignette"></div>
+      <div class="poster-glass"></div>
       <div class="poster-grain"></div>
       <div class="poster-content">
         <div class="poster-eyebrow">August 2026 · Monthly recap</div>
         <div class="poster-hero">
-          <div class="poster-num font-display">${m.consistency}%</div>
+          <div class="poster-num"><span class="num-main font-display">${m.consistency}</span><span class="num-unit font-display">%</span></div>
           <div class="poster-label">Monthly consistency</div>
         </div>
-        <div class="poster-curve"><canvas width="${CARD_W}" height="236"></canvas></div>
+        <div class="poster-curve"><canvas width="${CARD_W}" height="256"></canvas></div>
         <div class="poster-stats">
           <div class="poster-stat"><span class="v font-display">74</span><span class="l">Efficiency</span></div>
           <div class="poster-stat"><span class="v font-display">${Math.min(100, m.consistency + 4)}</span><span class="l">Momentum</span></div>
