@@ -32,10 +32,9 @@ describe("AuthScreen", () => {
     expect(screen.getByRole("link", { name: "Create an account" })).toHaveAttribute("href", "/signup");
   });
 
-  it("asks for an email before password recovery", () => {
+  it("opens password recovery on a dedicated page", () => {
     render(<AuthScreen mode="login" />);
-    fireEvent.click(screen.getByRole("button", { name: "Forgot password?" }));
-    expect(screen.getByRole("status")).toHaveTextContent("Enter your email first");
+    expect(screen.getByRole("link", { name: "Forgot password?" })).toHaveAttribute("href", "/forgot-password");
   });
 
   it("reveals the password and links back to login", () => {

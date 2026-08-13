@@ -39,7 +39,6 @@ export function AuthScreen({ mode, nextPath = "/today", notice }: { mode: AuthMo
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState(() => notice ? noticeMessages[notice] : "");
   const [submitting, setSubmitting] = useState(false);
-  const [recoverySending, setRecoverySending] = useState(false);
   const strength = passwordStrength(password);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -85,25 +84,6 @@ export function AuthScreen({ mode, nextPath = "/today", notice }: { mode: AuthMo
     }
   }
 
-  async function recoverPassword() {
-    setMessage("");
-    if (!email.trim()) {
-      setMessage("Enter your email first, then request a reset link.");
-      return;
-    }
-    setRecoverySending(true);
-    try {
-      const supabase = createBrowserSupabaseClient();
-      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/callback?next=/reset-password` });
-      if (error) throw error;
-      setMessage("Password reset link sent. Check your inbox.");
-    } catch (error) {
-      setMessage(error instanceof Error && !error.message.includes("environment variables") ? error.message : "Password recovery will activate once Supabase keys are added.");
-    } finally {
-      setRecoverySending(false);
-    }
-  }
-
   return (
     <main className="auth-canvas public-canvas min-h-screen p-3 text-[var(--soft-ink)] sm:p-5">
       <a className="skip-link" href="#auth-form">Skip to account form</a>
@@ -145,7 +125,7 @@ export function AuthScreen({ mode, nextPath = "/today", notice }: { mode: AuthMo
 
               <label className="block"><span className="text-xs font-semibold text-[#46534c]">Email address</span><div className="mt-2 flex items-center rounded-[18px] border border-[#6b9b86]/16 bg-[#dfece5]/72 px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,.65)] transition focus-within:border-[#2f6f5e]/45 focus-within:bg-[#e8f2ed]"><span className="mr-3 grid size-8 place-items-center rounded-full bg-[#2f6f5e] text-white"><Mail size={16} strokeWidth={1.9} /></span><input autoComplete="email" className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[#789086]/55" onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" required type="email" value={email} /></div></label>
 
-              <div className="block"><span className="flex items-center justify-between text-xs font-semibold text-[#46534c]"><label htmlFor="auth-password">Password</label>{isSignup ? <span className="font-medium text-[#2f6f5e]">12+ characters</span> : <button className="font-medium text-[#2f6f5e] hover:underline disabled:opacity-50" disabled={recoverySending} onClick={recoverPassword} type="button">{recoverySending ? "Sending…" : "Forgot password?"}</button>}</span><div className="mt-2 flex items-center rounded-[18px] border border-[#6b9b86]/16 bg-[#dfece5]/72 px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,.65)] transition focus-within:border-[#2f6f5e]/45 focus-within:bg-[#e8f2ed]"><span className="mr-3 grid size-8 place-items-center rounded-full bg-[#2f6f5e] text-white"><LockKeyhole size={16} strokeWidth={1.9} /></span><input autoComplete={isSignup ? "new-password" : "current-password"} className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[#789086]/55" id="auth-password" minLength={isSignup ? 12 : 1} onChange={(event) => setPassword(event.target.value)} placeholder={isSignup ? "Try a memorable phrase" : "Enter your password"} required type={showPassword ? "text" : "password"} value={password} /><button aria-label={showPassword ? "Hide password" : "Show password"} className="ml-3 text-[#2f6f5e]/65 hover:text-[#1f4f40]" onClick={() => setShowPassword((current) => !current)} type="button">{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button></div></div>
+              <div className="block"><span className="flex items-center justify-between text-xs font-semibold text-[#46534c]"><label htmlFor="auth-password">Password</label>{isSignup ? <span className="font-medium text-[#2f6f5e]">12+ characters</span> : <Link className="font-medium text-[#2f6f5e] hover:underline" href="/forgot-password">Forgot password?</Link>}</span><div className="mt-2 flex items-center rounded-[18px] border border-[#6b9b86]/16 bg-[#dfece5]/72 px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,.65)] transition focus-within:border-[#2f6f5e]/45 focus-within:bg-[#e8f2ed]"><span className="mr-3 grid size-8 place-items-center rounded-full bg-[#2f6f5e] text-white"><LockKeyhole size={16} strokeWidth={1.9} /></span><input autoComplete={isSignup ? "new-password" : "current-password"} className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-[#789086]/55" id="auth-password" minLength={isSignup ? 12 : 1} onChange={(event) => setPassword(event.target.value)} placeholder={isSignup ? "Try a memorable phrase" : "Enter your password"} required type={showPassword ? "text" : "password"} value={password} /><button aria-label={showPassword ? "Hide password" : "Show password"} className="ml-3 text-[#2f6f5e]/65 hover:text-[#1f4f40]" onClick={() => setShowPassword((current) => !current)} type="button">{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button></div></div>
 
               {isSignup && <div aria-label={`Password strength: ${strength.label}`} className="flex items-center gap-3"><div className="grid flex-1 grid-cols-4 gap-1.5">{Array.from({ length: 4 }, (_, index) => <span className={`h-1.5 rounded-full transition-colors ${index < strength.score ? strength.score >= 4 ? "bg-[#2f6f5e]" : "bg-[#d89a42]" : "bg-[#24302a]/10"}`} key={index} />)}</div><span className="w-16 text-right text-[10px] font-semibold uppercase tracking-[0.1em] text-[#6f7e76]">{strength.label}</span></div>}
 

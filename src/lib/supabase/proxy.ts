@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 const protectedRoutes = ["/today", "/habits", "/quests", "/insights", "/check-in", "/account", "/onboarding", "/reset-password"];
-const authRoutes = ["/login", "/signup"];
+const authRoutes = ["/login", "/signup", "/forgot-password"];
 
 export async function updateSession(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -47,7 +47,10 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(destination);
   }
 
-  if (signedIn && !onboardingCompleted && pathname !== "/onboarding") {
+  // Password recovery intentionally creates a temporary authenticated session.
+  // Always let that session reach the password form before applying onboarding
+  // routing, otherwise recovery links for unfinished accounts appear broken.
+  if (signedIn && !onboardingCompleted && pathname !== "/onboarding" && pathname !== "/reset-password") {
     const destination = request.nextUrl.clone();
     destination.pathname = "/onboarding";
     destination.search = "";
