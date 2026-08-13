@@ -1,0 +1,695 @@
+<title>Aduvia — Step Cards</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --page-bg: #eef0e9;
+    --page-bg-alt: #e3e8dd;
+    --page-panel: #f7f8f3;
+    --page-ink: #1f271f;
+    --page-muted: #5c6a5d;
+    --page-accent: #a86f5b;
+    --page-border: rgba(20, 61, 49, 0.12);
+    --page-shadow: 0 30px 60px -34px rgba(20, 43, 32, 0.35);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page-bg: #10201a;
+      --page-bg-alt: #0b1712;
+      --page-panel: #16281f;
+      --page-ink: #eef0e9;
+      --page-muted: #9bb0a2;
+      --page-accent: #e2ab61;
+      --page-border: rgba(238, 240, 233, 0.12);
+      --page-shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.6);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page-bg: #10201a;
+    --page-bg-alt: #0b1712;
+    --page-panel: #16281f;
+    --page-ink: #eef0e9;
+    --page-muted: #9bb0a2;
+    --page-accent: #e2ab61;
+    --page-border: rgba(238, 240, 233, 0.12);
+    --page-shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.6);
+    color-scheme: dark;
+  }
+  :root[data-theme="light"] {
+    --page-bg: #eef0e9;
+    --page-bg-alt: #e3e8dd;
+    --page-panel: #f7f8f3;
+    --page-ink: #1f271f;
+    --page-muted: #5c6a5d;
+    --page-accent: #a86f5b;
+    --page-border: rgba(20, 61, 49, 0.12);
+    --page-shadow: 0 30px 60px -34px rgba(20, 43, 32, 0.35);
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: radial-gradient(120% 140% at 15% -10%, var(--page-bg-alt), var(--page-bg) 55%);
+    color: var(--page-ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: clamp(24px, 5vw, 72px) clamp(16px, 6vw, 64px) 96px;
+  }
+  .font-display {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+  }
+  .font-mono {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  a { color: inherit; }
+
+  /* ---------- page chrome ---------- */
+  .intro {
+    max-width: 760px;
+    margin: 0 auto clamp(40px, 6vw, 64px);
+  }
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--page-accent);
+    margin: 0 0 14px;
+  }
+  h1 {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 700;
+    font-size: clamp(30px, 4.4vw, 46px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    margin: 0 0 16px;
+  }
+  .lede {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--page-muted);
+    max-width: 62ch;
+    margin: 0;
+  }
+
+  .section-head {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 4px;
+  }
+  .section-head h2 {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+  .section-head p {
+    font-size: 13px;
+    color: var(--page-muted);
+    margin: 0;
+    text-align: right;
+    max-width: 40ch;
+  }
+
+  .rule {
+    max-width: 1180px;
+    margin: 56px auto 28px;
+    border: none;
+    border-top: 1px solid var(--page-border);
+  }
+
+  .stage {
+    max-width: 1180px;
+    margin: 28px auto 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: clamp(20px, 3vw, 34px);
+    justify-items: center;
+  }
+
+  .legend {
+    max-width: 1180px;
+    margin: 18px auto 0;
+    padding: 0 4px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 22px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--page-muted);
+  }
+  .legend-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    flex: none;
+  }
+
+  footer {
+    max-width: 760px;
+    margin: 80px auto 0;
+    padding-top: 28px;
+    border-top: 1px solid var(--page-border);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--page-muted);
+  }
+  footer strong { color: var(--page-ink); }
+
+  /* ---------- the card object ----------
+     Deliberately theme-independent: a shared card is exported as one
+     image and must look identical to whoever it's sent to, so its
+     tokens are self-contained rather than following the page's tokens. */
+  .card-wrap {
+    perspective: 900px;
+  }
+  .card {
+    position: relative;
+    width: 268px;
+    height: 375px; /* 2.5:3.5 trading-card ratio */
+    border-radius: 16px;
+    padding: 3px;
+    background: var(--frame-a);
+    box-shadow: var(--page-shadow), 0 2px 0 rgba(255, 255, 255, 0.06) inset;
+    transform: rotateX(0deg) rotateY(0deg);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+  .card-face {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 13px;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 90% at 20% -10%, var(--face-glow), transparent 60%),
+      var(--face-a);
+    color: #f4f1e6;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(244, 241, 230, 0.14);
+  }
+
+  .card-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 13px 0;
+  }
+  .card-taxonomy {
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(244, 241, 230, 0.72);
+  }
+  .card-taxonomy b { color: #f4f1e6; }
+  .card-rarity-gem {
+    width: 15px;
+    height: 15px;
+    border-radius: 4px;
+    background: var(--gem);
+    box-shadow: 0 0 0 1px rgba(244, 241, 230, 0.35) inset, 0 2px 6px rgba(0, 0, 0, 0.35);
+    transform: rotate(45deg);
+    flex: none;
+  }
+
+  .card-hero {
+    position: relative;
+    margin: 8px 12px 0;
+    height: 132px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.16);
+    border: 1px solid rgba(244, 241, 230, 0.1);
+    overflow: hidden;
+  }
+  .card-hero canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .card-stat-headline {
+    padding: 10px 14px 0;
+  }
+  .card-stat-headline .num {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .card-stat-headline .label {
+    margin-top: 3px;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(244, 241, 230, 0.68);
+  }
+
+  .card-stats {
+    margin: 10px 12px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .card-stat-row {
+    display: grid;
+    grid-template-columns: 60px 1fr 26px;
+    align-items: center;
+    gap: 7px;
+    font-size: 9px;
+  }
+  .card-stat-row .stat-label {
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(244, 241, 230, 0.68);
+  }
+  .card-stat-row .stat-track {
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(244, 241, 230, 0.14);
+    overflow: hidden;
+  }
+  .card-stat-row .stat-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--gem);
+  }
+  .card-stat-row .stat-val {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: #f4f1e6;
+    font-weight: 700;
+  }
+
+  .card-footer {
+    margin-top: auto;
+    padding: 10px 13px 11px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid rgba(244, 241, 230, 0.12);
+  }
+  .card-serial {
+    font-size: 8px;
+    letter-spacing: 0.04em;
+    color: rgba(244, 241, 230, 0.55);
+  }
+  .card-mark {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: rgba(244, 241, 230, 0.8);
+  }
+
+  /* holo sheen — a material, not a decoration; strength scales with rarity */
+  .card-face::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: conic-gradient(
+      from calc(var(--sheen-angle, 110deg)),
+      transparent 0deg,
+      rgba(216, 154, 66, var(--sheen-strength, 0)) 40deg,
+      rgba(219, 226, 233, var(--sheen-strength, 0)) 90deg,
+      rgba(215, 227, 220, var(--sheen-strength, 0)) 140deg,
+      transparent 190deg,
+      transparent 360deg
+    );
+    mix-blend-mode: color-dodge;
+    opacity: 0.85;
+    pointer-events: none;
+  }
+
+  .card-name {
+    padding: 0 13px;
+    margin-top: 2px;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #f4f1e6;
+  }
+
+  .rarity-caption {
+    margin-top: 14px;
+    text-align: center;
+  }
+  .rarity-caption .r-name {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .rarity-caption .r-sub {
+    margin-top: 2px;
+    font-size: 11.5px;
+    color: var(--page-muted);
+  }
+
+  /* rarity tiers */
+  .rarity-bronze {
+    --frame-a: linear-gradient(155deg, #caa06f, #6f4f34 55%, #3a2b20);
+    --face-a: #241b15;
+    --face-glow: rgba(184, 132, 83, 0.22);
+    --gem: #b98453;
+    --sheen-strength: 0.05;
+  }
+  .rarity-silver {
+    --frame-a: linear-gradient(155deg, #d7e0d9, #7f9187 55%, #384039);
+    --face-a: #182019;
+    --face-glow: rgba(157, 178, 166, 0.22);
+    --gem: #aebdb1;
+    --sheen-strength: 0.12;
+  }
+  .rarity-gold {
+    --frame-a: linear-gradient(155deg, #f3cf8e, #b8823c 55%, #6b4c22);
+    --face-a: #1a1710;
+    --face-glow: rgba(216, 154, 66, 0.28);
+    --gem: #e6b768;
+    --sheen-strength: 0.22;
+  }
+  .rarity-prism {
+    --frame-a: linear-gradient(155deg, #f3e3c4, #d89a42 30%, #a86f5b 60%, #7f97a0 85%);
+    --face-a: #0d1310;
+    --face-glow: rgba(220, 200, 170, 0.3);
+    --gem: #efd9a8;
+    --sheen-strength: 0.38;
+  }
+
+  .card-wrap:hover .card,
+  .card-wrap:focus-within .card {
+    transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+  }
+</style>
+
+<div class="intro">
+  <p class="eyebrow">Draft — sharable card system</p>
+  <h1 class="font-display">Step Cards</h1>
+  <p class="lede">
+    A monthly review, exported as one collectible object. Aduvia's own metaphor — <em>adugu</em> +
+    <em>via</em>, a path shaped one step at a time — becomes the hero art: a generative staircase of
+    nodes where the filled count is the actual data, not an illustration standing in for it. Rarity
+    isn't a skin — Bronze through Prism Step is read directly off that month's consistency score, so a
+    card someone shares is proof of something real. Hover or focus a card for the foil tilt.
+  </p>
+</div>
+
+<div class="section-head">
+  <h2 class="font-display">Rarity, earned by the month</h2>
+  <p>Same card type — Consistency — at four real scores. The frame, the gem, and the holo strength all
+    move together with the number.</p>
+</div>
+<div class="stage" id="rarity-stage"></div>
+<div class="legend">
+  <span class="legend-item"><span class="legend-swatch" style="background:#8a6a4f"></span>Bronze Step · under 60%</span>
+  <span class="legend-item"><span class="legend-swatch" style="background:#9aa3a0"></span>Silver Step · 60–79%</span>
+  <span class="legend-item"><span class="legend-swatch" style="background:#d89a42"></span>Gold Step · 80–94%</span>
+  <span class="legend-item"><span class="legend-swatch" style="background:linear-gradient(90deg,#d89a42,#a86f5b,#7f97a0)"></span>Prism Step · 95%+</span>
+</div>
+
+<hr class="rule" />
+
+<div class="section-head">
+  <h2 class="font-display">Three card species, one visual family</h2>
+  <p>Consistency, Momentum, and Side Quests each get their own hero glyph, built from the same
+    step/path language rather than three unrelated icon sets.</p>
+</div>
+<div class="stage" id="species-stage"></div>
+
+<footer>
+  <strong>Production notes.</strong> Drafted at display size (268×375, the real 2.5:3.5 trading-card
+  ratio); an exported share image would render this frame at 2–3× into a PNG sized for Instagram
+  (1080×1512) with the tilt/hover state baked out. Typefaces are the native Apple system stack (SF Pro
+  Display / SF Pro Text / SF Mono) per the brief; production would swap in Aduvia's existing
+  Manrope/Inter pairing if brand consistency with the rest of the app matters more than the system-font
+  read. Card backs, a full rarity-name set per species, and the actual monthly-data wiring are the
+  natural next steps once a direction here is picked.
+</footer>
+
+<script>
+  const CARD_W = 268 * 2, CARD_H = 132 * 2; // draw at 2x for crisp canvases
+
+  function drawSteps(ctx, w, h, filled, total, color) {
+    ctx.clearRect(0, 0, w, h);
+    const padX = w * 0.12, padY = h * 0.16;
+    const usableW = w - padX * 2, usableH = h - padY * 2;
+    const stepW = usableW / (total - 1);
+    const pts = [];
+    for (let i = 0; i < total; i++) {
+      const x = padX + stepW * i;
+      const y = h - padY - (usableH * (i / (total - 1)));
+      pts.push([x, y]);
+    }
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    for (let i = 0; i < pts.length - 1; i++) {
+      const on = i < filled - 1;
+      ctx.strokeStyle = on ? color : "rgba(244,241,230,0.18)";
+      ctx.setLineDash(on ? [] : [1, 6]);
+      ctx.beginPath();
+      ctx.moveTo(pts[i][0], pts[i][1]);
+      ctx.lineTo(pts[i + 1][0], pts[i + 1][1]);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    pts.forEach(([x, y], i) => {
+      const on = i < filled;
+      ctx.beginPath();
+      ctx.arc(x, y, on ? 5 : 3.4, 0, Math.PI * 2);
+      if (on) {
+        ctx.fillStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 10;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      } else {
+        ctx.strokeStyle = "rgba(244,241,230,0.3)";
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+      }
+    });
+  }
+
+  function drawMomentum(ctx, w, h, recentPct, prevPct, color) {
+    ctx.clearRect(0, 0, w, h);
+    const cx = w / 2, cy = h * 0.62, r1 = h * 0.5, r2 = h * 0.36;
+    const start = Math.PI * 0.78;
+    ctx.lineCap = "round";
+
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = "rgba(244,241,230,0.14)";
+    ctx.beginPath(); ctx.arc(cx, cy, r1, start, start + Math.PI * 1.44); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, cy, r2, start, start + Math.PI * 1.44); ctx.stroke();
+
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.arc(cx, cy, r1, start, start + Math.PI * 1.44 * recentPct); ctx.stroke();
+
+    ctx.strokeStyle = "rgba(244,241,230,0.55)";
+    ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(cx, cy, r2, start, start + Math.PI * 1.44 * prevPct); ctx.stroke();
+  }
+
+  function drawQuests(ctx, w, h, done, total, color) {
+    ctx.clearRect(0, 0, w, h);
+    const gap = w / (total + 1);
+    const cy = h * 0.56;
+    const size = Math.min(gap * 0.5, h * 0.24);
+    for (let i = 0; i < total; i++) {
+      const x = gap * (i + 1);
+      const on = i < done;
+      ctx.save();
+      ctx.translate(x, cy);
+      ctx.rotate(Math.PI / 4);
+      if (on) {
+        ctx.fillStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 10;
+        ctx.fillRect(-size / 2, -size / 2, size, size);
+        ctx.shadowBlur = 0;
+      } else {
+        ctx.strokeStyle = "rgba(244,241,230,0.32)";
+        ctx.lineWidth = 1.6;
+        ctx.strokeRect(-size / 2, -size / 2, size, size);
+      }
+      ctx.restore();
+    }
+    // connecting path underneath, same family as the step glyph
+    ctx.strokeStyle = "rgba(244,241,230,0.16)";
+    ctx.lineWidth = 1.4;
+    ctx.setLineDash([1, 6]);
+    ctx.beginPath();
+    ctx.moveTo(gap * 0.4, cy + size);
+    ctx.lineTo(w - gap * 0.4, cy + size);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function makeCard({ rarity, rarityName, rarityCaption, taxonomy, name, headline, headlineLabel, stats, serial, draw }) {
+    const wrap = document.createElement("div");
+    wrap.className = "card-wrap";
+    wrap.innerHTML = `
+      <div class="card ${rarity}" tabindex="0">
+        <div class="card-face">
+          <div class="card-topbar">
+            <div class="card-taxonomy">STEP CARD — <b>${taxonomy}</b></div>
+            <div class="card-rarity-gem"></div>
+          </div>
+          <div class="card-name font-display">${name}</div>
+          <div class="card-hero"><canvas width="${CARD_W}" height="${CARD_H}"></canvas></div>
+          <div class="card-stat-headline">
+            <div class="num font-display">${headline}</div>
+            <div class="label">${headlineLabel}</div>
+          </div>
+          <div class="card-stats">
+            ${stats.map(s => `
+              <div class="card-stat-row">
+                <span class="stat-label">${s.label}</span>
+                <span class="stat-track"><span class="stat-fill" style="width:${s.pct}%"></span></span>
+                <span class="stat-val">${s.val}</span>
+              </div>
+            `).join("")}
+          </div>
+          <div class="card-footer">
+            <span class="card-serial font-mono">${serial}</span>
+            <span class="card-mark font-display">ADUVIA</span>
+          </div>
+        </div>
+      </div>
+      <div class="rarity-caption">
+        <div class="r-name font-display">${rarityName}</div>
+        <div class="r-sub">${rarityCaption}</div>
+      </div>
+    `;
+    const canvas = wrap.querySelector("canvas");
+    const ctx = canvas.getContext("2d");
+    draw(ctx, CARD_W, CARD_H);
+
+    const cardEl = wrap.querySelector(".card");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduceMotion) {
+      wrap.addEventListener("pointermove", (e) => {
+        const rect = cardEl.getBoundingClientRect();
+        const px = (e.clientX - rect.left) / rect.width - 0.5;
+        const py = (e.clientY - rect.top) / rect.height - 0.5;
+        cardEl.style.setProperty("--tilt-y", `${px * 14}deg`);
+        cardEl.style.setProperty("--tilt-x", `${py * -14}deg`);
+        cardEl.querySelector(".card-face").style.setProperty("--sheen-angle", `${110 + px * 90}deg`);
+      });
+      wrap.addEventListener("pointerleave", () => {
+        cardEl.style.setProperty("--tilt-y", "0deg");
+        cardEl.style.setProperty("--tilt-x", "0deg");
+      });
+    }
+    return wrap;
+  }
+
+  const rarityStage = document.getElementById("rarity-stage");
+  [
+    { rarity: "rarity-bronze", rarityName: "Bronze Step", rarityCaption: "54% consistency", consistency: 54, filled: 5 },
+    { rarity: "rarity-silver", rarityName: "Silver Step", rarityCaption: "68% consistency", consistency: 68, filled: 7 },
+    { rarity: "rarity-gold", rarityName: "Gold Step", rarityCaption: "87% consistency", consistency: 87, filled: 9 },
+    { rarity: "rarity-prism", rarityName: "Prism Step", rarityCaption: "98% consistency", consistency: 98, filled: 10 },
+  ].forEach((t, i) => {
+    rarityStage.appendChild(makeCard({
+      rarity: t.rarity,
+      rarityName: t.rarityName,
+      rarityCaption: t.rarityCaption,
+      taxonomy: "CONSISTENCY",
+      name: "August 2026",
+      headline: `${t.consistency}%`,
+      headlineLabel: "Monthly consistency",
+      stats: [
+        { label: "Efficiency", pct: 74, val: 74 },
+        { label: "Momentum", pct: Math.min(100, t.consistency + 4), val: Math.min(100, t.consistency + 4) },
+        { label: "Quests", pct: 75, val: "3/4" },
+      ],
+      serial: `NO. 0${i + 1} / SEASON 2026`,
+      draw: (ctx, w, h) => drawSteps(ctx, w, h, t.filled, 10, getComputedStyle(document.documentElement).getPropertyValue("--page-accent") || "#d89a42"),
+    }));
+  });
+  // give each rarity its own glyph color matching its gem, after mount
+  document.querySelectorAll("#rarity-stage .card").forEach((card) => {
+    const gem = getComputedStyle(card).getPropertyValue("--gem").trim();
+    const canvas = card.querySelector("canvas");
+    const ctx = canvas.getContext("2d");
+    const filledMap = { "rarity-bronze": 5, "rarity-silver": 7, "rarity-gold": 9, "rarity-prism": 10 };
+    const key = [...card.classList].find(c => filledMap[c]);
+    drawSteps(ctx, canvas.width, canvas.height, filledMap[key], 10, gem);
+  });
+
+  const speciesStage = document.getElementById("species-stage");
+  const gold = "#e6b768";
+
+  speciesStage.appendChild(makeCard({
+    rarity: "rarity-gold",
+    rarityName: "Gold Step",
+    rarityCaption: "Consistency card",
+    taxonomy: "CONSISTENCY",
+    name: "August 2026",
+    headline: "87%",
+    headlineLabel: "Monthly consistency",
+    stats: [
+      { label: "Efficiency", pct: 74, val: 74 },
+      { label: "Momentum", pct: 91, val: 91 },
+      { label: "Quests", pct: 75, val: "3/4" },
+    ],
+    serial: "NO. 01 / SEASON 2026",
+    draw: (ctx, w, h) => drawSteps(ctx, w, h, 9, 10, gold),
+  }));
+
+  speciesStage.appendChild(makeCard({
+    rarity: "rarity-gold",
+    rarityName: "Gold Step",
+    rarityCaption: "Momentum card",
+    taxonomy: "MOMENTUM",
+    name: "August 2026",
+    headline: "91",
+    headlineLabel: "Momentum score",
+    stats: [
+      { label: "Last 7d", pct: 94, val: 94 },
+      { label: "Prior 7d", pct: 83, val: 83 },
+      { label: "Consistency", pct: 87, val: 87 },
+    ],
+    serial: "NO. 02 / SEASON 2026",
+    draw: (ctx, w, h) => drawMomentum(ctx, w, h, 0.94, 0.83, gold),
+  }));
+
+  speciesStage.appendChild(makeCard({
+    rarity: "rarity-gold",
+    rarityName: "Gold Step",
+    rarityCaption: "Side quest card",
+    taxonomy: "SIDE QUEST",
+    name: "August 2026",
+    headline: "3/4",
+    headlineLabel: "Quests completed",
+    stats: [
+      { label: "Completed", pct: 75, val: 3 },
+      { label: "Deferred", pct: 25, val: 1 },
+      { label: "Consistency", pct: 87, val: 87 },
+    ],
+    serial: "NO. 03 / SEASON 2026",
+    draw: (ctx, w, h) => drawQuests(ctx, w, h, 3, 4, gold),
+  }));
+</script>
