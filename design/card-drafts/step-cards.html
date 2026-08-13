@@ -461,11 +461,11 @@
   <p class="eyebrow">Draft — sharable card system</p>
   <h1 class="font-display">Step Cards</h1>
   <p class="lede">
-    A monthly review, exported as one collectible object. The hero art is the user's own daily
-    consistency graph — one bar per day of the month, a dashed line marking the monthly average, a
-    glowing marker on the most recent day — not an illustration standing in for the data. Rarity
-    isn't a skin — Bronze through Prism Step is read directly off that month's consistency score, so a
-    card someone shares is proof of something real. Hover or focus a card for the foil tilt.
+    A monthly review, exported as one collectible object. The hero art is a real 14-day pulse of the
+    user's own daily consistency — a smoothed trend curve, not a bar-per-day ledger — with a glowing
+    marker on the most recent day. Rarity isn't a skin — Bronze through Prism Step is read directly off
+    that month's consistency score, so a steadier curve and a higher tier arrive together, not by
+    coincidence. Hover or focus a card for the foil tilt.
   </p>
 </div>
 
@@ -533,61 +533,83 @@
     return raw.map((v) => Math.max(0, Math.min(1, v + (targetAvg - mean))));
   }
 
-  // The actual daily-consistency graph — one bar per day of the month, not
-  // a stand-in illustration. A faint 100% guide, a dashed monthly-average
-  // line, and a glowing marker on the most recent day (an emphasized
-  // endpoint, same as any chart worth reading).
-  function drawDailyConsistency(ctx, w, h, values, color) {
+  // Light rolling average — turns a noisy daily series into a readable
+  // trend without inventing data; each point is still real, just smoothed.
+  function movingAverage(values, window) {
+    return values.map((_, i, arr) => {
+      const slice = arr.slice(Math.max(0, i - window + 1), i + 1);
+      return slice.reduce((a, b) => a + b, 0) / slice.length;
+    });
+  }
+
+  // A smooth trend curve through real daily values — the recent-pulse
+  // read (Whoop/Oura/Apple Health register) rather than a bar-per-day
+  // ledger. Filled plateau, a glowing marker on the most recent day, an
+  // in-canvas label naming the window so the art reads on its own.
+  function drawPulseCurve(ctx, w, h, values, color, label) {
     ctx.clearRect(0, 0, w, h);
-    const padX = w * 0.05, padY = h * 0.16;
-    const usableW = w - padX * 2, usableH = h - padY * 2;
-    const baseline = h - padY;
+    const padX = w * 0.07, padTop = h * 0.26, padBottom = h * 0.12;
+    const usableW = w - padX * 2, usableH = h - padTop - padBottom;
+    const baseline = h - padBottom;
     const n = values.length;
-    const gap = usableW * 0.012;
-    const barW = (usableW - gap * (n - 1)) / n;
 
-    ctx.strokeStyle = "rgba(244,241,230,0.16)";
+    ctx.strokeStyle = "rgba(244,241,230,0.12)";
     ctx.lineWidth = 1;
-    ctx.setLineDash([1, 4]);
-    ctx.beginPath();
-    ctx.moveTo(padX, baseline - usableH);
-    ctx.lineTo(padX + usableW, baseline - usableH);
-    ctx.stroke();
-
-    const avg = values.reduce((a, b) => a + b, 0) / n;
-    const avgY = baseline - usableH * avg;
-    ctx.strokeStyle = hexToRgba(color, 0.55);
-    ctx.setLineDash([2, 3]);
-    ctx.beginPath();
-    ctx.moveTo(padX, avgY);
-    ctx.lineTo(padX + usableW, avgY);
-    ctx.stroke();
+    ctx.setLineDash([1, 5]);
+    [0.3, 0.65, 1].forEach((f) => {
+      const y = baseline - usableH * f;
+      ctx.beginPath();
+      ctx.moveTo(padX, y);
+      ctx.lineTo(w - padX, y);
+      ctx.stroke();
+    });
     ctx.setLineDash([]);
 
-    values.forEach((v, i) => {
-      const x = padX + i * (barW + gap);
-      const barH = Math.max(usableH * v, 1.4);
-      const y = baseline - barH;
-      if (v > 0.04) {
-        const grad = ctx.createLinearGradient(0, y, 0, baseline);
-        grad.addColorStop(0, hexToRgba(color, 0.95));
-        grad.addColorStop(1, hexToRgba(color, 0.3));
-        ctx.fillStyle = grad;
-      } else {
-        ctx.fillStyle = "rgba(244,241,230,0.14)";
+    const pts = values.map((v, i) => [padX + (usableW * i) / (n - 1), baseline - usableH * v]);
+    const tracePath = () => {
+      ctx.moveTo(pts[0][0], pts[0][1]);
+      for (let i = 1; i < pts.length - 1; i++) {
+        const xc = (pts[i][0] + pts[i + 1][0]) / 2;
+        const yc = (pts[i][1] + pts[i + 1][1]) / 2;
+        ctx.quadraticCurveTo(pts[i][0], pts[i][1], xc, yc);
       }
-      ctx.fillRect(x, y, barW, barH);
-    });
+      const p = pts[pts.length - 1];
+      ctx.lineTo(p[0], p[1]);
+    };
 
-    const lastX = padX + (n - 1) * (barW + gap) + barW / 2;
-    const lastY = baseline - usableH * values[n - 1] - 1;
+    const last = pts[pts.length - 1];
     ctx.beginPath();
-    ctx.arc(lastX, lastY, 3.2, 0, Math.PI * 2);
+    tracePath();
+    ctx.lineTo(last[0], baseline);
+    ctx.lineTo(pts[0][0], baseline);
+    ctx.closePath();
+    const grad = ctx.createLinearGradient(0, padTop, 0, baseline);
+    grad.addColorStop(0, hexToRgba(color, 0.5));
+    grad.addColorStop(1, hexToRgba(color, 0.02));
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    ctx.beginPath();
+    tracePath();
+    ctx.lineWidth = 2.4;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.strokeStyle = color;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(last[0], last[1], 3.6, 0, Math.PI * 2);
     ctx.fillStyle = color;
     ctx.shadowColor = color;
-    ctx.shadowBlur = 9;
+    ctx.shadowBlur = 10;
     ctx.fill();
     ctx.shadowBlur = 0;
+
+    ctx.textBaseline = "top";
+    ctx.fillStyle = "rgba(244,241,230,0.62)";
+    ctx.font = `700 ${Math.round(h * 0.05)}px -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif`;
+    try { ctx.letterSpacing = "1.5px"; } catch (e) { /* older engines skip letter-spacing */ }
+    ctx.fillText(label.toUpperCase(), padX, h * 0.07);
   }
 
   function drawMomentum(ctx, w, h, recentPct, prevPct, color) {
@@ -706,6 +728,12 @@
   }
 
   const DAYS_IN_MONTH = 31; // August 2026
+  const PULSE_WINDOW = 14;
+  function pulseFor(consistency, wobble, seed) {
+    const month = synthesizeDaily(DAYS_IN_MONTH, consistency / 100, wobble, seed);
+    return movingAverage(month.slice(-PULSE_WINDOW), 3);
+  }
+
   const rarityStage = document.getElementById("rarity-stage");
   // Higher rarity reads as both higher AND steadier — wobble shrinks as
   // consistency climbs, the same way a real month gets less erratic.
@@ -730,10 +758,11 @@
         { label: "Quests", pct: 75, val: "3/4" },
       ],
       serial: `NO. 0${i + 1} / SEASON 2026`,
-      draw: (ctx, w, h) => drawDailyConsistency(
+      draw: (ctx, w, h) => drawPulseCurve(
         ctx, w, h,
-        synthesizeDaily(DAYS_IN_MONTH, t.consistency / 100, t.wobble, t.seed),
+        pulseFor(t.consistency, t.wobble, t.seed),
         getComputedStyle(document.documentElement).getPropertyValue("--page-accent") || "#d89a42",
+        `${PULSE_WINDOW}-Day Pulse`,
       ),
     }));
   });
@@ -743,7 +772,7 @@
     const canvas = card.querySelector("canvas");
     const ctx = canvas.getContext("2d");
     const t = rarityConfig.find((r) => card.classList.contains(r.rarity));
-    drawDailyConsistency(ctx, canvas.width, canvas.height, synthesizeDaily(DAYS_IN_MONTH, t.consistency / 100, t.wobble, t.seed), gem);
+    drawPulseCurve(ctx, canvas.width, canvas.height, pulseFor(t.consistency, t.wobble, t.seed), gem, `${PULSE_WINDOW}-Day Pulse`);
   });
 
   const speciesStage = document.getElementById("species-stage");
@@ -763,7 +792,7 @@
       { label: "Quests", pct: 75, val: "3/4" },
     ],
     serial: "NO. 01 / SEASON 2026",
-    draw: (ctx, w, h) => drawDailyConsistency(ctx, w, h, synthesizeDaily(31, 0.87, 0.16, 33), gold),
+    draw: (ctx, w, h) => drawPulseCurve(ctx, w, h, pulseFor(87, 0.16, 33), gold, `${PULSE_WINDOW}-Day Pulse`),
   }));
 
   speciesStage.appendChild(makeCard({
