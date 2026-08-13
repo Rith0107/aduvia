@@ -3,6 +3,20 @@
 Static, self-contained concept drafts for the "download/share a monthly image" launch-checklist
 item. Open any file directly in a browser — no build step, no dependencies.
 
+Every iteration is kept as its own file rather than overwritten in place, so earlier drafts stay
+around for comparison. `step-cards.html` always mirrors the latest version.
+
+## Step Cards — versions
+
+- **`step-cards-v1.html`** — first pass. Diagonal scatter-plot hero glyph, flat rotated-square gem,
+  no idle motion (holo sheen only appears on hover).
+- **`step-cards-v2.html`** (= `step-cards.html`, current) — hero glyph rebuilt as an actual
+  staircase silhouette (tread + riser, gradient-filled area under the achieved run) instead of
+  points on a line; added an always-on idle foil shimmer scaled by rarity (real foil catches light
+  at rest, not just on interaction); faceted gem with a highlight instead of a flat square; fine
+  dot-grid surface texture so the face isn't empty flat space; deeper inset shadow on the hero
+  window.
+
 ## `step-cards.html` — Step Cards
 
 A monthly review exported as one collectible object, built around Aduvia's own metaphor
