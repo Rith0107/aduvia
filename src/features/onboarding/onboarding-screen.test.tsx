@@ -39,4 +39,13 @@ describe("OnboardingScreen", () => {
     expect(screen.getByRole("heading", { name: "Add a side quest." })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "I’ll add one later" })).toBeInTheDocument();
   });
+
+  it("enables the next step when a recommended habit is selected", () => {
+    render(<OnboardingScreen />);
+    const next = screen.getByRole("button", { name: /Next: add a side quest/i });
+    expect(next).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "Add Morning walk" }));
+    expect(next).toBeEnabled();
+    expect(screen.getByText("1 rhythm selected")).toBeInTheDocument();
+  });
 });

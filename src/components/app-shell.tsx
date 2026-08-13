@@ -5,8 +5,6 @@ import type { ReactNode } from "react";
 import { ChartNoAxesCombined, CircleCheck, Gem, ListChecks, MoonStar } from "lucide-react";
 import { AccountMenu } from "@/components/account-menu";
 import { BrandLogo } from "@/components/brand-logo";
-import { PaletteChooser } from "@/components/palette-chooser";
-import { TypographyChooser } from "@/components/typography-chooser";
 import { useAppData } from "@/lib/app-data";
 
 const navItems = [
@@ -33,7 +31,7 @@ export function AppShell({ active, children, eyebrow, title, action }: AppShellP
     <main className="soft-canvas min-h-screen text-[var(--soft-ink)]">
       <a className="skip-link" href="#main-content">Skip to main content</a>
       <div className="soft-shell min-h-screen overflow-hidden">
-        <header className="premium-toolbar sticky top-0 z-40 mx-auto flex max-w-[1800px] items-center justify-between px-5 py-5 sm:px-9 lg:px-14">
+        <header className="premium-toolbar sticky top-0 z-40 flex w-full items-center justify-between px-5 py-5 sm:px-9 lg:px-14">
           <BrandLogo href="/today" />
           <nav aria-label="Primary" className="hidden rounded-full bg-white/45 p-1 shadow-[inset_0_0_0_1px_rgba(31,45,38,0.05)] backdrop-blur-xl md:flex">
             {navItems.map((item) => (
@@ -41,8 +39,6 @@ export function AppShell({ active, children, eyebrow, title, action }: AppShellP
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            <PaletteChooser />
-            <TypographyChooser />
             <Link aria-label="Evening mode" className="flex min-h-10 items-center gap-2 rounded-full bg-white/45 px-3 text-xs font-bold text-[var(--soft-ink)] shadow-[inset_0_1px_0_rgba(255,255,255,.55)] backdrop-blur-xl sm:px-4" href="/check-in"><MoonStar aria-hidden className="size-4 text-[var(--soft-accent)]" strokeWidth={1.8} /><span className="hidden sm:inline">Evening mode</span></Link>
             <AccountMenu />
           </div>
