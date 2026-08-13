@@ -455,6 +455,120 @@
   @media (prefers-reduced-motion: reduce) {
     .card { transition: none; }
   }
+
+  /* ---------- Direction B: Atmosphere ----------
+     No frame, no gem, no card-object metaphor. A full-bleed story-format
+     poster where the month's data sets the light instead of a border
+     setting the rarity. Also self-contained tokens, for the same reason
+     the Step Card face is: this is exported as one image. */
+  .poster {
+    position: relative;
+    width: 300px;
+    height: 533px; /* 9:16 story ratio */
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: var(--page-shadow);
+    color: #fbf7ee;
+    isolation: isolate;
+  }
+  .poster-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(120% 90% at 50% 8%, transparent 40%, rgba(0, 0, 0, 0.28) 100%);
+    pointer-events: none;
+  }
+  .poster-grain {
+    position: absolute;
+    inset: -20%;
+    filter: url(#aduviaGrain);
+    opacity: 0.16;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+  .poster-content {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 26px 24px 20px;
+  }
+  .poster-eyebrow {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(251, 247, 238, 0.72);
+  }
+  .poster-hero {
+    margin-top: 16px;
+  }
+  .poster-num {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    font-size: 68px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 6px 40px var(--mood-glow);
+  }
+  .poster-label {
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(251, 247, 238, 0.78);
+  }
+  .poster-curve {
+    margin-top: auto;
+    height: 118px;
+  }
+  .poster-curve canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .poster-stats {
+    margin-top: 14px;
+    padding-top: 14px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid rgba(251, 247, 238, 0.18);
+  }
+  .poster-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border-left: 1px solid rgba(251, 247, 238, 0.14);
+    padding-left: 14px;
+  }
+  .poster-stat:first-child { border-left: none; padding-left: 0; }
+  .poster-stat .v {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .poster-stat .l {
+    font-size: 9.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(251, 247, 238, 0.6);
+  }
+  .poster-footer {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .poster-footer .tier { color: rgba(251, 247, 238, 0.75); }
+  .poster-footer .mark { color: rgba(251, 247, 238, 0.92); }
+
+  .mood-bronze { background: linear-gradient(190deg, #3a2b1f 0%, #5a3d28 46%, #7a5236 78%, #8f6440 100%); --mood-glow: rgba(180, 130, 80, 0.35); --mood-line: #d9a06c; }
+  .mood-silver { background: linear-gradient(190deg, #1c2723 0%, #33443c 46%, #587266 78%, #7f9c8d 100%); --mood-glow: rgba(150, 190, 175, 0.32); --mood-line: #cfe3d8; }
+  .mood-gold   { background: linear-gradient(190deg, #241a10 0%, #6b4321 42%, #b8823c 74%, #f0c179 100%); --mood-glow: rgba(230, 175, 90, 0.4); --mood-line: #ffdca0; }
+  .mood-prism  { background: linear-gradient(190deg, #17202e 0%, #6b4c22 34%, #d89a42 58%, #a86f5b 78%, #7f97a0 100%); --mood-glow: rgba(240, 210, 170, 0.45); --mood-line: #fff1d6; }
 </style>
 
 <div class="intro">
@@ -492,15 +606,43 @@
 </div>
 <div class="stage" id="species-stage"></div>
 
+<hr class="rule" />
+
+<div class="intro" style="margin-bottom: 32px;">
+  <p class="eyebrow">Direction B — no card object</p>
+  <h1 class="font-display" style="font-size: clamp(26px, 3.6vw, 38px);">Atmosphere</h1>
+  <p class="lede">
+    Flighty's recap cards are the reference: no frame, no border, no icon standing in for rarity — a
+    full-bleed gradient the data itself sets the temperature of, one oversized number, and a route line
+    with nothing boxing it in. Same underlying rule as Step Cards — Bronze through Prism is still read
+    directly off consistency — but the tier shows up as the light in the room, not a gem in the corner.
+  </p>
+</div>
+<div class="section-head">
+  <h2 class="font-display">Same month, four moods</h2>
+  <p>Bronze reads as overcast dusk; Prism as full sunrise. The 14-day pulse floats straight on the
+    gradient, no panel underneath it.</p>
+</div>
+<div class="stage" id="atmosphere-stage"></div>
+
 <footer>
-  <strong>Production notes.</strong> Drafted at display size (268×375, the real 2.5:3.5 trading-card
-  ratio); an exported share image would render this frame at 2–3× into a PNG sized for Instagram
-  (1080×1512) with the tilt/hover state baked out. Typefaces are the native Apple system stack (SF Pro
+  <strong>Production notes.</strong> Step Cards drafted at display size (268×375, the real 2.5:3.5
+  trading-card ratio); an exported share image would render at 2–3× into a PNG sized for Instagram
+  (1080×1512) with the tilt/hover state baked out. Atmosphere drafted at 300×533 (a scaled 1080×1920
+  story crop); production would render the true resolution with a heavier grain pass, since screen
+  compression flattens fine noise. Typefaces throughout are the native Apple system stack (SF Pro
   Display / SF Pro Text / SF Mono) per the brief; production would swap in Aduvia's existing
   Manrope/Inter pairing if brand consistency with the rest of the app matters more than the system-font
-  read. Card backs, a full rarity-name set per species, and the actual monthly-data wiring are the
-  natural next steps once a direction here is picked.
+  read. Both directions use the same underlying rarity/consistency data — picking one over the other is
+  a call about how loud the "collectible" feeling should be, not a data or engineering difference.
 </footer>
+
+<svg height="0" width="0" style="position: absolute;">
+  <filter id="aduviaGrain">
+    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" result="noise" />
+    <feColorMatrix in="noise" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.5 0" />
+  </filter>
+</svg>
 
 <script>
   const CARD_W = 268 * 2, CARD_H = 132 * 2; // draw at 2x for crisp canvases
@@ -828,4 +970,88 @@
     serial: "NO. 03 / SEASON 2026",
     draw: (ctx, w, h) => drawQuests(ctx, w, h, 3, 4, gold),
   }));
+
+  // ---------- Direction B: Atmosphere ----------
+  // Same pulse-curve data as Step Cards, but floating directly on the
+  // gradient — a soft glow trail instead of a filled chart panel, since
+  // there's no card face here to contain it.
+  function drawPosterCurve(ctx, w, h, values, lineColor) {
+    ctx.clearRect(0, 0, w, h);
+    const padX = w * 0.02, padTop = h * 0.1, padBottom = h * 0.08;
+    const usableW = w - padX * 2, usableH = h - padTop - padBottom;
+    const baseline = h - padBottom;
+    const n = values.length;
+    const pts = values.map((v, i) => [padX + (usableW * i) / (n - 1), baseline - usableH * v]);
+    const tracePath = () => {
+      ctx.moveTo(pts[0][0], pts[0][1]);
+      for (let i = 1; i < pts.length - 1; i++) {
+        const xc = (pts[i][0] + pts[i + 1][0]) / 2;
+        const yc = (pts[i][1] + pts[i + 1][1]) / 2;
+        ctx.quadraticCurveTo(pts[i][0], pts[i][1], xc, yc);
+      }
+      const p = pts[pts.length - 1];
+      ctx.lineTo(p[0], p[1]);
+    };
+
+    ctx.beginPath();
+    tracePath();
+    ctx.lineTo(pts[pts.length - 1][0], baseline + padBottom);
+    ctx.lineTo(pts[0][0], baseline + padBottom);
+    ctx.closePath();
+    const grad = ctx.createLinearGradient(0, padTop, 0, baseline);
+    grad.addColorStop(0, hexToRgba(lineColor, 0.4));
+    grad.addColorStop(1, hexToRgba(lineColor, 0));
+    ctx.fillStyle = grad;
+    ctx.globalCompositeOperation = "screen";
+    ctx.fill();
+    ctx.globalCompositeOperation = "source-over";
+
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.beginPath(); tracePath(); ctx.lineWidth = 10; ctx.strokeStyle = hexToRgba(lineColor, 0.22); ctx.stroke();
+    ctx.beginPath(); tracePath(); ctx.lineWidth = 5; ctx.strokeStyle = hexToRgba(lineColor, 0.4); ctx.stroke();
+    ctx.beginPath(); tracePath(); ctx.lineWidth = 2.2; ctx.strokeStyle = "#fffaf0"; ctx.stroke();
+
+    const last = pts[pts.length - 1];
+    ctx.beginPath();
+    ctx.arc(last[0], last[1], 4, 0, Math.PI * 2);
+    ctx.fillStyle = "#fffaf0";
+    ctx.shadowColor = lineColor;
+    ctx.shadowBlur = 16;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  const atmosphereStage = document.getElementById("atmosphere-stage");
+  const moodConfig = [
+    { mood: "mood-bronze", tier: "Bronze Step", consistency: 54, wobble: 0.34, seed: 11, line: "#e2b98a" },
+    { mood: "mood-silver", tier: "Silver Step", consistency: 68, wobble: 0.26, seed: 22, line: "#cfe8dc" },
+    { mood: "mood-gold", tier: "Gold Step", consistency: 87, wobble: 0.16, seed: 33, line: "#ffd691" },
+    { mood: "mood-prism", tier: "Prism Step", consistency: 98, wobble: 0.05, seed: 44, line: "#fff0d0" },
+  ];
+  moodConfig.forEach((m) => {
+    const el = document.createElement("div");
+    el.className = `poster ${m.mood}`;
+    el.innerHTML = `
+      <div class="poster-vignette"></div>
+      <div class="poster-grain"></div>
+      <div class="poster-content">
+        <div class="poster-eyebrow">August 2026 · Monthly recap</div>
+        <div class="poster-hero">
+          <div class="poster-num font-display">${m.consistency}%</div>
+          <div class="poster-label">Monthly consistency</div>
+        </div>
+        <div class="poster-curve"><canvas width="${CARD_W}" height="236"></canvas></div>
+        <div class="poster-stats">
+          <div class="poster-stat"><span class="v font-display">74</span><span class="l">Efficiency</span></div>
+          <div class="poster-stat"><span class="v font-display">${Math.min(100, m.consistency + 4)}</span><span class="l">Momentum</span></div>
+          <div class="poster-stat"><span class="v font-display">3/4</span><span class="l">Quests</span></div>
+        </div>
+        <div class="poster-footer"><span class="tier">${m.tier}</span><span class="mark font-display">ADUVIA</span></div>
+      </div>
+    `;
+    atmosphereStage.appendChild(el);
+    const canvas = el.querySelector("canvas");
+    drawPosterCurve(canvas.getContext("2d"), canvas.width, canvas.height, pulseFor(m.consistency, m.wobble, m.seed), m.line);
+  });
 </script>
