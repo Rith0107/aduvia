@@ -6,6 +6,7 @@ import { MonthCoverPreview } from "./month-cover-preview";
 import { isHabitAvailableOn, isHabitScheduledOn, scheduledDaysFor, useAppData } from "@/lib/app-data";
 import type { HabitSummary } from "@/features/habits/types";
 import { Download, Share2, Smartphone, Square } from "lucide-react";
+import { toBlob } from "html-to-image";
 import {
   Area,
   AreaChart,
@@ -148,41 +149,17 @@ function cardDimensions(format: ShareFormat) {
 async function renderPreviewElement(element: HTMLElement, format: ShareFormat) {
   const sourceWidth = format === "story" ? 310 : 560;
   const sourceHeight = format === "story" ? sourceWidth * 16 / 9 : sourceWidth;
-  const clone = element.cloneNode(true) as HTMLElement;
-  const sourceNodes = [element, ...Array.from(element.querySelectorAll<HTMLElement>("*"))];
-  const clonedNodes = [clone, ...Array.from(clone.querySelectorAll<HTMLElement>("*"))];
-
-  sourceNodes.forEach((source, index) => {
-    const target = clonedNodes[index];
-    const computed = getComputedStyle(source);
-    for (let propertyIndex = 0; propertyIndex < computed.length; propertyIndex += 1) {
-      const property = computed.item(propertyIndex);
-      target.style.setProperty(property, computed.getPropertyValue(property), computed.getPropertyPriority(property));
-    }
+  const { width, height } = cardDimensions(format);
+  const blob = await toBlob(element, {
+    cacheBust: true,
+    canvasHeight: height,
+    canvasWidth: width,
+    height: sourceHeight,
+    pixelRatio: 1,
+    width: sourceWidth,
   });
-  clone.style.width = `${sourceWidth}px`;
-  clone.style.height = `${sourceHeight}px`;
-  clone.style.maxWidth = "none";
-  clone.style.boxSizing = "border-box";
-
-  const markup = new XMLSerializer().serializeToString(clone);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${sourceWidth}" height="${sourceHeight}" viewBox="0 0 ${sourceWidth} ${sourceHeight}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml">${markup}</div></foreignObject></svg>`;
-  const imageUrl = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
-  try {
-    const image = new Image();
-    image.decoding = "sync";
-    await new Promise<void>((resolve, reject) => { image.onload = () => resolve(); image.onerror = () => reject(new Error("Could not render Month Cover.")); image.src = imageUrl; });
-    const { width, height } = cardDimensions(format);
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    const context = canvas.getContext("2d");
-    if (!context) throw new Error("Canvas is unavailable.");
-    context.drawImage(image, 0, 0, width, height);
-    return await new Promise<Blob>((resolve, reject) => canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("Could not create image."))), "image/png"));
-  } finally {
-    URL.revokeObjectURL(imageUrl);
-  }
+  if (!blob) throw new Error("Could not create Month Cover image.");
+  return blob;
 }
 
 async function renderShareCard(format: ShareFormat, trim: ShareTrim, consistency: number, monthLabel: string, completedQuestTitles: string[], habits: ReportHabit[], daysShownUp: number) {
