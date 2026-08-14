@@ -41,14 +41,14 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
         <p className="text-right text-[8px] font-bold uppercase tracking-[.12em] text-white/88">{monthName}<br />{year}</p>
       </header>
 
-      <section className={`${isStory ? "mt-3" : "mt-5 grid grid-cols-[.72fr_1.28fr] items-center gap-5"}`}>
+      <section className={`${isStory ? "mt-5" : "mt-5 grid grid-cols-[.72fr_1.28fr] items-center gap-5"}`}>
         <div className={isStory ? "text-center" : ""}>
           <p className="text-[5.5rem] font-semibold leading-[.82] tracking-[-.09em]">{consistency}<span className="ml-1 text-2xl text-[var(--chart-primary)]">%</span></p>
           <p className={`${isStory ? "mt-2" : "mt-3"} text-[8px] font-black uppercase tracking-[.2em] text-white/78`}>rhythm glow</p>
           {!isStory && <p className="mt-4 max-w-[155px] text-[10px] font-medium leading-4 text-white/82">Your month left a calm signal in the sky.</p>}
         </div>
 
-        <div aria-label={`${habits.length} habit auroras`} className={`relative ${isStory ? "mt-1 h-56 overflow-visible" : "h-48 overflow-hidden rounded-[24px] border border-white/10 bg-black/10 shadow-[inset_0_0_30px_rgba(0,0,0,.18)]"}`}>
+        <div aria-label={`${habits.length} habit auroras`} className={`relative ${isStory ? "mt-1 h-52 overflow-visible" : "h-48 overflow-hidden rounded-[24px] border border-white/10 bg-black/10 shadow-[inset_0_0_30px_rgba(0,0,0,.18)]"}`}>
           <div className="absolute inset-x-[-12%] top-[20%] h-[28%] -rotate-[7deg] rounded-[50%] opacity-85 blur-[9px]" style={{ background: "linear-gradient(90deg,transparent,color-mix(in srgb,var(--chart-green) 72%,transparent),color-mix(in srgb,var(--chart-primary) 84%,transparent),color-mix(in srgb,var(--chart-blue) 66%,transparent),transparent)", boxShadow: "0 0 30px color-mix(in srgb,var(--chart-primary) 42%,transparent)" }} />
           <div className="absolute inset-x-[-15%] top-[50%] h-[18%] rotate-[6deg] rounded-[50%] opacity-65 blur-[7px]" style={{ background: "linear-gradient(90deg,transparent,color-mix(in srgb,var(--chart-blue) 78%,transparent),color-mix(in srgb,var(--chart-rust) 72%,transparent),transparent)" }} />
           <div className="absolute left-1/2 top-1/2 size-24 -translate-x-1/2 -translate-y-1/2 rounded-full p-[3px] shadow-[0_0_18px_var(--chart-primary),0_0_48px_color-mix(in_srgb,var(--chart-primary)_55%,transparent)]" style={{ background: `conic-gradient(var(--chart-primary) ${consistency * 3.6}deg,rgba(255,255,255,.13) 0deg)` }}><div className="grid size-full place-items-center rounded-full border border-white/12 bg-[color-mix(in_srgb,var(--chart-deep)_86%,transparent)] backdrop-blur-sm"><span className="size-2.5 rounded-full bg-white shadow-[0_0_8px_white,0_0_24px_var(--chart-primary)]" /></div></div>
@@ -64,6 +64,11 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
         <div className="border-x border-white/20"><p className="text-2xl font-semibold tracking-[-.06em]">{habits.length}</p><p className="mt-1 text-[7px] font-semibold uppercase tracking-[.11em] text-white/72">aurora ribbons</p></div>
         <div><p className="text-2xl font-semibold tracking-[-.06em]">{completedQuests.length}</p><p className="mt-1 text-[7px] font-semibold uppercase tracking-[.11em] text-white/72">discoveries</p></div>
       </section>
+
+      {isStory && completedQuests.length > 0 && <section aria-label="Completed quest symbols" className="mt-4 flex items-center justify-center gap-6 text-[color-mix(in_srgb,var(--chart-primary)_70%,white)]">
+        {completedQuests.slice(0, 4).map((quest) => <ActivityIcon activity={quest} className="size-5 drop-shadow-[0_0_7px_var(--chart-primary)]" key={quest} />)}
+        {completedQuests.length > 4 && <span className="text-[8px] font-black tracking-[.1em] text-white/72">+{completedQuests.length - 4}</span>}
+      </section>}
 
       {!isStory && <section className="mt-5">
         <div className="flex items-end justify-between"><p className="text-[8px] font-black uppercase tracking-[.18em] text-[color-mix(in_srgb,var(--chart-primary)_72%,white)]">Constellations discovered</p><p className="text-[7px] font-semibold uppercase tracking-[.11em] text-white/65">{completedQuests.length} mapped</p></div>

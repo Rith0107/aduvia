@@ -38,6 +38,7 @@ describe("AuroraSkyPreview", () => {
 
     expect(screen.getByLabelText("Aurora Sky share preview")).toBeInTheDocument();
     expect(screen.getByLabelText("3 habit auroras")).toBeInTheDocument();
+    expect(screen.getByLabelText("Completed quest symbols")).toBeInTheDocument();
     expect(screen.queryByText("Constellations discovered")).not.toBeInTheDocument();
     expect(screen.queryByText("Hiked Stone Mountain")).not.toBeInTheDocument();
     expect(screen.getByText("A month written in light.")).toBeInTheDocument();
