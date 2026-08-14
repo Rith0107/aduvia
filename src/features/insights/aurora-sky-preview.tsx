@@ -21,7 +21,7 @@ const ribbonColors = ["var(--chart-primary)", "var(--chart-blue)", "var(--chart-
 
 export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, format, habits, monthName, year }: AuroraSkyPreviewProps) {
   const isStory = format === "story";
-  const visibleQuests = completedQuests.slice(0, isStory ? 3 : 4);
+  const visibleQuests = completedQuests.slice(0, 4);
   const remainingQuests = Math.max(0, completedQuests.length - visibleQuests.length);
   const shell = isStory ? "aspect-[9/16] w-full max-w-[310px]" : "aspect-square w-full max-w-[560px]";
 
@@ -45,7 +45,7 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
           {!isStory && <p className="mt-4 max-w-[155px] text-[10px] font-medium leading-4 text-white/82">Your month left a calm signal in the sky.</p>}
         </div>
 
-        <div aria-label={`${habits.length} habit auroras`} className={`relative overflow-hidden rounded-[24px] border border-white/10 bg-black/10 shadow-[inset_0_0_30px_rgba(0,0,0,.18)] ${isStory ? "mt-3 h-32" : "h-48"}`}>
+        <div aria-label={`${habits.length} habit auroras`} className={`relative overflow-hidden ${isStory ? "mt-3 h-44" : "h-48 rounded-[24px] border border-white/10 bg-black/10 shadow-[inset_0_0_30px_rgba(0,0,0,.18)]"}`}>
           <div className="absolute inset-x-[-12%] top-[20%] h-[28%] -rotate-[7deg] rounded-[50%] opacity-85 blur-[9px]" style={{ background: "linear-gradient(90deg,transparent,color-mix(in srgb,var(--chart-green) 72%,transparent),color-mix(in srgb,var(--chart-primary) 84%,transparent),color-mix(in srgb,var(--chart-blue) 66%,transparent),transparent)", boxShadow: "0 0 30px color-mix(in srgb,var(--chart-primary) 42%,transparent)" }} />
           <div className="absolute inset-x-[-15%] top-[50%] h-[18%] rotate-[6deg] rounded-[50%] opacity-65 blur-[7px]" style={{ background: "linear-gradient(90deg,transparent,color-mix(in srgb,var(--chart-blue) 78%,transparent),color-mix(in srgb,var(--chart-rust) 72%,transparent),transparent)" }} />
           <div className="absolute left-1/2 top-1/2 size-24 -translate-x-1/2 -translate-y-1/2 rounded-full p-[3px] shadow-[0_0_18px_var(--chart-primary),0_0_48px_color-mix(in_srgb,var(--chart-primary)_55%,transparent)]" style={{ background: `conic-gradient(var(--chart-primary) ${consistency * 3.6}deg,rgba(255,255,255,.13) 0deg)` }}><div className="grid size-full place-items-center rounded-full border border-white/12 bg-[color-mix(in_srgb,var(--chart-deep)_86%,transparent)] backdrop-blur-sm"><span className="size-2.5 rounded-full bg-white shadow-[0_0_8px_white,0_0_24px_var(--chart-primary)]" /></div></div>
@@ -62,10 +62,10 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
         <div><p className="text-2xl font-semibold tracking-[-.06em]">{completedQuests.length}</p><p className="mt-1 text-[7px] font-semibold uppercase tracking-[.11em] text-white/72">discoveries</p></div>
       </section>
 
-      <section className={`${isStory ? "mt-3" : "mt-5"}`}>
+      {!isStory && <section className="mt-5">
         <div className="flex items-end justify-between"><p className="text-[8px] font-black uppercase tracking-[.18em] text-[color-mix(in_srgb,var(--chart-primary)_72%,white)]">Constellations discovered</p><p className="text-[7px] font-semibold uppercase tracking-[.11em] text-white/65">{completedQuests.length} mapped</p></div>
         <div className={`${isStory ? "mt-2 space-y-1.5" : "mt-3 grid grid-cols-2 gap-x-5 gap-y-2"}`}>{visibleQuests.length ? visibleQuests.map((quest) => <div className="grid grid-cols-[29px_1fr] items-center gap-2" key={quest}><span className={`${isStory ? "size-6" : "size-7"} grid place-items-center rounded-full border border-white/40 bg-[var(--chart-primary)]/20 text-white shadow-[0_0_8px_var(--chart-primary),0_0_22px_color-mix(in_srgb,var(--chart-primary)_55%,transparent)]`}><ActivityIcon activity={quest} className="size-4" /></span><p className="line-clamp-2 border-b border-white/25 pb-1.5 text-[8px] font-bold uppercase leading-tight text-white/95">{toAchievementTitle(quest)}</p></div>) : <p className="text-sm font-semibold text-white/82">The next constellation is still forming.</p>}{remainingQuests > 0 && <p className="col-span-full pt-1 text-[8px] font-bold uppercase tracking-[.11em] text-[color-mix(in_srgb,var(--chart-primary)_72%,white)]">+{remainingQuests} more discover{remainingQuests === 1 ? "y" : "ies"}</p>}</div>
-      </section>
+      </section>}
 
       <footer className={`absolute ${isStory ? "inset-x-5 bottom-3" : "inset-x-7 bottom-4"} flex items-end justify-between border-t border-white/16 bg-[linear-gradient(180deg,transparent_0%,rgba(7,19,29,.72)_35%)] pt-2 text-[7px] font-semibold uppercase tracking-[.14em] text-white/72`}><span>A month written in light.</span><span className="text-xl font-black tracking-[-.08em] text-white/95">A.</span></footer>
     </div>

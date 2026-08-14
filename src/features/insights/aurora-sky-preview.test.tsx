@@ -23,13 +23,23 @@ const props = {
 };
 
 describe("AuroraSkyPreview", () => {
-  it.each(["square", "story"] as const)("renders the %s composition with achievement copy", (format) => {
-    render(<AuroraSkyPreview {...props} format={format} />);
+  it("renders the square composition with achievement copy", () => {
+    render(<AuroraSkyPreview {...props} format="square" />);
 
     expect(screen.getByLabelText("Aurora Sky share preview")).toBeInTheDocument();
     expect(screen.getByText("87")).toBeInTheDocument();
     expect(screen.getByText("Hiked Stone Mountain")).toBeInTheDocument();
     expect(screen.getByText("Published my portfolio")).toBeInTheDocument();
+    expect(screen.getByText("A month written in light.")).toBeInTheDocument();
+  });
+
+  it("keeps the story focused on the galaxy and omits the discovery list", () => {
+    render(<AuroraSkyPreview {...props} format="story" />);
+
+    expect(screen.getByLabelText("Aurora Sky share preview")).toBeInTheDocument();
+    expect(screen.getByLabelText("3 habit auroras")).toBeInTheDocument();
+    expect(screen.queryByText("Constellations discovered")).not.toBeInTheDocument();
+    expect(screen.queryByText("Hiked Stone Mountain")).not.toBeInTheDocument();
     expect(screen.getByText("A month written in light.")).toBeInTheDocument();
   });
 });
