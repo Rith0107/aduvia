@@ -6,6 +6,8 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 export const maxDuration = 60;
 export const runtime = "nodejs";
 
+chromium.setGraphicsMode = false;
+
 const MAX_SVG_LENGTH = 4_000_000;
 
 function validDimension(value: unknown): value is number {
@@ -23,10 +25,10 @@ export async function POST(request: Request) {
   }
 
   const browser = await puppeteer.launch({
-    args: chromium.args,
+    args: await puppeteer.defaultArgs({ args: chromium.args, headless: "shell" }),
     defaultViewport: { deviceScaleFactor: 1, height: body.height, width: body.width },
     executablePath: await chromium.executablePath(),
-    headless: true,
+    headless: "shell",
   });
 
   try {
