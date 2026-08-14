@@ -3,7 +3,7 @@ import puppeteer from "puppeteer-core";
 
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 export const runtime = "nodejs";
 
 const MAX_SVG_LENGTH = 4_000_000;
@@ -31,8 +31,14 @@ export async function POST(request: Request) {
 
   try {
     const page = await browser.newPage();
-    await page.setContent(`<!doctype html><html><head><meta charset="utf-8"><style>*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden;background:transparent}img{display:block;width:100%;height:100%}</style></head><body><img alt="" src=${JSON.stringify(body.svg)}></body></html>`, { waitUntil: "load" });
-    await page.$eval("img", (image) => image.decode());
+    await page.setContent(`<!doctype html><html><head><meta charset="utf-8"><style>*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden;background:transparent}img{display:block;width:100%;height:100%}</style></head><body><img alt="" src=${JSON.stringify(body.svg)}></body></html>`, { waitUntil: "domcontentloaded" });
+    await page.$eval("img", async (image) => {
+      if (image.complete) return;
+      await Promise.race([
+        image.decode().catch(() => undefined),
+        new Promise<void>((resolve) => setTimeout(resolve, 10_000)),
+      ]);
+    });
     await page.evaluate(() => document.fonts.ready);
     const png = await page.screenshot({ captureBeyondViewport: false, omitBackground: true, type: "png" });
     return new Response(Buffer.from(png), {
