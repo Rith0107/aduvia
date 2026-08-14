@@ -33,6 +33,8 @@ describe("MonthlyReport", () => {
     expect(passport).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("article", { name: "Rhythm Passport share preview" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Month Cover" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Afterglow Ticket" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Quiet Ledger" })).toBeInTheDocument();
   });
 
   it("uses the calendar day count when changing months", () => {
