@@ -19,10 +19,12 @@ type AuroraSkyPreviewProps = {
   year: number;
 };
 
-function paintAuroraGalaxy(isStory: boolean, consistency: number, habits: AuroraHabit[]) {
+const ribbonColors = ["var(--chart-primary)", "var(--chart-blue)", "var(--chart-green)", "var(--chart-rust)"];
+
+function paintAuroraRibbons(isStory: boolean) {
   const canvas = document.createElement("canvas");
   canvas.width = 1080;
-  canvas.height = 720;
+  canvas.height = isStory ? 1920 : 1080;
   const context = canvas.getContext("2d");
   if (!context) return "";
 
@@ -58,73 +60,10 @@ function paintAuroraGalaxy(isStory: boolean, consistency: number, habits: Aurora
     context!.restore();
   }
 
-  const centerX = canvas.width / 2;
-  const centerY = height / 2;
-  drawRibbon({ bend: height * .22, colors: [colors.green, colors.primary, colors.blue], lineWidth: isStory ? 210 : 170, opacity: .42, y: centerY - 28 });
-  drawRibbon({ bend: -height * .17, colors: [colors.blue, colors.rust, colors.primary], lineWidth: isStory ? 130 : 104, opacity: .34, y: centerY + 32 });
-  drawRibbon({ bend: height * .14, colors: [colors.green, colors.blue, colors.primary], lineWidth: isStory ? 72 : 62, opacity: .5, y: centerY + 4 });
-
-  const orbitColors = [colors.primary, colors.blue, colors.green, colors.rust];
-  habits.slice(0, 4).forEach((habit, index) => {
-    const radiusX = 250 + index * 54;
-    const radiusY = 92 + index * 12;
-    const angle = (index * 23 - 34) * Math.PI / 180;
-    context.save();
-    context.translate(centerX, centerY);
-    context.rotate(angle);
-    context.globalAlpha = .8;
-    context.strokeStyle = orbitColors[index];
-    context.lineWidth = 4;
-    context.shadowBlur = 13 + index * 3;
-    context.shadowColor = orbitColors[index];
-    context.beginPath();
-    context.ellipse(0, 0, radiusX, radiusY, 0, 0, Math.PI * 2);
-    context.stroke();
-
-    const markerCount = Math.min(8, Math.max(3, habit.completedDays));
-    for (let markerIndex = 0; markerIndex < markerCount; markerIndex += 1) {
-      const markerAngle = ((markerIndex + 1) / (markerCount + 1)) * Math.PI * 2;
-      const x = Math.cos(markerAngle) * radiusX;
-      const y = Math.sin(markerAngle) * radiusY;
-      context.globalAlpha = .54 + markerIndex / markerCount * .42;
-      context.fillStyle = "#ffffff";
-      context.shadowBlur = 14;
-      context.shadowColor = colors.primary;
-      context.beginPath();
-      context.arc(x, y, 7, 0, Math.PI * 2);
-      context.fill();
-    }
-    context.restore();
-  });
-
-  context.save();
-  context.translate(centerX, centerY);
-  context.lineWidth = 15;
-  context.strokeStyle = "rgba(255,255,255,.14)";
-  context.beginPath();
-  context.arc(0, 0, 116, 0, Math.PI * 2);
-  context.stroke();
-  context.strokeStyle = colors.primary;
-  context.shadowBlur = 26;
-  context.shadowColor = colors.primary;
-  context.beginPath();
-  context.arc(0, 0, 116, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.max(0, Math.min(100, consistency)) / 100);
-  context.stroke();
-  const core = context.createRadialGradient(0, 0, 0, 0, 0, 104);
-  core.addColorStop(0, "rgba(255,255,255,.18)");
-  core.addColorStop(1, "rgba(3,12,22,.88)");
-  context.fillStyle = core;
-  context.shadowBlur = 0;
-  context.beginPath();
-  context.arc(0, 0, 104, 0, Math.PI * 2);
-  context.fill();
-  context.fillStyle = "#ffffff";
-  context.shadowBlur = 34;
-  context.shadowColor = "#ffffff";
-  context.beginPath();
-  context.arc(0, 0, 13, 0, Math.PI * 2);
-  context.fill();
-  context.restore();
+  const center = height * (isStory ? .49 : .5);
+  drawRibbon({ bend: height * .085, colors: [colors.green, colors.primary, colors.blue], lineWidth: isStory ? 210 : 150, opacity: .42, y: center - height * .035 });
+  drawRibbon({ bend: -height * .06, colors: [colors.blue, colors.rust, colors.primary], lineWidth: isStory ? 130 : 92, opacity: .34, y: center + height * .035 });
+  drawRibbon({ bend: height * .055, colors: [colors.green, colors.blue, colors.primary], lineWidth: isStory ? 72 : 56, opacity: .5, y: center + height * .005 });
 
   return canvas.toDataURL("image/png");
 }
@@ -132,7 +71,7 @@ function paintAuroraGalaxy(isStory: boolean, consistency: number, habits: Aurora
 export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, format, habits, monthName, year }: AuroraSkyPreviewProps) {
   const artworkRef = useRef<HTMLElement>(null);
   const [rasterUrl, setRasterUrl] = useState("");
-  const [galaxyImage, setGalaxyImage] = useState("");
+  const [ribbonImage, setRibbonImage] = useState("");
   const [paletteRevision, setPaletteRevision] = useState(0);
   const isStory = format === "story";
   const visibleQuests = completedQuests.slice(0, 4);
@@ -150,16 +89,16 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
 
   useEffect(() => {
     if (process.env.NODE_ENV === "test") return;
-    const frame = requestAnimationFrame(() => setGalaxyImage(paintAuroraGalaxy(isStory, consistency, habits)));
+    const frame = requestAnimationFrame(() => setRibbonImage(paintAuroraRibbons(isStory)));
     return () => cancelAnimationFrame(frame);
-  }, [consistency, habits, isStory, paletteRevision]);
+  }, [isStory, paletteRevision]);
 
   useEffect(() => {
     if (process.env.NODE_ENV === "test") return;
     let active = true;
     let nextUrl = "";
     const artwork = artworkRef.current;
-    if (!artwork || !galaxyImage) return;
+    if (!artwork || !ribbonImage) return;
 
     async function createMatchingRaster() {
       await document.fonts?.ready;
@@ -191,13 +130,16 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
       active = false;
       if (nextUrl) URL.revokeObjectURL(nextUrl);
     };
-  }, [completedQuests, consistency, daysShownUp, galaxyImage, habits, isStory, monthName, paletteRevision, year]);
+  }, [completedQuests, consistency, daysShownUp, habits, isStory, monthName, paletteRevision, ribbonImage, year]);
 
   return <div className={`${shell} relative`}>
   <article aria-label={rasterUrl ? undefined : "Aurora Sky share preview"} className="absolute inset-0 overflow-hidden rounded-[26px] border border-white/25 bg-[linear-gradient(155deg,color-mix(in_srgb,var(--chart-deep)_78%,#07131d)_0%,color-mix(in_srgb,var(--chart-deep)_72%,#081827)_54%,color-mix(in_srgb,var(--chart-deep)_46%,#09111f)_100%)] text-white shadow-[0_28px_70px_rgba(3,10,18,.42),inset_0_0_0_1px_rgba(255,255,255,.06)]" ref={artworkRef}>
     <div className="absolute inset-0 opacity-65" style={{ backgroundImage: "radial-gradient(circle at 7% 5%, color-mix(in srgb,var(--chart-green) 42%,transparent),transparent 27%), radial-gradient(circle at 92% 72%, color-mix(in srgb,var(--chart-blue) 44%,transparent),transparent 41%), radial-gradient(circle at 48% 48%, color-mix(in srgb,var(--chart-primary) 10%,transparent),transparent 37%)" }} />
     <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,8,15,.04),rgba(2,8,15,.22))]" />
     <div className={`absolute inset-0 ${isStory ? "opacity-55" : "opacity-28"}`} style={{ backgroundImage: starField, backgroundSize: isStory ? "100% 100%" : "29px 29px" }} />
+    {/* eslint-disable-next-line @next/next/no-img-element */}
+    {ribbonImage && <img alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 size-full object-fill" data-aurora-ribbons="bitmap" src={ribbonImage} />}
+
     <div className={`relative flex h-full flex-col ${isStory ? "px-5 pb-10 pt-5" : "px-7 pb-14 pt-7"}`}>
       <header className="flex items-start justify-between border-b border-white/25 pb-3">
         <div><p className="text-[9px] font-black uppercase tracking-[.21em] text-[color-mix(in_srgb,var(--chart-primary)_72%,white)]">Aduvia · {monthName} sky</p><p className="mt-1 text-[7px] font-medium uppercase tracking-[.15em] text-white/70">Monthly light record</p></div>
@@ -211,10 +153,12 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
           {!isStory && <p className="mt-4 max-w-[155px] text-[10px] font-medium leading-4 text-white/82">Your month left a calm signal in the sky.</p>}
         </div>
 
-        <div aria-label={`${habits.length} habit auroras`} className={`relative ${isStory ? "mt-1 h-48 overflow-visible" : "h-48 overflow-hidden rounded-[24px] border border-white/10 bg-black/10"}`}>
-          {/* The whole glow is already flattened. Safari never has to composite transformed filtered layers inside SVG foreignObject. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          {galaxyImage && <img alt="" aria-hidden="true" className="absolute inset-0 size-full object-fill" data-aurora-galaxy="bitmap" src={galaxyImage} />}
+        <div aria-label={`${habits.length} habit auroras`} className={`relative ${isStory ? "mt-1 h-48 overflow-visible" : "h-48 overflow-hidden rounded-[24px] border border-white/10 bg-black/10 shadow-[inset_0_0_30px_rgba(0,0,0,.18)]"}`}>
+          <div className="absolute left-1/2 top-1/2 size-24 -translate-x-1/2 -translate-y-1/2 rounded-full p-[3px] shadow-[0_0_18px_var(--chart-primary),0_0_48px_color-mix(in_srgb,var(--chart-primary)_55%,transparent)]" style={{ background: `conic-gradient(var(--chart-primary) ${consistency * 3.6}deg,rgba(255,255,255,.13) 0deg)` }}><div className="grid size-full place-items-center rounded-full border border-white/12 bg-[color-mix(in_srgb,var(--chart-deep)_86%,transparent)] backdrop-blur-sm"><span className="size-2.5 rounded-full bg-white shadow-[0_0_8px_white,0_0_24px_var(--chart-primary)]" /></div></div>
+          {habits.slice(0, 4).map((habit, index) => {
+            const markerCount = Math.min(8, Math.max(3, habit.completedDays));
+            return <div className="absolute left-1/2 top-1/2 h-[32%] rounded-[50%] border opacity-75" key={habit.name} style={{ borderColor: ribbonColors[index], boxShadow: `0 0 ${7 + index * 3}px ${ribbonColors[index]}`, transform: `translate(-50%,-50%) rotate(${index * 23 - 34}deg)`, width: `${56 + index * 12}%` }}>{Array.from({ length: markerCount }, (_, markerIndex) => { const position = (markerIndex + 1) / (markerCount + 1) * 100; return <i className="absolute size-1.5 rounded-full bg-white shadow-[0_0_7px_white,0_0_15px_var(--chart-primary)]" key={markerIndex} style={{ left: `${position}%`, opacity: .5 + markerIndex / markerCount * .5, top: markerIndex % 2 ? "4%" : "92%" }} />; })}</div>;
+          })}
         </div>
       </section>
 
@@ -225,7 +169,7 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
       </section>
 
       {isStory && completedQuests.length > 0 && <section aria-label="Completed quest symbols" className="mt-2 flex h-8 items-center justify-center gap-6 text-[color-mix(in_srgb,var(--chart-primary)_70%,white)]">
-        {completedQuests.slice(0, 4).map((quest) => <ActivityIcon activity={quest} className="size-5" key={quest} />)}
+        {completedQuests.slice(0, 4).map((quest) => <ActivityIcon activity={quest} className="size-5 drop-shadow-[0_0_7px_var(--chart-primary)]" key={quest} />)}
         {completedQuests.length > 4 && <span className="text-[8px] font-black tracking-[.1em] text-white/72">+{completedQuests.length - 4}</span>}
       </section>}
 
