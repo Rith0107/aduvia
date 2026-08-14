@@ -77,7 +77,7 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
     <div className="absolute inset-[4%] opacity-25" style={{ backgroundImage: "radial-gradient(ellipse 58% 32% at 8% 8%,var(--chart-green) 0%,transparent 72%),radial-gradient(ellipse 60% 38% at 92% 74%,var(--chart-blue) 0%,transparent 75%)" }} />
     <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,8,15,.04),rgba(2,8,15,.22))]" />
     <div className={`absolute inset-0 ${isStory ? "opacity-55" : "opacity-28"}`} style={{ backgroundImage: starField, backgroundSize: isStory ? "100% 100%" : "29px 29px" }} />
-    <div className="absolute inset-x-[10%] top-[31%] h-[24%] opacity-28" style={{ backgroundImage: "radial-gradient(ellipse 72% 30% at 30% 44%,var(--chart-green) 0%,transparent 72%),radial-gradient(ellipse 68% 28% at 70% 60%,var(--chart-primary) 0%,transparent 74%),radial-gradient(ellipse 56% 28% at 80% 30%,var(--chart-blue) 0%,transparent 72%)" }} />
+    <div className="absolute inset-x-0 top-[31%] h-[24%] opacity-32" style={{ backgroundImage: "radial-gradient(ellipse 82% 30% at 18% 44%,var(--chart-green) 0%,transparent 74%),radial-gradient(ellipse 80% 28% at 72% 60%,var(--chart-primary) 0%,transparent 76%),radial-gradient(ellipse 68% 28% at 94% 30%,var(--chart-blue) 0%,transparent 74%)" }} />
 
     <div className={`relative flex h-full flex-col ${isStory ? "px-5 pb-10 pt-5" : "px-7 pb-14 pt-7"}`}>
       <header className="flex items-start justify-between border-b border-white/25 pb-3">
