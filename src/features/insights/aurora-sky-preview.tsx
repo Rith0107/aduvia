@@ -32,7 +32,7 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
     <div className="absolute -left-[18%] top-[31%] h-[18%] w-[140%] -rotate-[8deg] rounded-[50%] opacity-75 blur-[15px]" style={{ background: "linear-gradient(90deg,transparent,color-mix(in srgb,var(--chart-green) 72%,transparent),color-mix(in srgb,var(--chart-primary) 78%,transparent),color-mix(in srgb,var(--chart-blue) 62%,transparent),transparent)", boxShadow: "0 0 42px color-mix(in srgb,var(--chart-primary) 52%,transparent)" }} />
     <div className="absolute -left-[22%] top-[38%] h-[10%] w-[145%] rotate-[5deg] rounded-[50%] opacity-55 blur-[10px]" style={{ background: "linear-gradient(90deg,transparent,color-mix(in srgb,var(--chart-blue) 75%,transparent),color-mix(in srgb,var(--chart-rust) 70%,transparent),transparent)" }} />
 
-    <div className={`relative flex h-full flex-col ${isStory ? "px-5 pb-12 pt-7" : "p-7"}`}>
+    <div className={`relative flex h-full flex-col ${isStory ? "px-5 pb-12 pt-7" : "px-7 pb-14 pt-7"}`}>
       <header className="flex items-start justify-between border-b border-white/25 pb-3">
         <div><p className="text-[9px] font-black uppercase tracking-[.21em] text-[color-mix(in_srgb,var(--chart-primary)_72%,white)]">Aduvia · {monthName} sky</p><p className="mt-1 text-[7px] font-medium uppercase tracking-[.15em] text-white/70">Monthly light record</p></div>
         <p className="text-right text-[8px] font-bold uppercase tracking-[.12em] text-white/88">{monthName}<br />{year}</p>
@@ -67,7 +67,7 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
         <div className={`${isStory ? "mt-3 space-y-2" : "mt-3 grid grid-cols-2 gap-x-5 gap-y-2"}`}>{visibleQuests.length ? visibleQuests.map((quest) => <div className="grid grid-cols-[29px_1fr] items-center gap-2" key={quest}><span className="grid size-7 place-items-center rounded-full border border-white/40 bg-[var(--chart-primary)]/20 text-white shadow-[0_0_8px_var(--chart-primary),0_0_22px_color-mix(in_srgb,var(--chart-primary)_55%,transparent)]"><ActivityIcon activity={quest} className="size-4" /></span><p className="line-clamp-2 border-b border-white/25 pb-1.5 text-[8px] font-bold uppercase leading-tight text-white/95">{toAchievementTitle(quest)}</p></div>) : <p className="text-sm font-semibold text-white/82">The next constellation is still forming.</p>}{remainingQuests > 0 && <p className="col-span-full pt-1 text-[8px] font-bold uppercase tracking-[.11em] text-[color-mix(in_srgb,var(--chart-primary)_72%,white)]">+{remainingQuests} more discover{remainingQuests === 1 ? "y" : "ies"}</p>}</div>
       </section>
 
-      <footer className={`${isStory ? "absolute inset-x-5 bottom-5" : "mt-auto"} flex items-end justify-between border-t border-white/16 pt-2 text-[7px] font-semibold uppercase tracking-[.14em] text-white/72`}><span>A month written in light.</span><span className="text-xl font-black tracking-[-.08em] text-white/95">A.</span></footer>
+      <footer className={`absolute bottom-4 ${isStory ? "inset-x-5" : "inset-x-7"} flex items-end justify-between border-t border-white/16 bg-[linear-gradient(180deg,transparent_0%,rgba(7,19,29,.72)_35%)] pt-3 text-[7px] font-semibold uppercase tracking-[.14em] text-white/72`}><span>A month written in light.</span><span className="text-xl font-black tracking-[-.08em] text-white/95">A.</span></footer>
     </div>
   </article>;
 }
