@@ -43,5 +43,7 @@ describe("AuroraSkyPreview", () => {
     expect(screen.queryByText("Hiked Stone Mountain")).not.toBeInTheDocument();
     expect(screen.getByText("A month written in light.")).toBeInTheDocument();
     expect(container.querySelector("feGaussianBlur")).not.toBeInTheDocument();
+    expect(container.querySelector('[style*="box-shadow"]')).not.toBeInTheDocument();
+    expect(container.querySelector("i")).not.toBeInTheDocument();
   });
 });
