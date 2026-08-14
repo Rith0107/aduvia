@@ -67,6 +67,20 @@ function errorMessage(error: unknown, fallback: string) {
   return fallback;
 }
 
+// A tab left open across a sleep or a long idle period can hold an access
+// token that expired before its background refresh timer ever fired. A
+// write sent with that token isn't rejected outright — PostgREST evaluates
+// auth.uid() as if the request were unauthenticated, so it silently fails
+// "row violates row-level security policy" instead of a clean 401. Forcing
+// a refresh here whenever the token is near or past expiry avoids that.
+async function ensureFreshSession(supabase: ReturnType<typeof createBrowserSupabaseClient>) {
+  const { data } = await supabase.auth.getSession();
+  const expiresAt = data.session?.expires_at;
+  if (expiresAt && expiresAt * 1000 - Date.now() < 60_000) {
+    await supabase.auth.refreshSession();
+  }
+}
+
 function scheduleForRemote(habit: HabitSummary) {
   if (habit.frequency === "Daily") return { type: "daily" };
   if (habit.frequency === "Weekdays") return { type: "weekdays", days: [1, 2, 3, 4, 5] };
@@ -344,9 +358,10 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
 
   async function applyPendingMutation(mutation: PendingMutation) {
     if (!remoteUserId) throw new Error("Your session is unavailable.");
+    const supabase = createBrowserSupabaseClient();
+    await ensureFreshSession(supabase);
     if (mutation.kind === "habits") return saveHabitsRemote(mutation.habits);
     if (mutation.kind === "quests") return saveQuestsRemote(mutation.quests);
-    const supabase = createBrowserSupabaseClient();
     if (mutation.kind === "reflection") {
       const { error } = await supabase.from("daily_reflections").upsert({ user_id: remoteUserId, reflection_date: mutation.date, note: mutation.note }, { onConflict: "user_id,reflection_date" });
       if (error) throw error;
@@ -462,7 +477,9 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       const cleanNote = note.trim();
       setReflections((current) => ({ ...current, [key]: cleanNote }));
       if (!remoteUserId) return true;
-      const { error } = await createBrowserSupabaseClient().from("daily_reflections").upsert({ user_id: remoteUserId, reflection_date: key, note: cleanNote }, { onConflict: "user_id,reflection_date" });
+      const supabase = createBrowserSupabaseClient();
+      await ensureFreshSession(supabase);
+      const { error } = await supabase.from("daily_reflections").upsert({ user_id: remoteUserId, reflection_date: key, note: cleanNote }, { onConflict: "user_id,reflection_date" });
       if (error) {
         queueMutation({ key: `reflection:${key}`, kind: "reflection", date: key, note: cleanNote });
         return false;
@@ -480,10 +497,11 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       });
       if (remoteUserId) {
         const supabase = createBrowserSupabaseClient();
-        const request = status === "pending"
-          ? supabase.from("habit_check_ins").delete().eq("habit_id", habitId).eq("scheduled_date", key)
-          : supabase.from("habit_check_ins").upsert({ user_id: remoteUserId, habit_id: habitId, scheduled_date: key, status: status === "complete" ? "complete" : "skipped", completion: status === "complete" ? 1 : 0, completed_at: status === "complete" ? new Date().toISOString() : null }, { onConflict: "habit_id,scheduled_date" });
         void (async () => {
+          await ensureFreshSession(supabase);
+          const request = status === "pending"
+            ? supabase.from("habit_check_ins").delete().eq("habit_id", habitId).eq("scheduled_date", key)
+            : supabase.from("habit_check_ins").upsert({ user_id: remoteUserId, habit_id: habitId, scheduled_date: key, status: status === "complete" ? "complete" : "skipped", completion: status === "complete" ? 1 : 0, completed_at: status === "complete" ? new Date().toISOString() : null }, { onConflict: "habit_id,scheduled_date" });
           const result = await request;
           const mutationKey = `check-in:${key}:${habitId}`;
           if (result.error) queueMutation({ key: mutationKey, kind: "check-in", habitId, date: key, status });
