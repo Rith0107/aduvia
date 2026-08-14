@@ -23,6 +23,7 @@ const ribbonColors = ["var(--chart-primary)", "var(--chart-blue)", "var(--chart-
 
 export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, format, habits, monthName, year }: AuroraSkyPreviewProps) {
   const artworkRef = useRef<HTMLElement>(null);
+  const [rasterError, setRasterError] = useState("");
   const [rasterUrl, setRasterUrl] = useState("");
   const [paletteRevision, setPaletteRevision] = useState(0);
   const isStory = format === "story";
@@ -61,7 +62,10 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
         headers: { "content-type": "application/json" },
         method: "POST",
       });
-      if (!response.ok) throw new Error("Could not render the Aurora share image.");
+      if (!response.ok) {
+        const details = await response.text();
+        throw new Error(`Aurora renderer returned ${response.status}: ${details}`);
+      }
       const blob = await response.blob();
       if (!active) return;
       nextUrl = URL.createObjectURL(blob);
@@ -75,7 +79,10 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
       if (currentUrl) URL.revokeObjectURL(currentUrl);
       return "";
     });
-    void createMatchingRaster().catch(() => undefined);
+    setRasterError("");
+    void createMatchingRaster().catch((error: unknown) => {
+      setRasterError(error instanceof Error ? error.message : "Aurora renderer failed.");
+    });
 
     return () => {
       active = false;
@@ -83,7 +90,7 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
     };
   }, [completedQuests, consistency, daysShownUp, habits, isStory, monthName, paletteRevision, year]);
 
-  return <div className={`${shell} relative`}>
+  return <div className={`${shell} relative`} data-share-error={rasterError || undefined}>
   <article aria-label={rasterUrl ? undefined : "Aurora Sky share preview"} className="absolute inset-0 overflow-hidden rounded-[26px] border border-white/25 bg-[linear-gradient(155deg,color-mix(in_srgb,var(--chart-deep)_78%,#07131d)_0%,color-mix(in_srgb,var(--chart-deep)_72%,#081827)_54%,color-mix(in_srgb,var(--chart-deep)_46%,#09111f)_100%)] text-white shadow-[0_28px_70px_rgba(3,10,18,.42),inset_0_0_0_1px_rgba(255,255,255,.06)]" ref={artworkRef} style={{ fontFamily: "Arial, Helvetica, sans-serif" }}>
     <div className="absolute inset-0 opacity-65" style={{ backgroundImage: "radial-gradient(circle at 7% 5%, color-mix(in srgb,var(--chart-green) 42%,transparent),transparent 27%), radial-gradient(circle at 92% 72%, color-mix(in srgb,var(--chart-blue) 44%,transparent),transparent 41%), radial-gradient(circle at 48% 48%, color-mix(in srgb,var(--chart-primary) 10%,transparent),transparent 37%)" }} />
     <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,8,15,.04),rgba(2,8,15,.22))]" />
