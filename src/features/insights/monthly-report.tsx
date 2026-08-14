@@ -145,6 +145,46 @@ function cardDimensions(format: ShareFormat) {
   return format === "story" ? { width: 1080, height: 1920 } : { width: 1080, height: 1080 };
 }
 
+async function renderPreviewElement(element: HTMLElement, format: ShareFormat) {
+  const sourceWidth = format === "story" ? 310 : 560;
+  const sourceHeight = format === "story" ? sourceWidth * 16 / 9 : sourceWidth;
+  const clone = element.cloneNode(true) as HTMLElement;
+  const sourceNodes = [element, ...Array.from(element.querySelectorAll<HTMLElement>("*"))];
+  const clonedNodes = [clone, ...Array.from(clone.querySelectorAll<HTMLElement>("*"))];
+
+  sourceNodes.forEach((source, index) => {
+    const target = clonedNodes[index];
+    const computed = getComputedStyle(source);
+    for (let propertyIndex = 0; propertyIndex < computed.length; propertyIndex += 1) {
+      const property = computed.item(propertyIndex);
+      target.style.setProperty(property, computed.getPropertyValue(property), computed.getPropertyPriority(property));
+    }
+  });
+  clone.style.width = `${sourceWidth}px`;
+  clone.style.height = `${sourceHeight}px`;
+  clone.style.maxWidth = "none";
+  clone.style.boxSizing = "border-box";
+
+  const markup = new XMLSerializer().serializeToString(clone);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${sourceWidth}" height="${sourceHeight}" viewBox="0 0 ${sourceWidth} ${sourceHeight}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml">${markup}</div></foreignObject></svg>`;
+  const imageUrl = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
+  try {
+    const image = new Image();
+    image.decoding = "sync";
+    await new Promise<void>((resolve, reject) => { image.onload = () => resolve(); image.onerror = () => reject(new Error("Could not render Month Cover.")); image.src = imageUrl; });
+    const { width, height } = cardDimensions(format);
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Canvas is unavailable.");
+    context.drawImage(image, 0, 0, width, height);
+    return await new Promise<Blob>((resolve, reject) => canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("Could not create image."))), "image/png"));
+  } finally {
+    URL.revokeObjectURL(imageUrl);
+  }
+}
+
 async function renderShareCard(format: ShareFormat, trim: ShareTrim, consistency: number, monthLabel: string, completedQuestTitles: string[], habits: ReportHabit[], daysShownUp: number) {
   const { width, height } = cardDimensions(format);
   const canvas = document.createElement("canvas");
@@ -518,8 +558,17 @@ export function MonthlyReport() {
     setFallbackHabits(createReportHabits(year, month));
   }
 
+  async function createShareBlob() {
+    if (shareTrim === "cover") {
+      const preview = document.querySelector<HTMLElement>('[aria-label="Month Cover share preview"]');
+      if (!preview) throw new Error("Month Cover preview is unavailable.");
+      return renderPreviewElement(preview, format);
+    }
+    return renderShareCard(format, shareTrim, overallConsistency, monthLabel, completedQuestTitles, habits, daysShownUp);
+  }
+
   async function downloadCard() {
-    const blob = await renderShareCard(format, shareTrim, overallConsistency, monthLabel, completedQuestTitles, habits, daysShownUp);
+    const blob = await createShareBlob();
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -530,7 +579,7 @@ export function MonthlyReport() {
   }
 
   async function shareCard() {
-    const blob = await renderShareCard(format, shareTrim, overallConsistency, monthLabel, completedQuestTitles, habits, daysShownUp);
+    const blob = await createShareBlob();
     const file = new File([blob], `aduvia-${monthName.toLowerCase()}-${reportMonth.year}-${format}.png`, { type: "image/png" });
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
       await navigator.share({ files: [file], title: "My Aduvia monthly report" });
