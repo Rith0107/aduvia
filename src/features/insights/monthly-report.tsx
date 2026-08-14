@@ -503,7 +503,10 @@ export function MonthlyReport() {
   const observedWeekdays = weekdayReport.filter((day) => day.sampleSize > 0);
   const bestDay = observedWeekdays.reduce((best, day) => day.score > best.score ? day : best, observedWeekdays[0] ?? { day: "–", name: "No data yet", score: 0, sampleSize: 0 });
   const daysShownUp = dailyConsistency.filter((point) => point.completed > 0).length;
-  const completedQuestTitles = appData ? appData.quests.filter((quest) => quest.status === "completed").map((quest) => quest.title) : fallbackCompletedQuests;
+  const completedQuestTitles = useMemo(
+    () => appData ? appData.quests.filter((quest) => quest.status === "completed").map((quest) => quest.title) : fallbackCompletedQuests,
+    [appData],
+  );
   const categoryBalance = useMemo(() => {
     const totals = habits.reduce<Record<string, number>>((result, habit) => {
       result[habit.category] = (result[habit.category] ?? 0) + habit.days.filter((day) => day === "done").length;
