@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { toBlob } from "html-to-image";
 import { ActivityIcon } from "@/components/activity-icon";
 
@@ -21,7 +21,37 @@ type AuroraSkyPreviewProps = {
 
 const ribbonColors = ["var(--chart-primary)", "var(--chart-blue)", "var(--chart-green)", "var(--chart-rust)"];
 
+function AuroraLightRibbons({ id, local = false }: { id: string; local?: boolean }) {
+  const primaryGradient = `${id}-primary`;
+  const secondaryGradient = `${id}-secondary`;
+  const broadGlow = `${id}-broad-glow`;
+  const softGlow = `${id}-soft-glow`;
+
+  return <svg aria-hidden="true" className="pointer-events-none absolute inset-0 size-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 100">
+    <defs>
+      <linearGradient id={primaryGradient} x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0" stopColor="var(--chart-green)" stopOpacity="0" />
+        <stop offset="0.2" stopColor="var(--chart-green)" stopOpacity=".72" />
+        <stop offset="0.5" stopColor="var(--chart-primary)" stopOpacity=".82" />
+        <stop offset="0.78" stopColor="var(--chart-blue)" stopOpacity=".66" />
+        <stop offset="1" stopColor="var(--chart-blue)" stopOpacity="0" />
+      </linearGradient>
+      <linearGradient id={secondaryGradient} x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0" stopColor="var(--chart-blue)" stopOpacity="0" />
+        <stop offset="0.25" stopColor="var(--chart-blue)" stopOpacity=".68" />
+        <stop offset="0.68" stopColor="var(--chart-rust)" stopOpacity=".68" />
+        <stop offset="1" stopColor="var(--chart-rust)" stopOpacity="0" />
+      </linearGradient>
+      <filter height="240%" id={broadGlow} width="150%" x="-25%" y="-70%"><feGaussianBlur stdDeviation={local ? "4.2" : "3.2"} /></filter>
+      <filter height="240%" id={softGlow} width="150%" x="-25%" y="-70%"><feGaussianBlur stdDeviation={local ? "2.9" : "2.2"} /></filter>
+    </defs>
+    <path d={local ? "M -12 43 C 20 17, 63 72, 112 30" : "M -12 42 C 20 25, 62 55, 112 34"} fill="none" filter={`url(#${broadGlow})`} opacity=".88" stroke={`url(#${primaryGradient})`} strokeLinecap="round" strokeWidth={local ? "17" : "13"} />
+    <path d={local ? "M -14 57 C 24 77, 69 32, 114 61" : "M -14 46 C 25 58, 69 31, 114 50"} fill="none" filter={`url(#${softGlow})`} opacity=".7" stroke={`url(#${secondaryGradient})`} strokeLinecap="round" strokeWidth={local ? "10" : "7"} />
+  </svg>;
+}
+
 export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, format, habits, monthName, year }: AuroraSkyPreviewProps) {
+  const ribbonId = useId().replaceAll(":", "");
   const artworkRef = useRef<HTMLElement>(null);
   const [rasterUrl, setRasterUrl] = useState("");
   const [paletteRevision, setPaletteRevision] = useState(0);
@@ -83,8 +113,7 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
     <div className="absolute inset-0 opacity-65" style={{ backgroundImage: "radial-gradient(circle at 7% 5%, color-mix(in srgb,var(--chart-green) 42%,transparent),transparent 27%), radial-gradient(circle at 92% 72%, color-mix(in srgb,var(--chart-blue) 44%,transparent),transparent 41%), radial-gradient(circle at 48% 48%, color-mix(in srgb,var(--chart-primary) 10%,transparent),transparent 37%)" }} />
     <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,8,15,.04),rgba(2,8,15,.22))]" />
     <div className={`absolute inset-0 ${isStory ? "opacity-55" : "opacity-28"}`} style={{ backgroundImage: starField, backgroundSize: isStory ? "100% 100%" : "29px 29px" }} />
-    <div className="absolute -left-[18%] top-[31%] h-[18%] w-[140%] -rotate-[8deg] rounded-[50%] opacity-75 blur-[15px]" style={{ background: "linear-gradient(90deg,transparent,color-mix(in srgb,var(--chart-green) 72%,transparent),color-mix(in srgb,var(--chart-primary) 78%,transparent),color-mix(in srgb,var(--chart-blue) 62%,transparent),transparent)", boxShadow: "0 0 42px color-mix(in srgb,var(--chart-primary) 52%,transparent)" }} />
-    <div className="absolute -left-[22%] top-[38%] h-[10%] w-[145%] rotate-[5deg] rounded-[50%] opacity-55 blur-[10px]" style={{ background: "linear-gradient(90deg,transparent,color-mix(in srgb,var(--chart-blue) 75%,transparent),color-mix(in srgb,var(--chart-rust) 70%,transparent),transparent)" }} />
+    <AuroraLightRibbons id={`${ribbonId}-card`} />
 
     <div className={`relative flex h-full flex-col ${isStory ? "px-5 pb-10 pt-5" : "px-7 pb-14 pt-7"}`}>
       <header className="flex items-start justify-between border-b border-white/25 pb-3">
@@ -100,8 +129,7 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
         </div>
 
         <div aria-label={`${habits.length} habit auroras`} className={`relative ${isStory ? "mt-1 h-48 overflow-visible" : "h-48 overflow-hidden rounded-[24px] border border-white/10 bg-black/10 shadow-[inset_0_0_30px_rgba(0,0,0,.18)]"}`}>
-          <div className="absolute inset-x-[-12%] top-[20%] h-[28%] -rotate-[7deg] rounded-[50%] opacity-85 blur-[9px]" style={{ background: "linear-gradient(90deg,transparent,color-mix(in srgb,var(--chart-green) 72%,transparent),color-mix(in srgb,var(--chart-primary) 84%,transparent),color-mix(in srgb,var(--chart-blue) 66%,transparent),transparent)", boxShadow: "0 0 30px color-mix(in srgb,var(--chart-primary) 42%,transparent)" }} />
-          <div className="absolute inset-x-[-15%] top-[50%] h-[18%] rotate-[6deg] rounded-[50%] opacity-65 blur-[7px]" style={{ background: "linear-gradient(90deg,transparent,color-mix(in srgb,var(--chart-blue) 78%,transparent),color-mix(in srgb,var(--chart-rust) 72%,transparent),transparent)" }} />
+          <AuroraLightRibbons id={`${ribbonId}-galaxy`} local />
           <div className="absolute left-1/2 top-1/2 size-24 -translate-x-1/2 -translate-y-1/2 rounded-full p-[3px] shadow-[0_0_18px_var(--chart-primary),0_0_48px_color-mix(in_srgb,var(--chart-primary)_55%,transparent)]" style={{ background: `conic-gradient(var(--chart-primary) ${consistency * 3.6}deg,rgba(255,255,255,.13) 0deg)` }}><div className="grid size-full place-items-center rounded-full border border-white/12 bg-[color-mix(in_srgb,var(--chart-deep)_86%,transparent)] backdrop-blur-sm"><span className="size-2.5 rounded-full bg-white shadow-[0_0_8px_white,0_0_24px_var(--chart-primary)]" /></div></div>
           {habits.slice(0, 4).map((habit, index) => {
             const markerCount = Math.min(8, Math.max(3, habit.completedDays));
