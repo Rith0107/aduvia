@@ -24,11 +24,14 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
   const visibleQuests = completedQuests.slice(0, 4);
   const remainingQuests = Math.max(0, completedQuests.length - visibleQuests.length);
   const shell = isStory ? "aspect-[9/16] w-full max-w-[310px]" : "aspect-square w-full max-w-[560px]";
+  const starField = isStory
+    ? "radial-gradient(circle at 9% 13%,rgba(255,255,255,.88) 0 1px,transparent 1.6px),radial-gradient(circle at 81% 8%,rgba(255,255,255,.62) 0 .8px,transparent 1.4px),radial-gradient(circle at 66% 24%,rgba(255,255,255,.82) 0 1.2px,transparent 1.8px),radial-gradient(circle at 24% 38%,rgba(255,255,255,.5) 0 .7px,transparent 1.3px),radial-gradient(circle at 92% 46%,rgba(255,255,255,.75) 0 1px,transparent 1.6px),radial-gradient(circle at 13% 59%,rgba(255,255,255,.68) 0 .9px,transparent 1.5px),radial-gradient(circle at 72% 69%,rgba(255,255,255,.55) 0 .7px,transparent 1.3px),radial-gradient(circle at 37% 81%,rgba(255,255,255,.78) 0 1px,transparent 1.6px),radial-gradient(circle at 88% 90%,rgba(255,255,255,.52) 0 .8px,transparent 1.4px)"
+    : "radial-gradient(circle,rgba(255,255,255,.88) 0 1px,transparent 1.5px)";
 
   return <article aria-label="Aurora Sky share preview" className={`${shell} relative overflow-hidden rounded-[26px] border border-white/25 bg-[linear-gradient(155deg,#07131d_0%,color-mix(in_srgb,var(--chart-deep)_72%,#081827)_54%,#09111f_100%)] text-white shadow-[0_28px_70px_rgba(3,10,18,.42),inset_0_0_0_1px_rgba(255,255,255,.06)]`}>
     <div className="absolute inset-0 opacity-65" style={{ backgroundImage: "radial-gradient(circle at 7% 5%, color-mix(in srgb,var(--chart-green) 42%,transparent),transparent 27%), radial-gradient(circle at 92% 72%, color-mix(in srgb,var(--chart-blue) 44%,transparent),transparent 41%), radial-gradient(circle at 48% 48%, color-mix(in srgb,var(--chart-primary) 10%,transparent),transparent 37%)" }} />
     <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,8,15,.04),rgba(2,8,15,.22))]" />
-    <div className="absolute inset-0 opacity-28" style={{ backgroundImage: "radial-gradient(circle,rgba(255,255,255,.88) 0 1px,transparent 1.5px)", backgroundSize: "29px 29px" }} />
+    <div className={`absolute inset-0 ${isStory ? "opacity-55" : "opacity-28"}`} style={{ backgroundImage: starField, backgroundSize: isStory ? "100% 100%" : "29px 29px" }} />
     <div className="absolute -left-[18%] top-[31%] h-[18%] w-[140%] -rotate-[8deg] rounded-[50%] opacity-75 blur-[15px]" style={{ background: "linear-gradient(90deg,transparent,color-mix(in srgb,var(--chart-green) 72%,transparent),color-mix(in srgb,var(--chart-primary) 78%,transparent),color-mix(in srgb,var(--chart-blue) 62%,transparent),transparent)", boxShadow: "0 0 42px color-mix(in srgb,var(--chart-primary) 52%,transparent)" }} />
     <div className="absolute -left-[22%] top-[38%] h-[10%] w-[145%] rotate-[5deg] rounded-[50%] opacity-55 blur-[10px]" style={{ background: "linear-gradient(90deg,transparent,color-mix(in srgb,var(--chart-blue) 75%,transparent),color-mix(in srgb,var(--chart-rust) 70%,transparent),transparent)" }} />
 
@@ -40,12 +43,12 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
 
       <section className={`${isStory ? "mt-3" : "mt-5 grid grid-cols-[.72fr_1.28fr] items-center gap-5"}`}>
         <div className={isStory ? "text-center" : ""}>
-          <p className={`${isStory ? "text-[4rem]" : "text-[5.5rem]"} font-semibold leading-[.82] tracking-[-.09em]`}>{consistency}<span className="ml-1 text-2xl text-[var(--chart-primary)]">%</span></p>
+          <p className="text-[5.5rem] font-semibold leading-[.82] tracking-[-.09em]">{consistency}<span className="ml-1 text-2xl text-[var(--chart-primary)]">%</span></p>
           <p className={`${isStory ? "mt-2" : "mt-3"} text-[8px] font-black uppercase tracking-[.2em] text-white/78`}>rhythm glow</p>
           {!isStory && <p className="mt-4 max-w-[155px] text-[10px] font-medium leading-4 text-white/82">Your month left a calm signal in the sky.</p>}
         </div>
 
-        <div aria-label={`${habits.length} habit auroras`} className={`relative overflow-hidden ${isStory ? "mt-3 h-44" : "h-48 rounded-[24px] border border-white/10 bg-black/10 shadow-[inset_0_0_30px_rgba(0,0,0,.18)]"}`}>
+        <div aria-label={`${habits.length} habit auroras`} className={`relative ${isStory ? "mt-1 h-48 overflow-visible" : "h-48 overflow-hidden rounded-[24px] border border-white/10 bg-black/10 shadow-[inset_0_0_30px_rgba(0,0,0,.18)]"}`}>
           <div className="absolute inset-x-[-12%] top-[20%] h-[28%] -rotate-[7deg] rounded-[50%] opacity-85 blur-[9px]" style={{ background: "linear-gradient(90deg,transparent,color-mix(in srgb,var(--chart-green) 72%,transparent),color-mix(in srgb,var(--chart-primary) 84%,transparent),color-mix(in srgb,var(--chart-blue) 66%,transparent),transparent)", boxShadow: "0 0 30px color-mix(in srgb,var(--chart-primary) 42%,transparent)" }} />
           <div className="absolute inset-x-[-15%] top-[50%] h-[18%] rotate-[6deg] rounded-[50%] opacity-65 blur-[7px]" style={{ background: "linear-gradient(90deg,transparent,color-mix(in srgb,var(--chart-blue) 78%,transparent),color-mix(in srgb,var(--chart-rust) 72%,transparent),transparent)" }} />
           <div className="absolute left-1/2 top-1/2 size-24 -translate-x-1/2 -translate-y-1/2 rounded-full p-[3px] shadow-[0_0_18px_var(--chart-primary),0_0_48px_color-mix(in_srgb,var(--chart-primary)_55%,transparent)]" style={{ background: `conic-gradient(var(--chart-primary) ${consistency * 3.6}deg,rgba(255,255,255,.13) 0deg)` }}><div className="grid size-full place-items-center rounded-full border border-white/12 bg-[color-mix(in_srgb,var(--chart-deep)_86%,transparent)] backdrop-blur-sm"><span className="size-2.5 rounded-full bg-white shadow-[0_0_8px_white,0_0_24px_var(--chart-primary)]" /></div></div>
