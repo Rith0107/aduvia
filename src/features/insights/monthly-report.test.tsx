@@ -26,12 +26,13 @@ describe("MonthlyReport", () => {
     expect(storyFormat).toHaveAttribute("aria-pressed", "true");
   });
 
-  it("offers distinct visual trims for the share artifact", () => {
+  it("offers distinct share artifacts rather than recolored trims", () => {
     render(<MonthlyReport />);
-    const aurora = screen.getByRole("button", { name: "Aurora Glow" });
-    fireEvent.click(aurora);
-    expect(aurora).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", { name: "Archive File" })).toBeInTheDocument();
+    const passport = screen.getByRole("button", { name: "Rhythm Passport" });
+    fireEvent.click(passport);
+    expect(passport).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("article", { name: "Rhythm Passport share preview" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Month Cover" })).toBeInTheDocument();
   });
 
   it("uses the calendar day count when changing months", () => {

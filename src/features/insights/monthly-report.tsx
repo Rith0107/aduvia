@@ -5,6 +5,7 @@ import { AppShell } from "@/components/app-shell";
 import { isHabitAvailableOn, isHabitScheduledOn, scheduledDaysFor, useAppData } from "@/lib/app-data";
 import type { HabitSummary } from "@/features/habits/types";
 import { Download, Share2, Smartphone, Square } from "lucide-react";
+import { ShareCardPreview, type ShareDesign, type ShareFormat } from "./share-card-preview";
 import {
   Area,
   AreaChart,
@@ -20,8 +21,6 @@ import {
 } from "recharts";
 
 type CellState = "done" | "missed" | "off" | "pending";
-type ShareFormat = "square" | "story";
-type ShareTrim = "orbit" | "archive" | "aurora";
 
 type ReportHabit = {
   id: string;
@@ -144,7 +143,7 @@ function cardDimensions(format: ShareFormat) {
   return format === "story" ? { width: 1080, height: 1920 } : { width: 1080, height: 1080 };
 }
 
-async function renderShareCard(format: ShareFormat, trim: ShareTrim, consistency: number, monthLabel: string, completedQuestTitles: string[], habits: ReportHabit[], daysShownUp: number) {
+async function renderShareCard(format: ShareFormat, design: ShareDesign, consistency: number, monthLabel: string, completedQuestTitles: string[], habits: ReportHabit[], daysShownUp: number) {
   const { width, height } = cardDimensions(format);
   const canvas = document.createElement("canvas");
   canvas.width = width;
@@ -168,7 +167,7 @@ async function renderShareCard(format: ShareFormat, trim: ShareTrim, consistency
   context.fillStyle = gradient;
   context.fillRect(0, 0, width, height);
 
-  if (trim === "archive") {
+  if (design === "passport") {
     context.strokeStyle = primary;
     context.lineWidth = 5;
     context.strokeRect(28, 28, width - 56, height - 56);
@@ -178,7 +177,7 @@ async function renderShareCard(format: ShareFormat, trim: ShareTrim, consistency
     context.fillStyle = primary;
     [[28, 28], [width - 28, 28], [28, height - 28], [width - 28, height - 28]].forEach(([x, y]) => { context.beginPath(); context.arc(x, y, 11, 0, Math.PI * 2); context.fill(); });
   }
-  if (trim === "aurora") {
+  if (design === "cover") {
     const glow = context.createRadialGradient(width * .15, height * .12, 0, width * .15, height * .12, width * .65);
     glow.addColorStop(0, "rgba(124,227,210,.38)");
     glow.addColorStop(.55, "rgba(189,142,174,.18)");
@@ -208,16 +207,16 @@ async function renderShareCard(format: ShareFormat, trim: ShareTrim, consistency
 
   const margin = 90;
   const headerY = format === "story" ? 150 : 92;
-  if (trim === "aurora") {
+  if (design === "cover") {
     context.fillStyle = "rgba(10,30,38,.62)";
     context.beginPath();
     context.roundRect(margin - 28, headerY - 48, width - margin * 2 + 56, 76, 22);
     context.fill();
   }
-  context.fillStyle = trim === "aurora" ? "#fffaf0" : primary;
+  context.fillStyle = design === "cover" ? "#fffaf0" : primary;
   context.font = "700 25px system-ui";
   context.fillText("ADUVIA · MONTHLY CONSTELLATION", margin, headerY);
-  context.fillStyle = trim === "aurora" ? "rgba(255,250,240,.82)" : "rgba(255,250,240,.48)";
+  context.fillStyle = design === "cover" ? "rgba(255,250,240,.82)" : "rgba(255,250,240,.48)";
   context.font = "500 22px system-ui";
   context.textAlign = "right";
   context.fillText(monthLabel.toUpperCase(), width - margin, headerY);
@@ -312,13 +311,13 @@ async function renderShareCard(format: ShareFormat, trim: ShareTrim, consistency
     const maxLength = format === "story" ? 42 : 21;
     context.fillText(quest.length > maxLength ? `${quest.slice(0, maxLength - 1)}…` : quest, x + 30, y);
   });
-  if (trim === "aurora") {
+  if (design === "cover") {
     context.fillStyle = "rgba(10,30,38,.62)";
     context.beginPath();
     context.roundRect(margin - 28, height - 92, width - margin * 2 + 56, 62, 20);
     context.fill();
   }
-  context.fillStyle = trim === "aurora" ? "rgba(255,250,240,.86)" : "rgba(255,250,240,0.5)";
+  context.fillStyle = design === "cover" ? "rgba(255,250,240,.86)" : "rgba(255,250,240,0.5)";
   context.font = "500 20px system-ui";
   context.fillText(`ISSUED ${monthLabel.toUpperCase()} · SMALL STEPS, VISIBLE PROOF`, margin, height - 55);
 
@@ -334,7 +333,8 @@ export function MonthlyReport() {
   const [reportMonth, setReportMonth] = useState({ year: now.getFullYear(), month: now.getMonth() });
   const [fallbackHabits, setFallbackHabits] = useState(() => createReportHabits(now.getFullYear(), now.getMonth()));
   const [format, setFormat] = useState<ShareFormat>("square");
-  const [shareTrim, setShareTrim] = useState<ShareTrim>("orbit");
+  const [shareDesign, setShareDesign] = useState<ShareDesign>("orbit");
+  const shareTrim = shareDesign === "passport" ? "archive" : shareDesign === "cover" ? "aurora" : "orbit";
   const [shareMessage, setShareMessage] = useState("");
   const reportMonthStart = new Date(reportMonth.year, reportMonth.month, 1);
   const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -423,7 +423,7 @@ export function MonthlyReport() {
   }
 
   async function downloadCard() {
-    const blob = await renderShareCard(format, shareTrim, overallConsistency, monthLabel, completedQuestTitles, habits, daysShownUp);
+    const blob = await renderShareCard(format, shareDesign, overallConsistency, monthLabel, completedQuestTitles, habits, daysShownUp);
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -434,7 +434,7 @@ export function MonthlyReport() {
   }
 
   async function shareCard() {
-    const blob = await renderShareCard(format, shareTrim, overallConsistency, monthLabel, completedQuestTitles, habits, daysShownUp);
+    const blob = await renderShareCard(format, shareDesign, overallConsistency, monthLabel, completedQuestTitles, habits, daysShownUp);
     const file = new File([blob], `aduvia-${monthName.toLowerCase()}-${reportMonth.year}-${format}.png`, { type: "image/png" });
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
       await navigator.share({ files: [file], title: "My Aduvia monthly report" });
@@ -525,8 +525,12 @@ export function MonthlyReport() {
                 </fieldset>
 
                 <fieldset className="mt-6">
-                  <legend className="text-[10px] font-semibold uppercase tracking-[0.15em] text-stone-400">Choose a trim</legend>
-                  <div className="mt-3 grid max-w-md grid-cols-3 gap-2">{(["orbit", "archive", "aurora"] as const).map((trim) => <button aria-pressed={shareTrim === trim} className={`group rounded-[18px] border p-2 text-left transition ${shareTrim === trim ? "border-[var(--chart-deep)] bg-white/70 shadow-md" : "border-transparent bg-white/35 hover:bg-white/60"}`} key={trim} onClick={() => setShareTrim(trim)} type="button"><span className={`relative block h-14 overflow-hidden ${trim === "archive" ? "rounded-[3px] border-[3px] border-[var(--chart-primary)] bg-[var(--chart-ink)] outline outline-1 outline-offset-[-7px] outline-white/35" : trim === "aurora" ? "rounded-[13px] border-[3px] border-[#9edfd5] bg-[radial-gradient(circle_at_15%_10%,#9edfd588,transparent_52%),linear-gradient(135deg,var(--chart-deep),#50466f)] shadow-[0_0_14px_#9edfd566]" : "rounded-[13px] bg-[var(--chart-deep)]"}`}><i className="absolute left-1/2 top-1/2 h-5 w-10 -translate-x-1/2 -translate-y-1/2 rounded-[50%] border border-white/30" /><i className="absolute left-1/2 top-1/2 h-3 w-7 -translate-x-1/2 -translate-y-1/2 rounded-[50%] border border-[var(--chart-primary)]/55" /></span><span className="mt-2 block text-[10px] font-bold text-[var(--soft-ink)]">{trim === "orbit" ? "Soft Orbit" : trim === "archive" ? "Archive File" : "Aurora Glow"}</span></button>)}</div>
+                  <legend className="text-[10px] font-semibold uppercase tracking-[0.15em] text-stone-400">Choose an artifact</legend>
+                  <div className="mt-3 grid max-w-md grid-cols-3 gap-2">{(["orbit", "passport", "cover"] as const).map((design) => {
+                    const selected = shareDesign === design;
+                    const name = design === "orbit" ? "Orbit Signal" : design === "passport" ? "Rhythm Passport" : "Month Cover";
+                    return <button aria-label={name} aria-pressed={selected} className={`group rounded-[18px] border p-2 text-left transition ${selected ? "border-[var(--chart-deep)] bg-white/75 shadow-md" : "border-transparent bg-white/35 hover:bg-white/60"}`} key={design} onClick={() => setShareDesign(design)} type="button"><span className={`relative block h-14 overflow-hidden ${design === "passport" ? "rounded-[5px] border-[4px] border-[var(--chart-primary)] bg-[linear-gradient(to_bottom,var(--chart-deep)_42%,var(--chart-surface)_42%)]" : design === "cover" ? "rounded-[3px] bg-[var(--chart-primary)] shadow-[4px_4px_0_var(--chart-deep)]" : "rounded-[13px] bg-[var(--chart-deep)]"}`}>{design === "orbit" && <><i className="absolute left-1/2 top-1/2 h-5 w-10 -translate-x-1/2 -translate-y-1/2 rounded-[50%] border border-white/30" /><i className="absolute left-1/2 top-1/2 h-3 w-7 -translate-x-1/2 -translate-y-1/2 rounded-[50%] border border-[var(--chart-primary)]/55" /></>}{design === "passport" && <><i className="absolute left-2 top-2 size-4 rounded-full border-2 border-[var(--chart-primary)]" /><i className="absolute bottom-2 left-2 right-2 h-px bg-[var(--chart-deep)]/25" /></>}{design === "cover" && <strong className="absolute bottom-1 left-2 text-3xl font-black leading-none text-[var(--chart-deep)]">71</strong>}</span><span className="mt-2 block text-[10px] font-bold text-[var(--soft-ink)]">{name}</span></button>;
+                  })}</div>
                 </fieldset>
 
                 <div className="mt-auto flex flex-wrap gap-3 pt-9"><button className="inline-flex items-center gap-2 rounded-full bg-[var(--chart-primary)] px-5 py-3 text-sm font-semibold text-[var(--chart-deep)] shadow-[0_10px_24px_rgba(216,154,66,.22)] transition hover:-translate-y-0.5" onClick={shareCard} type="button"><Share2 size={16} />Share image</button><button className="inline-flex items-center gap-2 rounded-full border border-[color:color-mix(in_srgb,var(--chart-deep)_15%,transparent)] bg-white/65 px-5 py-3 text-sm font-semibold text-[var(--chart-deep)] transition hover:bg-white" onClick={downloadCard} type="button"><Download size={16} />Download</button></div>
@@ -534,7 +538,8 @@ export function MonthlyReport() {
               </div>
 
               <div className="grid min-h-[620px] place-items-center overflow-hidden rounded-[26px] bg-[linear-gradient(145deg,var(--soft-tint-a),var(--soft-surface))] p-5 sm:p-8">
-                <div className={`relative overflow-hidden text-white transition-all duration-500 ${shareTrim === "archive" ? "rounded-[4px] border-[10px] border-[var(--chart-surface)] outline outline-2 outline-offset-[-19px] outline-[var(--chart-primary)] shadow-[0_28px_65px_rgba(52,42,31,.3)]" : shareTrim === "aurora" ? "rounded-[30px] border-[7px] border-[#9edfd5] shadow-[0_0_0_2px_#c9a6d8,0_26px_70px_#6caea855]" : "rounded-[38px] shadow-[0_30px_70px_rgba(20,61,49,.28)]"} ${format === "story" ? "aspect-[9/16] w-full max-w-[310px] p-6" : "aspect-square w-full max-w-[560px] p-8 sm:p-9"}`} style={{ backgroundImage: shareTrim === "archive" ? "linear-gradient(145deg, color-mix(in srgb, var(--chart-ink) 72%, #171a18), var(--chart-deep))" : shareTrim === "aurora" ? "radial-gradient(circle at 12% 8%, rgba(143,225,208,.48), transparent 37%), radial-gradient(circle at 88% 80%, rgba(201,166,216,.38), transparent 42%), linear-gradient(145deg, var(--chart-deep), #51476f)" : "linear-gradient(145deg,var(--chart-deep),color-mix(in srgb,var(--chart-deep) 78%,var(--chart-green)))" }}>
+                <ShareCardPreview completedQuests={completedQuestTitles} consistency={overallConsistency} daysShownUp={daysShownUp} design={shareDesign} format={format} habitCount={habits.length} monthName={monthName} year={reportMonth.year} />
+                <div aria-hidden="true" className={`hidden relative overflow-hidden text-white transition-all duration-500 ${shareTrim === "archive" ? "rounded-[4px] border-[10px] border-[var(--chart-surface)] outline outline-2 outline-offset-[-19px] outline-[var(--chart-primary)] shadow-[0_28px_65px_rgba(52,42,31,.3)]" : shareTrim === "aurora" ? "rounded-[30px] border-[7px] border-[#9edfd5] shadow-[0_0_0_2px_#c9a6d8,0_26px_70px_#6caea855]" : "rounded-[38px] shadow-[0_30px_70px_rgba(20,61,49,.28)]"} ${format === "story" ? "aspect-[9/16] w-full max-w-[310px] p-6" : "aspect-square w-full max-w-[560px] p-8 sm:p-9"}`} style={{ backgroundImage: shareTrim === "archive" ? "linear-gradient(145deg, color-mix(in srgb, var(--chart-ink) 72%, #171a18), var(--chart-deep))" : shareTrim === "aurora" ? "radial-gradient(circle at 12% 8%, rgba(143,225,208,.48), transparent 37%), radial-gradient(circle at 88% 80%, rgba(201,166,216,.38), transparent 42%), linear-gradient(145deg, var(--chart-deep), #51476f)" : "linear-gradient(145deg,var(--chart-deep),color-mix(in srgb,var(--chart-deep) 78%,var(--chart-green)))" }}>
                   <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "repeating-radial-gradient(ellipse at 25% 10%, transparent 0 15px, rgba(255,255,255,.055) 16px 17px)" }} />
                   {shareTrim === "archive" && <><i className="absolute left-3 top-3 size-2 rounded-full bg-[var(--chart-primary)]" /><i className="absolute right-3 top-3 size-2 rounded-full bg-[var(--chart-primary)]" /><i className="absolute bottom-3 left-3 size-2 rounded-full bg-[var(--chart-primary)]" /><i className="absolute bottom-3 right-3 size-2 rounded-full bg-[var(--chart-primary)]" /><span className="absolute bottom-1/2 right-2 translate-y-1/2 rotate-90 text-[6px] font-black uppercase tracking-[.22em] text-white/25">Rhythm archive · verified record</span></>}
                   {shareTrim === "aurora" && <><div className="absolute -left-1/4 -top-1/4 size-[80%] rounded-full bg-[radial-gradient(circle,#9edfd566,transparent_68%)] blur-xl" /><i className="absolute left-[16%] top-[22%] size-1.5 rounded-full bg-[#d7b3ef] shadow-[0_0_12px_#d7b3ef]" /><i className="absolute right-[18%] top-[34%] size-1 rounded-full bg-[#9edfd5] shadow-[0_0_12px_#9edfd5]" /><i className="absolute bottom-[22%] left-[12%] size-1 rounded-full bg-[var(--chart-primary)] shadow-[0_0_12px_var(--chart-primary)]" /></>}
