@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
+import { AuroraSkyPreview } from "./aurora-sky-preview";
 import { MonthCoverPreview } from "./month-cover-preview";
 import { isHabitAvailableOn, isHabitScheduledOn, scheduledDaysFor, useAppData } from "@/lib/app-data";
 import type { HabitSummary } from "@/features/habits/types";
@@ -158,7 +159,7 @@ async function renderPreviewElement(element: HTMLElement, format: ShareFormat) {
     pixelRatio: 1,
     width: sourceWidth,
   });
-  if (!blob) throw new Error("Could not create Month Cover image.");
+  if (!blob) throw new Error("Could not create share image.");
   return blob;
 }
 
@@ -536,9 +537,10 @@ export function MonthlyReport() {
   }
 
   async function createShareBlob() {
-    if (shareTrim === "cover") {
-      const preview = document.querySelector<HTMLElement>('[aria-label="Month Cover share preview"]');
-      if (!preview) throw new Error("Month Cover preview is unavailable.");
+    if (shareTrim === "cover" || shareTrim === "aurora") {
+      const previewLabel = shareTrim === "cover" ? "Month Cover share preview" : "Aurora Sky share preview";
+      const preview = document.querySelector<HTMLElement>(`[aria-label="${previewLabel}"]`);
+      if (!preview) throw new Error(`${shareTrim === "cover" ? "Month Cover" : "Aurora Sky"} preview is unavailable.`);
       return renderPreviewElement(preview, format);
     }
     return renderShareCard(format, shareTrim, overallConsistency, monthLabel, completedQuestTitles, habits, daysShownUp);
@@ -656,11 +658,10 @@ export function MonthlyReport() {
               </div>
 
               <div className="grid min-h-[620px] place-items-center overflow-hidden rounded-[26px] bg-[linear-gradient(145deg,var(--soft-tint-a),var(--soft-surface))] p-5 sm:p-8">
-                {shareTrim === "cover" ? <MonthCoverPreview completedQuests={completedQuestTitles} consistency={overallConsistency} daysShownUp={daysShownUp} format={format} habitCount={habits.length} monthName={monthName} year={reportMonth.year} /> : <div className={`relative overflow-hidden text-white transition-all duration-500 ${shareTrim === "archive" ? "rounded-[4px] border-[10px] border-[var(--chart-surface)] outline outline-2 outline-offset-[-19px] outline-[var(--chart-primary)] shadow-[0_28px_65px_rgba(52,42,31,.3)]" : shareTrim === "aurora" ? "rounded-[30px] border-[7px] border-[#9edfd5] shadow-[0_0_0_2px_#c9a6d8,0_26px_70px_#6caea855]" : "rounded-[38px] shadow-[0_30px_70px_rgba(20,61,49,.28)]"} ${format === "story" ? "aspect-[9/16] w-full max-w-[310px] p-6" : "aspect-square w-full max-w-[560px] p-8 sm:p-9"}`} style={{ backgroundImage: shareTrim === "archive" ? "linear-gradient(145deg, color-mix(in srgb, var(--chart-ink) 72%, #171a18), var(--chart-deep))" : shareTrim === "aurora" ? "radial-gradient(circle at 12% 8%, rgba(143,225,208,.48), transparent 37%), radial-gradient(circle at 88% 80%, rgba(201,166,216,.38), transparent 42%), linear-gradient(145deg, var(--chart-deep), #51476f)" : "linear-gradient(145deg,var(--chart-deep),color-mix(in srgb,var(--chart-deep) 78%,var(--chart-green)))" }}>
+                {shareTrim === "cover" ? <MonthCoverPreview completedQuests={completedQuestTitles} consistency={overallConsistency} daysShownUp={daysShownUp} format={format} habitCount={habits.length} monthName={monthName} year={reportMonth.year} /> : shareTrim === "aurora" ? <AuroraSkyPreview completedQuests={completedQuestTitles} consistency={overallConsistency} daysShownUp={daysShownUp} format={format} habits={habits.map((habit) => ({ completedDays: habit.days.filter((day) => day === "done").length, name: habit.name }))} monthName={monthName} year={reportMonth.year} /> : <div className={`relative overflow-hidden text-white transition-all duration-500 ${shareTrim === "archive" ? "rounded-[4px] border-[10px] border-[var(--chart-surface)] outline outline-2 outline-offset-[-19px] outline-[var(--chart-primary)] shadow-[0_28px_65px_rgba(52,42,31,.3)]" : "rounded-[38px] shadow-[0_30px_70px_rgba(20,61,49,.28)]"} ${format === "story" ? "aspect-[9/16] w-full max-w-[310px] p-6" : "aspect-square w-full max-w-[560px] p-8 sm:p-9"}`} style={{ backgroundImage: shareTrim === "archive" ? "linear-gradient(145deg, color-mix(in srgb, var(--chart-ink) 72%, #171a18), var(--chart-deep))" : "linear-gradient(145deg,var(--chart-deep),color-mix(in srgb,var(--chart-deep) 78%,var(--chart-green)))" }}>
                   <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "repeating-radial-gradient(ellipse at 25% 10%, transparent 0 15px, rgba(255,255,255,.055) 16px 17px)" }} />
                   {shareTrim === "archive" && <><i className="absolute left-3 top-3 size-2 rounded-full bg-[var(--chart-primary)]" /><i className="absolute right-3 top-3 size-2 rounded-full bg-[var(--chart-primary)]" /><i className="absolute bottom-3 left-3 size-2 rounded-full bg-[var(--chart-primary)]" /><i className="absolute bottom-3 right-3 size-2 rounded-full bg-[var(--chart-primary)]" /><span className="absolute bottom-1/2 right-2 translate-y-1/2 rotate-90 text-[6px] font-black uppercase tracking-[.22em] text-white/25">Rhythm archive · verified record</span></>}
-                  {shareTrim === "aurora" && <><div className="absolute -left-1/4 -top-1/4 size-[80%] rounded-full bg-[radial-gradient(circle,#9edfd566,transparent_68%)] blur-xl" /><i className="absolute left-[16%] top-[22%] size-1.5 rounded-full bg-[#d7b3ef] shadow-[0_0_12px_#d7b3ef]" /><i className="absolute right-[18%] top-[34%] size-1 rounded-full bg-[#9edfd5] shadow-[0_0_12px_#9edfd5]" /><i className="absolute bottom-[22%] left-[12%] size-1 rounded-full bg-[var(--chart-primary)] shadow-[0_0_12px_var(--chart-primary)]" /></>}
-                  <div className={`relative flex items-start justify-between ${shareTrim === "aurora" ? "rounded-xl bg-[#102936]/65 px-3 py-2 shadow-sm backdrop-blur-sm" : ""}`}><div><p className={`text-[9px] font-black uppercase tracking-[0.21em] ${shareTrim === "aurora" ? "text-[#fffaf0]" : "text-[var(--chart-primary)]"}`}>Aduvia</p><p className={`mt-1 text-[8px] uppercase tracking-[.14em] ${shareTrim === "aurora" ? "text-white/75" : "text-white/40"}`}>Monthly constellation</p></div><div className="text-right"><p className="text-[9px] font-semibold uppercase tracking-[.14em]">{monthName}</p><p className={`mt-1 text-[8px] ${shareTrim === "aurora" ? "text-white/70" : "text-white/35"}`}>{reportMonth.year} · #{String(reportMonth.month + 1).padStart(2, "0")}</p></div></div>
+                  <div className="relative flex items-start justify-between"><div><p className="text-[9px] font-black uppercase tracking-[0.21em] text-[var(--chart-primary)]">Aduvia</p><p className="mt-1 text-[8px] uppercase tracking-[.14em] text-white/40">Monthly constellation</p></div><div className="text-right"><p className="text-[9px] font-semibold uppercase tracking-[.14em]">{monthName}</p><p className="mt-1 text-[8px] text-white/35">{reportMonth.year} · #{String(reportMonth.month + 1).padStart(2, "0")}</p></div></div>
 
                   <div className={`relative mx-auto ${format === "story" ? "mt-8 h-[43%] w-full" : "mt-3 h-[48%] w-[92%]"}`} aria-label={`${monthLabel} habit constellation`}>
                     {habits.slice(0, 4).map((habit, orbitIndex) => {
@@ -672,7 +673,7 @@ export function MonthlyReport() {
                   </div>
 
                   <div className={`relative rounded-[22px] bg-[var(--chart-surface)] text-[var(--soft-ink)] ${format === "story" ? "p-4" : "p-5"}`}><p className="text-[7px] font-black uppercase tracking-[.18em] text-[var(--chart-ink)]">Constellation record</p><div className="mt-3 grid grid-cols-3 gap-2"><div><p className="text-2xl font-semibold">{daysShownUp}</p><p className="text-[7px] text-[var(--chart-ink)]">days in orbit</p></div><div><p className="text-2xl font-semibold">{habits.length}</p><p className="text-[7px] text-[var(--chart-ink)]">daily rituals</p></div><div><p className="text-2xl font-semibold">{completedQuestTitles.length}</p><p className="text-[7px] text-[var(--chart-ink)]">quests landed</p></div></div><div className={`mt-4 border-t border-[var(--chart-ink)]/15 pt-3 ${format === "story" ? "space-y-2" : "grid grid-cols-3 gap-2"}`}>{visibleShareQuests.map((quest, index) => <div className="flex min-w-0 items-center gap-2" key={quest}><span className="size-2 shrink-0 rounded-full bg-[var(--chart-primary)]" /><p className="truncate text-[8px] font-semibold">{String(index + 1).padStart(2, "0")} · {quest}</p></div>)}{remainingShareQuests > 0 && <p className="text-[8px] font-semibold text-[var(--chart-ink)]">+{remainingShareQuests} more in orbit</p>}</div></div>
-                  <div className={`absolute bottom-4 left-6 right-6 flex items-center justify-between text-[6px] uppercase tracking-[.14em] ${shareTrim === "aurora" ? "rounded-full bg-[#102936]/70 px-3 py-2 text-white/85 shadow-sm backdrop-blur-sm" : "text-white/35"}`}><span>Issued {monthLabel}</span><span>Small steps · visible proof</span></div>
+                  <div className="absolute bottom-4 left-6 right-6 flex items-center justify-between text-[6px] uppercase tracking-[.14em] text-white/35"><span>Issued {monthLabel}</span><span>Small steps · visible proof</span></div>
                 </div>}
               </div>
             </div>
