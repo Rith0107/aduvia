@@ -148,8 +148,13 @@ function cardDimensions(format: ShareFormat) {
 }
 
 async function renderPreviewElement(element: HTMLElement, format: ShareFormat) {
-  const sourceWidth = format === "story" ? 310 : 560;
-  const sourceHeight = format === "story" ? sourceWidth * 16 / 9 : sourceWidth;
+  // Measure the real rendered box rather than assuming a fixed size — an
+  // assumed size wider than the actual element leaves the captured content
+  // short of the requested canvas, and that unfilled margin renders as a
+  // transparent gap/border once stretched into the output PNG.
+  const rect = element.getBoundingClientRect();
+  const sourceWidth = rect.width;
+  const sourceHeight = rect.height;
   const { width, height } = cardDimensions(format);
   const blob = await toBlob(element, {
     cacheBust: true,

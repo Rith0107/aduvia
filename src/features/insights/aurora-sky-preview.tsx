@@ -50,8 +50,13 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
 
     async function createMatchingRaster() {
       await document.fonts?.ready;
-      const sourceWidth = isStory ? 310 : 560;
-      const sourceHeight = isStory ? sourceWidth * 16 / 9 : sourceWidth;
+      // Measure the real rendered box rather than assuming a fixed size —
+      // an assumed size wider than the actual element leaves the captured
+      // content short of the requested canvas, and that unfilled margin
+      // renders as a transparent gap/border once overlaid on the preview.
+      const rect = artwork!.getBoundingClientRect();
+      const sourceWidth = rect.width;
+      const sourceHeight = rect.height;
       const svg = await toSvg(artwork!, {
         cacheBust: true,
         height: sourceHeight,
