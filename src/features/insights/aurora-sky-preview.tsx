@@ -24,6 +24,7 @@ const ribbonColors = ["var(--chart-primary)", "var(--chart-blue)", "var(--chart-
 export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, format, habits, monthName, year }: AuroraSkyPreviewProps) {
   const artworkRef = useRef<HTMLElement>(null);
   const [rasterUrl, setRasterUrl] = useState("");
+  const [paletteRevision, setPaletteRevision] = useState(0);
   const isStory = format === "story";
   const visibleQuests = completedQuests.slice(0, 4);
   const remainingQuests = Math.max(0, completedQuests.length - visibleQuests.length);
@@ -31,6 +32,12 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
   const starField = isStory
     ? "radial-gradient(circle at 9% 13%,rgba(255,255,255,.88) 0 1px,transparent 1.6px),radial-gradient(circle at 81% 8%,rgba(255,255,255,.62) 0 .8px,transparent 1.4px),radial-gradient(circle at 66% 24%,rgba(255,255,255,.82) 0 1.2px,transparent 1.8px),radial-gradient(circle at 24% 38%,rgba(255,255,255,.5) 0 .7px,transparent 1.3px),radial-gradient(circle at 92% 46%,rgba(255,255,255,.75) 0 1px,transparent 1.6px),radial-gradient(circle at 13% 59%,rgba(255,255,255,.68) 0 .9px,transparent 1.5px),radial-gradient(circle at 72% 69%,rgba(255,255,255,.55) 0 .7px,transparent 1.3px),radial-gradient(circle at 37% 81%,rgba(255,255,255,.78) 0 1px,transparent 1.6px),radial-gradient(circle at 88% 90%,rgba(255,255,255,.52) 0 .8px,transparent 1.4px)"
     : "radial-gradient(circle,rgba(255,255,255,.88) 0 1px,transparent 1.5px)";
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => setPaletteRevision((revision) => revision + 1));
+    observer.observe(document.documentElement, { attributeFilter: ["data-palette"], attributes: true });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (process.env.NODE_ENV === "test") return;
@@ -69,10 +76,10 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
       active = false;
       if (nextUrl) URL.revokeObjectURL(nextUrl);
     };
-  }, [completedQuests, consistency, daysShownUp, habits, isStory, monthName, year]);
+  }, [completedQuests, consistency, daysShownUp, habits, isStory, monthName, paletteRevision, year]);
 
   return <div className={`${shell} relative`}>
-  <article aria-label={rasterUrl ? undefined : "Aurora Sky share preview"} className="absolute inset-0 overflow-hidden rounded-[26px] border border-white/25 bg-[linear-gradient(155deg,#07131d_0%,color-mix(in_srgb,var(--chart-deep)_72%,#081827)_54%,#09111f_100%)] text-white shadow-[0_28px_70px_rgba(3,10,18,.42),inset_0_0_0_1px_rgba(255,255,255,.06)]" ref={artworkRef}>
+  <article aria-label={rasterUrl ? undefined : "Aurora Sky share preview"} className="absolute inset-0 overflow-hidden rounded-[26px] border border-white/25 bg-[linear-gradient(155deg,color-mix(in_srgb,var(--chart-deep)_78%,#07131d)_0%,color-mix(in_srgb,var(--chart-deep)_72%,#081827)_54%,color-mix(in_srgb,var(--chart-deep)_46%,#09111f)_100%)] text-white shadow-[0_28px_70px_rgba(3,10,18,.42),inset_0_0_0_1px_rgba(255,255,255,.06)]" ref={artworkRef}>
     <div className="absolute inset-0 opacity-65" style={{ backgroundImage: "radial-gradient(circle at 7% 5%, color-mix(in srgb,var(--chart-green) 42%,transparent),transparent 27%), radial-gradient(circle at 92% 72%, color-mix(in srgb,var(--chart-blue) 44%,transparent),transparent 41%), radial-gradient(circle at 48% 48%, color-mix(in srgb,var(--chart-primary) 10%,transparent),transparent 37%)" }} />
     <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,8,15,.04),rgba(2,8,15,.22))]" />
     <div className={`absolute inset-0 ${isStory ? "opacity-55" : "opacity-28"}`} style={{ backgroundImage: starField, backgroundSize: isStory ? "100% 100%" : "29px 29px" }} />
