@@ -546,6 +546,9 @@ export function MonthlyReport() {
         if (!response.ok) throw new Error("Aurora Sky image is unavailable.");
         return response.blob();
       }
+      if (shareTrim === "aurora") {
+        throw new Error("Aurora Sky is still preparing. Please try sharing again in a moment.");
+      }
       return renderPreviewElement(preview, format);
     }
     return renderShareCard(format, shareTrim, overallConsistency, monthLabel, completedQuestTitles, habits, daysShownUp);

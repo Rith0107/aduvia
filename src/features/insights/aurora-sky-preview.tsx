@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { toBlob } from "html-to-image";
+import { toSvg } from "html-to-image";
 import { ActivityIcon } from "@/components/activity-icon";
 
 import { toAchievementTitle } from "./achievement-title";
@@ -104,15 +104,19 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
       await document.fonts?.ready;
       const sourceWidth = isStory ? 310 : 560;
       const sourceHeight = isStory ? sourceWidth * 16 / 9 : sourceWidth;
-      const blob = await toBlob(artwork!, {
+      const svg = await toSvg(artwork!, {
         cacheBust: true,
-        canvasHeight: isStory ? 1920 : 1080,
-        canvasWidth: 1080,
         height: sourceHeight,
-        pixelRatio: 1,
         width: sourceWidth,
       });
-      if (!blob || !active) return;
+      const response = await fetch("/api/share/aurora", {
+        body: JSON.stringify({ height: isStory ? 1920 : 1080, svg, width: 1080 }),
+        headers: { "content-type": "application/json" },
+        method: "POST",
+      });
+      if (!response.ok) throw new Error("Could not render the Aurora share image.");
+      const blob = await response.blob();
+      if (!active) return;
       nextUrl = URL.createObjectURL(blob);
       setRasterUrl((currentUrl) => {
         if (currentUrl) URL.revokeObjectURL(currentUrl);
