@@ -34,7 +34,7 @@ describe("AuroraSkyPreview", () => {
   });
 
   it("keeps the story focused on the galaxy and omits the discovery list", () => {
-    render(<AuroraSkyPreview {...props} format="story" />);
+    const { container } = render(<AuroraSkyPreview {...props} format="story" />);
 
     expect(screen.getByLabelText("Aurora Sky share preview")).toBeInTheDocument();
     expect(screen.getByLabelText("3 habit auroras")).toBeInTheDocument();
@@ -42,5 +42,6 @@ describe("AuroraSkyPreview", () => {
     expect(screen.queryByText("Constellations discovered")).not.toBeInTheDocument();
     expect(screen.queryByText("Hiked Stone Mountain")).not.toBeInTheDocument();
     expect(screen.getByText("A month written in light.")).toBeInTheDocument();
+    expect(container.querySelector('[class*="blur-"]')).not.toBeInTheDocument();
   });
 });
