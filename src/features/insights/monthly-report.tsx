@@ -541,6 +541,11 @@ export function MonthlyReport() {
       const previewLabel = shareTrim === "cover" ? "Month Cover share preview" : "Aurora Sky share preview";
       const preview = document.querySelector<HTMLElement>(`[aria-label="${previewLabel}"]`);
       if (!preview) throw new Error(`${shareTrim === "cover" ? "Month Cover" : "Aurora Sky"} preview is unavailable.`);
+      if (preview instanceof HTMLImageElement && preview.dataset.shareRaster === "true") {
+        const response = await fetch(preview.src);
+        if (!response.ok) throw new Error("Aurora Sky image is unavailable.");
+        return response.blob();
+      }
       return renderPreviewElement(preview, format);
     }
     return renderShareCard(format, shareTrim, overallConsistency, monthLabel, completedQuestTitles, habits, daysShownUp);

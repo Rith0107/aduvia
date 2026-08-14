@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react";
+import { toBlob } from "html-to-image";
 import { ActivityIcon } from "@/components/activity-icon";
 
 import { toAchievementTitle } from "./achievement-title";
@@ -20,6 +22,8 @@ type AuroraSkyPreviewProps = {
 const ribbonColors = ["var(--chart-primary)", "var(--chart-blue)", "var(--chart-green)", "var(--chart-rust)"];
 
 export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, format, habits, monthName, year }: AuroraSkyPreviewProps) {
+  const artworkRef = useRef<HTMLElement>(null);
+  const [rasterUrl, setRasterUrl] = useState("");
   const isStory = format === "story";
   const visibleQuests = completedQuests.slice(0, 4);
   const remainingQuests = Math.max(0, completedQuests.length - visibleQuests.length);
@@ -28,7 +32,47 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
     ? "radial-gradient(circle at 9% 13%,rgba(255,255,255,.88) 0 1px,transparent 1.6px),radial-gradient(circle at 81% 8%,rgba(255,255,255,.62) 0 .8px,transparent 1.4px),radial-gradient(circle at 66% 24%,rgba(255,255,255,.82) 0 1.2px,transparent 1.8px),radial-gradient(circle at 24% 38%,rgba(255,255,255,.5) 0 .7px,transparent 1.3px),radial-gradient(circle at 92% 46%,rgba(255,255,255,.75) 0 1px,transparent 1.6px),radial-gradient(circle at 13% 59%,rgba(255,255,255,.68) 0 .9px,transparent 1.5px),radial-gradient(circle at 72% 69%,rgba(255,255,255,.55) 0 .7px,transparent 1.3px),radial-gradient(circle at 37% 81%,rgba(255,255,255,.78) 0 1px,transparent 1.6px),radial-gradient(circle at 88% 90%,rgba(255,255,255,.52) 0 .8px,transparent 1.4px)"
     : "radial-gradient(circle,rgba(255,255,255,.88) 0 1px,transparent 1.5px)";
 
-  return <article aria-label="Aurora Sky share preview" className={`${shell} relative overflow-hidden rounded-[26px] border border-white/25 bg-[linear-gradient(155deg,#07131d_0%,#0a2030_54%,#09111f_100%)] text-white shadow-[0_28px_70px_rgba(3,10,18,.42),inset_0_0_0_1px_rgba(255,255,255,.06)]`}>
+  useEffect(() => {
+    if (process.env.NODE_ENV === "test") return;
+    let active = true;
+    let nextUrl = "";
+    const artwork = artworkRef.current;
+    if (!artwork) return;
+
+    async function createMatchingRaster() {
+      await document.fonts?.ready;
+      const sourceWidth = isStory ? 310 : 560;
+      const sourceHeight = isStory ? sourceWidth * 16 / 9 : sourceWidth;
+      const blob = await toBlob(artwork!, {
+        cacheBust: true,
+        canvasHeight: isStory ? 1920 : 1080,
+        canvasWidth: 1080,
+        height: sourceHeight,
+        pixelRatio: 1,
+        width: sourceWidth,
+      });
+      if (!blob || !active) return;
+      nextUrl = URL.createObjectURL(blob);
+      setRasterUrl((currentUrl) => {
+        if (currentUrl) URL.revokeObjectURL(currentUrl);
+        return nextUrl;
+      });
+    }
+
+    setRasterUrl((currentUrl) => {
+      if (currentUrl) URL.revokeObjectURL(currentUrl);
+      return "";
+    });
+    void createMatchingRaster().catch(() => undefined);
+
+    return () => {
+      active = false;
+      if (nextUrl) URL.revokeObjectURL(nextUrl);
+    };
+  }, [completedQuests, consistency, daysShownUp, habits, isStory, monthName, year]);
+
+  return <div className={`${shell} relative`}>
+  <article aria-label={rasterUrl ? undefined : "Aurora Sky share preview"} className="absolute inset-0 overflow-hidden rounded-[26px] border border-white/25 bg-[linear-gradient(155deg,#07131d_0%,#0a2030_54%,#09111f_100%)] text-white shadow-[0_28px_70px_rgba(3,10,18,.42),inset_0_0_0_1px_rgba(255,255,255,.06)]" ref={artworkRef}>
     <div className="absolute inset-0 opacity-80" style={{ backgroundImage: "radial-gradient(ellipse 68% 38% at 4% 4%,rgba(47,132,118,.42) 0%,rgba(47,132,118,.16) 42%,transparent 72%),radial-gradient(ellipse 72% 46% at 94% 72%,rgba(70,116,148,.38) 0%,rgba(70,116,148,.12) 45%,transparent 75%),radial-gradient(ellipse 72% 24% at 50% 43%,rgba(224,137,105,.13) 0%,transparent 72%)" }} />
     <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,8,15,.04),rgba(2,8,15,.22))]" />
     <div className={`absolute inset-0 ${isStory ? "opacity-55" : "opacity-28"}`} style={{ backgroundImage: starField, backgroundSize: isStory ? "100% 100%" : "29px 29px" }} />
@@ -75,5 +119,9 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
 
       <footer className={`absolute ${isStory ? "inset-x-5 bottom-3" : "inset-x-7 bottom-4"} flex items-end justify-between border-t border-white/16 bg-[linear-gradient(180deg,transparent_0%,rgba(7,19,29,.72)_35%)] pt-2 text-[7px] font-semibold uppercase tracking-[.14em] text-white/72`}><span>A month written in light.</span><span className="text-xl font-black tracking-[-.08em] text-white/95">A.</span></footer>
     </div>
-  </article>;
+  </article>
+  {/* The generated PNG is deliberately shown unchanged so the preview and shared file are identical. */}
+  {/* eslint-disable-next-line @next/next/no-img-element */}
+  {rasterUrl && <img alt="Aurora Sky share preview" aria-label="Aurora Sky share preview" className="absolute inset-0 z-10 size-full rounded-[26px] object-fill" data-share-raster="true" src={rasterUrl} />}
+  </div>;
 }
