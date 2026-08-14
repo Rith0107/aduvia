@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { MonthCoverPreview } from "./month-cover-preview";
-import { ArtifactDraftPreview } from "./artifact-draft-preview";
 import { isHabitAvailableOn, isHabitScheduledOn, scheduledDaysFor, useAppData } from "@/lib/app-data";
 import type { HabitSummary } from "@/features/habits/types";
 import { Download, Share2, Smartphone, Square } from "lucide-react";
@@ -25,7 +24,6 @@ import {
 type CellState = "done" | "missed" | "off" | "pending";
 type ShareFormat = "square" | "story";
 type ShareTrim = "orbit" | "archive" | "aurora" | "cover";
-type DraftVariant = "field-notes" | "almanac" | "atlas";
 
 type ReportHabit = {
   id: string;
@@ -450,7 +448,6 @@ export function MonthlyReport() {
   const [fallbackHabits, setFallbackHabits] = useState(() => createReportHabits(now.getFullYear(), now.getMonth()));
   const [format, setFormat] = useState<ShareFormat>("square");
   const [shareTrim, setShareTrim] = useState<ShareTrim>("orbit");
-  const [draftVariant, setDraftVariant] = useState<DraftVariant | null>(null);
   const [shareMessage, setShareMessage] = useState("");
   const reportMonthStart = new Date(reportMonth.year, reportMonth.month, 1);
   const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -539,11 +536,6 @@ export function MonthlyReport() {
   }
 
   async function createShareBlob() {
-    if (draftVariant) {
-      const preview = document.querySelector<HTMLElement>("[data-share-preview]");
-      if (!preview) throw new Error("Artifact preview is unavailable.");
-      return renderPreviewElement(preview, format);
-    }
     if (shareTrim === "cover") {
       const preview = document.querySelector<HTMLElement>('[aria-label="Month Cover share preview"]');
       if (!preview) throw new Error("Month Cover preview is unavailable.");
@@ -659,21 +651,11 @@ export function MonthlyReport() {
                   <div className="mt-3 grid max-w-md grid-cols-2 gap-2 sm:grid-cols-4">{(["orbit", "archive", "aurora", "cover"] as const).map((trim) => <button aria-label={trim === "cover" ? "Month Cover" : undefined} aria-pressed={shareTrim === trim} className={`group rounded-[18px] border p-2 text-left transition ${shareTrim === trim ? "border-[var(--chart-deep)] bg-white/70 shadow-md" : "border-transparent bg-white/35 hover:bg-white/60"}`} key={trim} onClick={() => setShareTrim(trim)} type="button"><span className={`relative block h-14 overflow-hidden ${trim === "archive" ? "rounded-[3px] border-[3px] border-[var(--chart-primary)] bg-[var(--chart-ink)] outline outline-1 outline-offset-[-7px] outline-white/35" : trim === "aurora" ? "rounded-[13px] border-[3px] border-[#9edfd5] bg-[radial-gradient(circle_at_15%_10%,#9edfd588,transparent_52%),linear-gradient(135deg,var(--chart-deep),#50466f)] shadow-[0_0_14px_#9edfd566]" : trim === "cover" ? "rounded-[5px] bg-[var(--chart-surface)] shadow-[4px_4px_0_var(--chart-deep)]" : "rounded-[13px] bg-[var(--chart-deep)]"}`}>{trim === "cover" ? <><strong className="absolute bottom-1 left-2 text-3xl font-black leading-none text-[var(--chart-deep)]">71</strong><i className="absolute -right-3 -top-3 size-9 rounded-full border border-[var(--chart-rust)]/40" /></> : <><i className="absolute left-1/2 top-1/2 h-5 w-10 -translate-x-1/2 -translate-y-1/2 rounded-[50%] border border-white/30" /><i className="absolute left-1/2 top-1/2 h-3 w-7 -translate-x-1/2 -translate-y-1/2 rounded-[50%] border border-[var(--chart-primary)]/55" /></>}</span><span className="mt-2 block text-[10px] font-bold text-[var(--soft-ink)]">{trim === "orbit" ? "Soft Orbit" : trim === "archive" ? "Archive File" : trim === "aurora" ? "Aurora Glow" : "Month Cover"}</span></button>)}</div>
                 </fieldset>
 
-                <fieldset className="mt-6">
-                  <legend className="text-[10px] font-semibold uppercase tracking-[0.15em] text-stone-400">Identity drafts · review only</legend>
-                  <div className="mt-3 grid max-w-md grid-cols-2 gap-2">
-                    {(["field-notes", "almanac", "atlas"] as const).map((draft) => <button aria-pressed={draftVariant === draft} className={`rounded-2xl border px-4 py-3 text-left transition ${draftVariant === draft ? "border-[var(--chart-deep)] bg-[var(--chart-deep)] text-white shadow-md" : "border-[color:color-mix(in_srgb,var(--chart-deep)_12%,transparent)] bg-white/55 text-[var(--soft-ink)] hover:bg-white"}`} key={draft} onClick={() => setDraftVariant(draft)} type="button"><span className="block text-xs font-bold">{draft === "field-notes" ? "Aduvia Field Notes" : draft === "almanac" ? "Rhythm Almanac" : "Aduvia Atlas"}</span><span className={`mt-1 block text-[9px] ${draftVariant === draft ? "text-white/55" : "text-[var(--soft-muted)]"}`}>{draft === "field-notes" ? "Personal · reflective" : draft === "almanac" ? "Collected · premium" : "Routes · destinations"}</span></button>)}
-                    <button className="rounded-2xl border border-dashed border-[color:color-mix(in_srgb,var(--chart-deep)_20%,transparent)] px-4 py-3 text-left text-xs font-bold text-[var(--soft-muted)] transition hover:bg-white/50" onClick={() => setDraftVariant(null)} type="button">Return to existing trims</button>
-                  </div>
-                </fieldset>
-
                 <div className="mt-auto flex flex-wrap gap-3 pt-9"><button className="inline-flex items-center gap-2 rounded-full bg-[var(--chart-primary)] px-5 py-3 text-sm font-semibold text-[var(--chart-deep)] shadow-[0_10px_24px_rgba(216,154,66,.22)] transition hover:-translate-y-0.5" onClick={shareCard} type="button"><Share2 size={16} />Share image</button><button className="inline-flex items-center gap-2 rounded-full border border-[color:color-mix(in_srgb,var(--chart-deep)_15%,transparent)] bg-white/65 px-5 py-3 text-sm font-semibold text-[var(--chart-deep)] transition hover:bg-white" onClick={downloadCard} type="button"><Download size={16} />Download</button></div>
                 {shareMessage && <p className="mt-4 text-xs text-[var(--soft-icon-green)]" role="status">{shareMessage}</p>}
               </div>
 
               <div className="grid min-h-[620px] place-items-center overflow-hidden rounded-[26px] bg-[linear-gradient(145deg,var(--soft-tint-a),var(--soft-surface))] p-5 sm:p-8">
-                {draftVariant && <ArtifactDraftPreview completedQuests={completedQuestTitles} consistency={overallConsistency} daysShownUp={daysShownUp} format={format} habitCount={habits.length} monthName={monthName} variant={draftVariant} year={reportMonth.year} />}
-                <div className={draftVariant ? "hidden" : "contents"}>
                 {shareTrim === "cover" ? <MonthCoverPreview completedQuests={completedQuestTitles} consistency={overallConsistency} daysShownUp={daysShownUp} format={format} habitCount={habits.length} monthName={monthName} year={reportMonth.year} /> : <div className={`relative overflow-hidden text-white transition-all duration-500 ${shareTrim === "archive" ? "rounded-[4px] border-[10px] border-[var(--chart-surface)] outline outline-2 outline-offset-[-19px] outline-[var(--chart-primary)] shadow-[0_28px_65px_rgba(52,42,31,.3)]" : shareTrim === "aurora" ? "rounded-[30px] border-[7px] border-[#9edfd5] shadow-[0_0_0_2px_#c9a6d8,0_26px_70px_#6caea855]" : "rounded-[38px] shadow-[0_30px_70px_rgba(20,61,49,.28)]"} ${format === "story" ? "aspect-[9/16] w-full max-w-[310px] p-6" : "aspect-square w-full max-w-[560px] p-8 sm:p-9"}`} style={{ backgroundImage: shareTrim === "archive" ? "linear-gradient(145deg, color-mix(in srgb, var(--chart-ink) 72%, #171a18), var(--chart-deep))" : shareTrim === "aurora" ? "radial-gradient(circle at 12% 8%, rgba(143,225,208,.48), transparent 37%), radial-gradient(circle at 88% 80%, rgba(201,166,216,.38), transparent 42%), linear-gradient(145deg, var(--chart-deep), #51476f)" : "linear-gradient(145deg,var(--chart-deep),color-mix(in srgb,var(--chart-deep) 78%,var(--chart-green)))" }}>
                   <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "repeating-radial-gradient(ellipse at 25% 10%, transparent 0 15px, rgba(255,255,255,.055) 16px 17px)" }} />
                   {shareTrim === "archive" && <><i className="absolute left-3 top-3 size-2 rounded-full bg-[var(--chart-primary)]" /><i className="absolute right-3 top-3 size-2 rounded-full bg-[var(--chart-primary)]" /><i className="absolute bottom-3 left-3 size-2 rounded-full bg-[var(--chart-primary)]" /><i className="absolute bottom-3 right-3 size-2 rounded-full bg-[var(--chart-primary)]" /><span className="absolute bottom-1/2 right-2 translate-y-1/2 rotate-90 text-[6px] font-black uppercase tracking-[.22em] text-white/25">Rhythm archive · verified record</span></>}
@@ -692,7 +674,6 @@ export function MonthlyReport() {
                   <div className={`relative rounded-[22px] bg-[var(--chart-surface)] text-[var(--soft-ink)] ${format === "story" ? "p-4" : "p-5"}`}><p className="text-[7px] font-black uppercase tracking-[.18em] text-[var(--chart-ink)]">Constellation record</p><div className="mt-3 grid grid-cols-3 gap-2"><div><p className="text-2xl font-semibold">{daysShownUp}</p><p className="text-[7px] text-[var(--chart-ink)]">days in orbit</p></div><div><p className="text-2xl font-semibold">{habits.length}</p><p className="text-[7px] text-[var(--chart-ink)]">daily rituals</p></div><div><p className="text-2xl font-semibold">{completedQuestTitles.length}</p><p className="text-[7px] text-[var(--chart-ink)]">quests landed</p></div></div><div className={`mt-4 border-t border-[var(--chart-ink)]/15 pt-3 ${format === "story" ? "space-y-2" : "grid grid-cols-3 gap-2"}`}>{visibleShareQuests.map((quest, index) => <div className="flex min-w-0 items-center gap-2" key={quest}><span className="size-2 shrink-0 rounded-full bg-[var(--chart-primary)]" /><p className="truncate text-[8px] font-semibold">{String(index + 1).padStart(2, "0")} · {quest}</p></div>)}{remainingShareQuests > 0 && <p className="text-[8px] font-semibold text-[var(--chart-ink)]">+{remainingShareQuests} more in orbit</p>}</div></div>
                   <div className={`absolute bottom-4 left-6 right-6 flex items-center justify-between text-[6px] uppercase tracking-[.14em] ${shareTrim === "aurora" ? "rounded-full bg-[#102936]/70 px-3 py-2 text-white/85 shadow-sm backdrop-blur-sm" : "text-white/35"}`}><span>Issued {monthLabel}</span><span>Small steps · visible proof</span></div>
                 </div>}
-                </div>
               </div>
             </div>
           </section>
