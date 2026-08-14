@@ -116,7 +116,7 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
         <div><p className="text-2xl font-semibold tracking-[-.06em]">{completedQuests.length}</p><p className="mt-1 text-[7px] font-semibold uppercase tracking-[.11em] text-white/72">discoveries</p></div>
       </section>
 
-      {isStory && completedQuests.length > 0 && <section aria-label="Completed quest symbols" className="mt-4 flex items-center justify-center gap-6 text-[color-mix(in_srgb,var(--chart-primary)_70%,white)]">
+      {isStory && completedQuests.length > 0 && <section aria-label="Completed quest symbols" className="mt-2 flex h-8 items-center justify-center gap-6 text-[color-mix(in_srgb,var(--chart-primary)_70%,white)]">
         {completedQuests.slice(0, 4).map((quest) => <ActivityIcon activity={quest} className="size-5 drop-shadow-[0_0_7px_var(--chart-primary)]" key={quest} />)}
         {completedQuests.length > 4 && <span className="text-[8px] font-black tracking-[.1em] text-white/72">+{completedQuests.length - 4}</span>}
       </section>}
