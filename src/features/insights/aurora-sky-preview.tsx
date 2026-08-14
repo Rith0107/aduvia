@@ -16,12 +16,13 @@ type AuroraSkyPreviewProps = {
   format: "square" | "story";
   habits: AuroraHabit[];
   monthName: string;
+  onRasterReadyChange?: (ready: boolean) => void;
   year: number;
 };
 
 const ribbonColors = ["var(--chart-primary)", "var(--chart-blue)", "var(--chart-green)", "var(--chart-rust)"];
 
-export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, format, habits, monthName, year }: AuroraSkyPreviewProps) {
+export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, format, habits, monthName, onRasterReadyChange, year }: AuroraSkyPreviewProps) {
   const artworkRef = useRef<HTMLElement>(null);
   const [rasterError, setRasterError] = useState("");
   const [rasterUrl, setRasterUrl] = useState("");
@@ -73,14 +74,17 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
         if (currentUrl) URL.revokeObjectURL(currentUrl);
         return nextUrl;
       });
+      onRasterReadyChange?.(true);
     }
 
     setRasterUrl((currentUrl) => {
       if (currentUrl) URL.revokeObjectURL(currentUrl);
       return "";
     });
+    onRasterReadyChange?.(false);
     setRasterError("");
     void createMatchingRaster().catch((error: unknown) => {
+      onRasterReadyChange?.(false);
       setRasterError(error instanceof Error ? error.message : "Aurora renderer failed.");
     });
 
@@ -88,7 +92,7 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
       active = false;
       if (nextUrl) URL.revokeObjectURL(nextUrl);
     };
-  }, [completedQuests, consistency, daysShownUp, habits, isStory, monthName, paletteRevision, year]);
+  }, [completedQuests, consistency, daysShownUp, habits, isStory, monthName, onRasterReadyChange, paletteRevision, year]);
 
   return <div className={`${shell} relative`} data-share-error={rasterError || undefined}>
   <article aria-label={rasterUrl ? undefined : "Aurora Sky share preview"} className="absolute inset-0 overflow-hidden rounded-[26px] border border-white/25 bg-[linear-gradient(155deg,color-mix(in_srgb,var(--chart-deep)_78%,#07131d)_0%,color-mix(in_srgb,var(--chart-deep)_72%,#081827)_54%,color-mix(in_srgb,var(--chart-deep)_46%,#09111f)_100%)] text-white shadow-[0_28px_70px_rgba(3,10,18,.42),inset_0_0_0_1px_rgba(255,255,255,.06)]" ref={artworkRef} style={{ fontFamily: "Arial, Helvetica, sans-serif" }}>
