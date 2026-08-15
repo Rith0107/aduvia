@@ -112,14 +112,19 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
         <p className="text-right text-[8px] font-bold uppercase tracking-[.12em] text-white/88">{monthName}<br />{year}</p>
       </header>
 
-      <section className={`${isStory ? "mt-6" : "mt-5 grid grid-cols-[.72fr_1.28fr] items-center gap-5"}`}>
+      <section className={`${isStory ? "mt-6 flex flex-1 flex-col" : "mt-5 grid grid-cols-[.72fr_1.28fr] items-center gap-5"}`}>
         <div className={isStory ? "text-center" : ""}>
           <p className={`${isStory ? "text-[4.4rem]" : "text-[5.5rem]"} font-semibold leading-[.82] tracking-[-.09em]`}>{consistency}<span className="ml-1 text-2xl text-[var(--chart-primary)]">%</span></p>
           <p className={`${isStory ? "mt-2" : "mt-3"} text-[8px] font-black uppercase tracking-[.2em] text-white/78`}>rhythm glow</p>
           {!isStory && <p className="mt-4 max-w-[155px] text-[10px] font-medium leading-4 text-white/82">Your month left a calm signal in the sky.</p>}
         </div>
 
-        <div aria-label={`${habits.length} habit auroras`} className={`relative ${isStory ? "-mx-5 mt-1 h-36 overflow-visible" : "h-48 overflow-hidden rounded-[24px] border border-white/10 bg-black/10 shadow-[inset_0_0_30px_rgba(0,0,0,.18)]"}`}>
+        {/* flex-1 lets this grow into whatever room the card has beyond
+            its narrow-viewport minimum, instead of leaving that space as
+            a dead gap between here and the footer (min-h keeps the ring
+            layout, which sizes itself as a % of this box, from collapsing
+            on the narrowest phones). */}
+        <div aria-label={`${habits.length} habit auroras`} className={`relative ${isStory ? "-mx-5 mt-1 min-h-36 flex-1 overflow-visible" : "h-48 overflow-hidden rounded-[24px] border border-white/10 bg-black/10 shadow-[inset_0_0_30px_rgba(0,0,0,.18)]"}`}>
           <div className="absolute -inset-x-[18%] inset-y-0 opacity-95" style={{ backgroundImage: "radial-gradient(ellipse 118% 30% at 50% 50%,color-mix(in srgb,var(--chart-primary) 42%,transparent) 0%,color-mix(in srgb,var(--chart-primary) 14%,transparent) 50%,transparent 84%),radial-gradient(ellipse 82% 26% at 30% 38%,color-mix(in srgb,var(--chart-green) 46%,transparent) 0%,color-mix(in srgb,var(--chart-green) 16%,transparent) 50%,transparent 78%),radial-gradient(ellipse 78% 26% at 72% 60%,color-mix(in srgb,var(--chart-rust) 44%,transparent) 0%,color-mix(in srgb,var(--chart-rust) 14%,transparent) 50%,transparent 78%),radial-gradient(ellipse 64% 28% at 80% 34%,color-mix(in srgb,var(--chart-blue) 40%,transparent) 0%,transparent 76%)" }} />
           <div className="absolute left-1/2 top-1/2 size-24 -translate-x-1/2 -translate-y-1/2 rounded-full p-[3px] shadow-[0_0_18px_var(--chart-primary),0_0_48px_color-mix(in_srgb,var(--chart-primary)_55%,transparent)]" style={{ background: `conic-gradient(var(--chart-primary) ${consistency * 3.6}deg,rgba(255,255,255,.13) 0deg)` }}><div className="grid size-full place-items-center rounded-full border border-white/12 bg-[color-mix(in_srgb,var(--chart-deep)_86%,transparent)] backdrop-blur-sm"><span className="size-2.5 rounded-full bg-white shadow-[0_0_8px_white,0_0_24px_var(--chart-primary)]" /></div></div>
           {habits.slice(0, 4).map((habit, index) => {
