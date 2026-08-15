@@ -106,7 +106,7 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
     <div className={`absolute inset-0 ${isStory ? "opacity-55" : "opacity-28"}`} style={{ backgroundImage: starField, backgroundSize: isStory ? "100% 100%" : "29px 29px" }} />
     <div className="absolute -inset-x-[12%] top-[27%] h-[32%] opacity-80" style={{ backgroundImage: "radial-gradient(ellipse 128% 42% at 50% 52%,color-mix(in srgb,var(--chart-primary) 34%,transparent) 0%,color-mix(in srgb,var(--chart-primary) 15%,transparent) 48%,transparent 82%),radial-gradient(ellipse 92% 36% at 24% 44%,color-mix(in srgb,var(--chart-green) 40%,transparent) 0%,color-mix(in srgb,var(--chart-green) 16%,transparent) 48%,transparent 78%),radial-gradient(ellipse 86% 34% at 78% 60%,color-mix(in srgb,var(--chart-rust) 34%,transparent) 0%,color-mix(in srgb,var(--chart-rust) 12%,transparent) 50%,transparent 78%),radial-gradient(ellipse 72% 32% at 86% 30%,color-mix(in srgb,var(--chart-blue) 30%,transparent) 0%,transparent 76%)" }} />
 
-    <div className={`relative flex h-full flex-col ${isStory ? "px-5 pb-10 pt-5" : "px-7 pb-14 pt-7"}`}>
+    <div className={`relative flex h-full flex-col ${isStory ? "px-5 pb-2 pt-5" : "px-7 pb-14 pt-7"}`}>
       <header className="flex items-start justify-between border-b border-white/25 pb-3">
         <div><p className="text-[9px] font-black uppercase tracking-[.21em] text-[color-mix(in_srgb,var(--chart-primary)_72%,white)]">Aduvia · {monthName} sky</p><p className="mt-1 text-[7px] font-medium uppercase tracking-[.15em] text-white/70">Monthly light record</p></div>
         <p className="text-right text-[8px] font-bold uppercase tracking-[.12em] text-white/88">{monthName}<br />{year}</p>
