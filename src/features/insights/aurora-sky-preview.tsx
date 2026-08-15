@@ -112,14 +112,14 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
         <p className="text-right text-[8px] font-bold uppercase tracking-[.12em] text-white/88">{monthName}<br />{year}</p>
       </header>
 
-      <section className={`${isStory ? "mt-10" : "mt-5 grid grid-cols-[.72fr_1.28fr] items-center gap-5"}`}>
+      <section className={`${isStory ? "mt-6" : "mt-5 grid grid-cols-[.72fr_1.28fr] items-center gap-5"}`}>
         <div className={isStory ? "text-center" : ""}>
-          <p className="text-[5.5rem] font-semibold leading-[.82] tracking-[-.09em]">{consistency}<span className="ml-1 text-2xl text-[var(--chart-primary)]">%</span></p>
+          <p className={`${isStory ? "text-[4.4rem]" : "text-[5.5rem]"} font-semibold leading-[.82] tracking-[-.09em]`}>{consistency}<span className="ml-1 text-2xl text-[var(--chart-primary)]">%</span></p>
           <p className={`${isStory ? "mt-2" : "mt-3"} text-[8px] font-black uppercase tracking-[.2em] text-white/78`}>rhythm glow</p>
           {!isStory && <p className="mt-4 max-w-[155px] text-[10px] font-medium leading-4 text-white/82">Your month left a calm signal in the sky.</p>}
         </div>
 
-        <div aria-label={`${habits.length} habit auroras`} className={`relative ${isStory ? "-mx-5 mt-1 h-48 overflow-visible" : "h-48 overflow-hidden rounded-[24px] border border-white/10 bg-black/10 shadow-[inset_0_0_30px_rgba(0,0,0,.18)]"}`}>
+        <div aria-label={`${habits.length} habit auroras`} className={`relative ${isStory ? "-mx-5 mt-1 h-36 overflow-visible" : "h-48 overflow-hidden rounded-[24px] border border-white/10 bg-black/10 shadow-[inset_0_0_30px_rgba(0,0,0,.18)]"}`}>
           <div className="absolute -inset-x-[18%] inset-y-0 opacity-95" style={{ backgroundImage: "radial-gradient(ellipse 118% 30% at 50% 50%,color-mix(in srgb,var(--chart-primary) 42%,transparent) 0%,color-mix(in srgb,var(--chart-primary) 14%,transparent) 50%,transparent 84%),radial-gradient(ellipse 82% 26% at 30% 38%,color-mix(in srgb,var(--chart-green) 46%,transparent) 0%,color-mix(in srgb,var(--chart-green) 16%,transparent) 50%,transparent 78%),radial-gradient(ellipse 78% 26% at 72% 60%,color-mix(in srgb,var(--chart-rust) 44%,transparent) 0%,color-mix(in srgb,var(--chart-rust) 14%,transparent) 50%,transparent 78%),radial-gradient(ellipse 64% 28% at 80% 34%,color-mix(in srgb,var(--chart-blue) 40%,transparent) 0%,transparent 76%)" }} />
           <div className="absolute left-1/2 top-1/2 size-24 -translate-x-1/2 -translate-y-1/2 rounded-full p-[3px] shadow-[0_0_18px_var(--chart-primary),0_0_48px_color-mix(in_srgb,var(--chart-primary)_55%,transparent)]" style={{ background: `conic-gradient(var(--chart-primary) ${consistency * 3.6}deg,rgba(255,255,255,.13) 0deg)` }}><div className="grid size-full place-items-center rounded-full border border-white/12 bg-[color-mix(in_srgb,var(--chart-deep)_86%,transparent)] backdrop-blur-sm"><span className="size-2.5 rounded-full bg-white shadow-[0_0_8px_white,0_0_24px_var(--chart-primary)]" /></div></div>
           {habits.slice(0, 4).map((habit, index) => {
@@ -129,14 +129,14 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
         </div>
       </section>
 
-      <section className={`${isStory ? "mt-2 py-1.5" : "mt-4 py-3"} grid grid-cols-3 border-y border-white/18 text-center`}>
+      <section className={`${isStory ? "mt-2 py-1.5" : "mt-4 py-3"} grid grid-cols-3 border-y border-white/28 text-center`}>
         <div><p className="text-2xl font-semibold tracking-[-.06em]">{daysShownUp}</p><p className="mt-1 text-[7px] font-semibold uppercase tracking-[.11em] text-white/72">illuminated days</p></div>
         <div className="border-x border-white/20"><p className="text-2xl font-semibold tracking-[-.06em]">{habits.length}</p><p className="mt-1 text-[7px] font-semibold uppercase tracking-[.11em] text-white/72">aurora ribbons</p></div>
         <div><p className="text-2xl font-semibold tracking-[-.06em]">{completedQuests.length}</p><p className="mt-1 text-[7px] font-semibold uppercase tracking-[.11em] text-white/72">discoveries</p></div>
       </section>
 
-      {isStory && completedQuests.length > 0 && <section aria-label="Completed quest symbols" className="mt-2 flex h-8 items-center justify-center gap-6 text-[color-mix(in_srgb,var(--chart-primary)_70%,white)]">
-        {completedQuests.slice(0, 4).map((quest) => <ActivityIcon activity={quest} className="size-5 drop-shadow-[0_0_7px_var(--chart-primary)]" key={quest} />)}
+      {isStory && completedQuests.length > 0 && <section aria-label="Completed quest symbols" className="mt-1.5 flex h-9 items-center justify-center gap-5 border-b border-white/28 pb-1.5 text-[color-mix(in_srgb,var(--chart-primary)_70%,white)]">
+        {completedQuests.slice(0, 4).map((quest) => <ActivityIcon activity={quest} className="size-6 drop-shadow-[0_0_7px_var(--chart-primary)]" key={quest} />)}
         {completedQuests.length > 4 && <span className="text-[8px] font-black tracking-[.1em] text-white/72">+{completedQuests.length - 4}</span>}
       </section>}
 
@@ -145,7 +145,7 @@ export function AuroraSkyPreview({ completedQuests, consistency, daysShownUp, fo
         <div className={`${isStory ? "mt-2 space-y-1.5" : "mt-3 grid grid-cols-2 gap-x-5 gap-y-2"}`}>{visibleQuests.length ? visibleQuests.map((quest) => <div className="grid grid-cols-[29px_1fr] items-center gap-2" key={quest}><span className={`${isStory ? "size-6" : "size-7"} grid place-items-center rounded-full border border-white/40 bg-[var(--chart-primary)]/20 text-white shadow-[0_0_8px_var(--chart-primary),0_0_22px_color-mix(in_srgb,var(--chart-primary)_55%,transparent)]`}><ActivityIcon activity={quest} className="size-4" /></span><p className="line-clamp-2 border-b border-white/25 pb-1.5 text-[8px] font-bold uppercase leading-tight text-white/95">{toAchievementTitle(quest)}</p></div>) : <p className="text-sm font-semibold text-white/82">The next constellation is still forming.</p>}{remainingQuests > 0 && <p className="col-span-full pt-1 text-[8px] font-bold uppercase tracking-[.11em] text-[color-mix(in_srgb,var(--chart-primary)_72%,white)]">+{remainingQuests} more discover{remainingQuests === 1 ? "y" : "ies"}</p>}</div>
       </section>}
 
-      <footer className={`${isStory ? "mt-auto" : "absolute inset-x-7 bottom-4"} flex items-end justify-between border-t border-white/16 pt-2 text-[7px] font-semibold uppercase tracking-[.14em] text-white/72`}><span>A month written in light.</span><span className="text-xl font-black tracking-[-.08em] text-white/95">A.</span></footer>
+      <footer className={`${isStory ? "mt-auto" : "absolute inset-x-7 bottom-4 border-t border-white/16"} flex items-end justify-between gap-3 pt-2 text-[7px] font-semibold uppercase tracking-[.14em] text-white/72`}><span className="whitespace-nowrap">A month written in light.</span><span className="shrink-0 text-xl font-black tracking-[-.08em] text-white/95">A.</span></footer>
     </div>
   </article>
   {/* The generated PNG is deliberately shown unchanged so the preview and shared file are identical. */}
