@@ -1,12 +1,13 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
-import { ChartNoAxesColumnIncreasing, Check, ChevronDown, CircleCheckBig, Flag, Pencil, Trash2 } from "lucide-react";
+import { FormEvent, useMemo, useState, useSyncExternalStore } from "react";
+import { Archive, ChartNoAxesColumnIncreasing, Check, ChevronDown, CircleCheckBig, Flag, Pencil, Trash2 } from "lucide-react";
 import { createPortal } from "react-dom";
 
 import { AppShell } from "@/components/app-shell";
 import { ActivityIcon } from "@/components/activity-icon";
 import { useAppData } from "@/lib/app-data";
+import { monthKey } from "@/lib/calendar";
 import { getMonthContext } from "@/lib/month-context";
 import type { QuestStatus, QuestSummary } from "./types";
 
@@ -47,17 +48,61 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
   const quests = appData?.quests ?? localQuests;
   const setQuests = appData?.setQuests ?? setLocalQuests;
   const [filter, setFilter] = useState<"all" | QuestStatus>("all");
+  const [view, setView] = useState<"current" | "archive">("current");
   const [isCreating, setIsCreating] = useState(false);
   const [title, setTitle] = useState("");
   const [openStatusId, setOpenStatusId] = useState<string | null>(null);
   const [editingQuest, setEditingQuest] = useState<QuestSummary | null>(null);
 
-  const visibleQuests = useMemo(
-    () => quests.filter((quest) => filter === "all" || quest.status === filter),
-    [filter, quests],
+  const thisMonth = monthKey();
+  // The board is scoped to the current month's quests — a quest entered in
+  // August is meant to be finished in August, not linger indefinitely.
+  // Anything from an earlier month lives in the Archive instead.
+  const currentQuests = useMemo(() => quests.filter((quest) => quest.targetMonth === thisMonth), [quests, thisMonth]);
+  const archivedQuests = useMemo(
+    () => quests.filter((quest) => quest.targetMonth !== thisMonth).sort((a, b) => b.targetMonth.localeCompare(a.targetMonth)),
+    [quests, thisMonth],
   );
-  const completed = quests.filter((quest) => quest.status === "completed").length;
-  const overallProgress = quests.length ? Math.round((completed / quests.length) * 100) : 0;
+  const visibleQuests = useMemo(
+    () => currentQuests.filter((quest) => filter === "all" || quest.status === filter),
+    [filter, currentQuests],
+  );
+  const completed = currentQuests.filter((quest) => quest.status === "completed").length;
+  const overallProgress = currentQuests.length ? Math.round((completed / currentQuests.length) * 100) : 0;
+
+  // Unfinished quests from a month that's already passed, where nobody has
+  // decided yet whether to carry them into this month or let them go.
+  // Ordinary edits never touch rolloverReviewedAt, so this list only ever
+  // shrinks via an explicit decision below — it can't reappear once resolved.
+  const needsRolloverDecision = useMemo(
+    () => quests.filter((quest) => quest.targetMonth < thisMonth && quest.status !== "completed" && !quest.rolloverReviewedAt),
+    [quests, thisMonth],
+  );
+  const [dismissedRollover, setDismissedRollover] = useState(false);
+  const [rolloverBusyId, setRolloverBusyId] = useState<string | null>(null);
+  // The other portals here default to closed, so they never reach
+  // createPortal during SSR. This one can be open on first render (a
+  // fresh month with an already-loaded quest list), so it needs an
+  // explicit client-only guard — useSyncExternalStore is the sanctioned
+  // way to read a value that's legitimately false on the server and
+  // during hydration, then true right after, with no setState-in-effect.
+  const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
+
+  async function resolveRollover(questId: string, carryForward: boolean) {
+    if (!appData) {
+      // Local-preview mode: no backend to reconcile, so just resolve in place.
+      const reviewedAt = new Date().toISOString();
+      setQuests((current) => {
+        const source = current.find((quest) => quest.id === questId);
+        const next = current.map((quest) => quest.id === questId ? { ...quest, rolloverReviewedAt: reviewedAt } : quest);
+        return carryForward && source ? [...next, { ...source, id: crypto.randomUUID(), targetMonth: thisMonth, dueLabel: monthContext.monthEndLabel, completedAt: null, carriedFromId: questId, rolloverReviewedAt: null }] : next;
+      });
+      return;
+    }
+    setRolloverBusyId(questId);
+    await (carryForward ? appData.carryQuestForward(questId) : appData.declineQuestRollover(questId));
+    setRolloverBusyId(null);
+  }
 
   function toggleQuestCompletion(id: string) {
     setQuests((current) =>
@@ -101,6 +146,10 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
         dueLabel: monthContext.monthEndLabel,
         effortHours: 6,
         color: "green",
+        targetMonth: monthKey(),
+        completedAt: null,
+        carriedFromId: null,
+        rolloverReviewedAt: null,
       },
     ]);
     setTitle("");
@@ -137,18 +186,41 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
   return (
     <AppShell active="Quests" eyebrow={`${monthContext.monthName} · ${monthContext.countdownLabel}`} title={<>A few things worth<br />finishing.</>} action={<button className="rounded-full bg-[var(--soft-ink)] px-6 py-4 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5" onClick={() => setIsCreating(true)} type="button">+ New quest</button>}>
           <section className="mt-12 grid border-y border-black/[0.09] sm:grid-cols-[1fr_1fr_1.4fr]">
-            <div className="py-6 sm:border-r sm:border-black/[0.09] sm:pr-6"><p className="metric-label"><Flag aria-hidden className="text-[var(--soft-icon-clay)]" />Committed</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{quests.length}</p></div>
+            <div className="py-6 sm:border-r sm:border-black/[0.09] sm:pr-6"><p className="metric-label"><Flag aria-hidden className="text-[var(--soft-icon-clay)]" />Committed</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{currentQuests.length}</p></div>
             <div className="border-t border-black/[0.09] py-6 sm:border-r sm:border-t-0 sm:px-6"><p className="metric-label"><CircleCheckBig aria-hidden className="text-[var(--soft-icon-green)]" />Completed</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{completed}</p></div>
             <div className="border-t border-black/[0.09] py-6 sm:border-t-0 sm:pl-6"><div className="flex items-start justify-between"><p className="metric-label"><ChartNoAxesColumnIncreasing aria-hidden className="text-[var(--soft-icon-blue)]" />Month progress</p><p className="text-4xl font-semibold tracking-[-0.05em]">{overallProgress}%</p></div><div className="mt-8 h-2 overflow-hidden rounded-full bg-black/[0.07]"><div className="h-full rounded-full bg-[var(--soft-ink)]" style={{ width: `${overallProgress}%` }} /></div></div>
           </section>
 
           <section className="mt-10 border-t border-black/[0.09] pt-7">
             <div className="flex flex-col gap-4 pb-5 sm:flex-row sm:items-center sm:justify-between">
-              <div><h2 className="text-xl font-semibold tracking-[-0.025em]">Monthly board</h2><p className="mt-1 text-sm text-stone-500">Meaningful goals beyond the daily routine.</p></div>
-              <div className="flex max-w-full gap-1 overflow-x-auto rounded-full bg-white/45 p-1">{(["all", "in-progress", "not-started", "paused", "blocked", "completed"] as const).map((option) => <button className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition ${filter === option ? "bg-[var(--soft-ink)] text-white" : "text-[var(--soft-muted)]"}`} key={option} onClick={() => setFilter(option)} type="button">{option === "all" ? "All" : statusLabels[option]}</button>)}</div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-semibold tracking-[-0.025em]">{view === "current" ? "Monthly board" : "Archive"}</h2>
+                  <div className="flex gap-1 rounded-full bg-white/45 p-1">
+                    <button aria-pressed={view === "current"} className={`rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-[.08em] transition ${view === "current" ? "bg-[var(--soft-ink)] text-white" : "text-[var(--soft-muted)]"}`} onClick={() => setView("current")} type="button">This month</button>
+                    <button aria-pressed={view === "archive"} className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-[.08em] transition ${view === "archive" ? "bg-[var(--soft-ink)] text-white" : "text-[var(--soft-muted)]"}`} onClick={() => setView("archive")} type="button"><Archive className="size-3" />Archive{archivedQuests.length > 0 ? ` (${archivedQuests.length})` : ""}</button>
+                  </div>
+                </div>
+                <p className="mt-1 text-sm text-stone-500">{view === "current" ? "Meaningful goals beyond the daily routine." : "Past months, kept for the record."}</p>
+              </div>
+              {view === "current" && <div className="flex max-w-full gap-1 overflow-x-auto rounded-full bg-white/45 p-1">{(["all", "in-progress", "not-started", "paused", "blocked", "completed"] as const).map((option) => <button className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition ${filter === option ? "bg-[var(--soft-ink)] text-white" : "text-[var(--soft-muted)]"}`} key={option} onClick={() => setFilter(option)} type="button">{option === "all" ? "All" : statusLabels[option]}</button>)}</div>}
             </div>
 
-            <div className="soft-flow soft-task-cards mt-5 grid gap-3 xl:grid-cols-2">
+            {view === "archive" && (archivedQuests.length
+              ? <div className="soft-flow mt-5 flex flex-col gap-2">
+                  {archivedQuests.map((quest) => <div className="flex flex-wrap items-center gap-3 rounded-[20px] border border-white/50 bg-white/35 px-5 py-4" key={quest.id}>
+                    <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white/60"><ActivityIcon activity={`${quest.title} ${quest.category}`} className="size-4" /></span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-bold">{quest.title}</p>
+                      <p className="mt-0.5 text-[11px] text-[var(--soft-muted)]">{new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(new Date(`${quest.targetMonth}T00:00:00`))} · {quest.category}</p>
+                    </div>
+                    <span className={`shrink-0 rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-[.08em] ${quest.status === "completed" ? "bg-[var(--soft-icon-green)]/15 text-[var(--soft-icon-green)]" : "bg-black/[0.06] text-[var(--soft-muted)]"}`}>{quest.status === "completed" && quest.completedAt ? `Completed ${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(new Date(quest.completedAt))}` : statusLabels[quest.status]}</span>
+                  </div>)}
+                </div>
+              : <div className="mt-5 flex min-h-40 flex-col items-center justify-center rounded-[34px] border border-dashed border-[var(--soft-accent)]/25 bg-white/30 px-6 py-10 text-center"><Archive className="size-6 text-[var(--soft-icon-clay)]" /><p className="mt-4 text-sm text-[var(--soft-muted)]">Nothing archived yet — past months will collect here.</p></div>
+            )}
+
+            {view === "current" && <div className="soft-flow soft-task-cards mt-5 grid gap-3 xl:grid-cols-2">
               {visibleQuests.map((quest) => {
                 const isComplete = quest.status === "completed";
                 return (
@@ -160,9 +232,30 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
                   </article>
                 );
               })}
-              {!visibleQuests.length && <div className="xl:col-span-2 flex min-h-64 flex-col items-center justify-center rounded-[34px] border border-dashed border-[var(--soft-accent)]/25 bg-white/30 px-6 py-12 text-center"><span className="grid size-14 place-items-center rounded-full bg-[var(--soft-tint-b)] text-[var(--soft-icon-clay)]"><Flag className="size-6" /></span><p className="mt-6 text-[10px] font-black uppercase tracking-[.2em] text-[var(--soft-accent)]">{quests.length ? "Nothing in this view" : "Your orbit is open"}</p><h3 className="mt-3 text-3xl font-semibold tracking-[-.04em]">{quests.length ? `No ${filter === "all" ? "" : statusLabels[filter].toLowerCase()} quests.` : "Add one meaningful finish."}</h3><p className="mt-3 max-w-md text-sm leading-6 text-[var(--soft-muted)]">{quests.length ? "Choose another status above to see the rest of your monthly board." : "A side quest is optional. When something feels worth finishing this month, give it a clear name and start from there."}</p>{!quests.length && <button className="mt-6 rounded-full bg-[var(--soft-ink)] px-6 py-3 text-sm font-bold text-white" onClick={() => setIsCreating(true)} type="button">Create my first quest</button>}</div>}
-            </div>
+              {!visibleQuests.length && <div className="xl:col-span-2 flex min-h-64 flex-col items-center justify-center rounded-[34px] border border-dashed border-[var(--soft-accent)]/25 bg-white/30 px-6 py-12 text-center"><span className="grid size-14 place-items-center rounded-full bg-[var(--soft-tint-b)] text-[var(--soft-icon-clay)]"><Flag className="size-6" /></span><p className="mt-6 text-[10px] font-black uppercase tracking-[.2em] text-[var(--soft-accent)]">{currentQuests.length ? "Nothing in this view" : "Your orbit is open"}</p><h3 className="mt-3 text-3xl font-semibold tracking-[-.04em]">{currentQuests.length ? `No ${filter === "all" ? "" : statusLabels[filter].toLowerCase()} quests.` : "Add one meaningful finish."}</h3><p className="mt-3 max-w-md text-sm leading-6 text-[var(--soft-muted)]">{currentQuests.length ? "Choose another status above to see the rest of your monthly board." : "A side quest is optional. When something feels worth finishing this month, give it a clear name and start from there."}</p>{!currentQuests.length && <button className="mt-6 rounded-full bg-[var(--soft-ink)] px-6 py-3 text-sm font-bold text-white" onClick={() => setIsCreating(true)} type="button">Create my first quest</button>}</div>}
+            </div>}
           </section>
+      {mounted && needsRolloverDecision.length > 0 && !dismissedRollover && createPortal(
+        <div aria-modal="true" className="creation-overlay" role="dialog">
+          <div className="w-full max-w-lg rounded-[28px] bg-[var(--theme-paper)] p-7 shadow-[0_40px_90px_-30px_rgba(24,43,35,.5)]">
+            <p className="soft-kicker text-[var(--soft-accent)]">New month, {monthContext.monthName}</p>
+            <h2 className="mt-2 text-2xl font-bold tracking-[-.03em]">A few quests are still open from last time.</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--soft-muted)]">Carry each one into {monthContext.monthName}, or leave it where it is — either way it stays in your Archive.</p>
+            <div className="mt-5 flex flex-col gap-2">
+              {needsRolloverDecision.map((quest) => <div className="flex flex-wrap items-center gap-3 rounded-[18px] border border-black/[0.06] bg-white/60 px-4 py-3" key={quest.id}>
+                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white/80"><ActivityIcon activity={`${quest.title} ${quest.category}`} className="size-4" /></span>
+                <div className="min-w-0 flex-1"><p className="truncate text-sm font-bold">{quest.title}</p><p className="text-[11px] text-[var(--soft-muted)]">{quest.category} · {statusLabels[quest.status]}</p></div>
+                <div className="flex shrink-0 gap-2">
+                  <button className="rounded-full bg-white/70 px-3 py-2 text-[11px] font-bold text-[var(--soft-muted)] disabled:opacity-50" disabled={rolloverBusyId === quest.id} onClick={() => void resolveRollover(quest.id, false)} type="button">Let it go</button>
+                  <button className="rounded-full bg-[var(--soft-ink)] px-3 py-2 text-[11px] font-bold text-white disabled:opacity-50" disabled={rolloverBusyId === quest.id} onClick={() => void resolveRollover(quest.id, true)} type="button">Carry forward</button>
+                </div>
+              </div>)}
+            </div>
+            <button className="mt-5 text-xs font-bold text-[var(--soft-muted)] underline underline-offset-2" onClick={() => setDismissedRollover(true)} type="button">Decide later</button>
+          </div>
+        </div>,
+        document.body,
+      )}
       {isCreating && createPortal(
         <div aria-modal="true" className="creation-overlay" role="dialog">
           <form className="creation-sheet" onSubmit={createQuest}>

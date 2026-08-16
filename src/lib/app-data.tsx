@@ -10,7 +10,8 @@ import { sampleQuests } from "@/features/quests/sample-data";
 import type { QuestSummary } from "@/features/quests/types";
 import type { TodayHabit } from "@/features/today/types";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
-import { browserTimeZone, calendarKey, calendarParts } from "@/lib/calendar";
+import { browserTimeZone, calendarKey, calendarParts, monthKey } from "@/lib/calendar";
+import { getMonthContext } from "@/lib/month-context";
 
 type CompletionMap = Record<string, Record<string, "complete" | "skipped">>;
 type PendingMutation =
@@ -32,12 +33,21 @@ type AppData = {
   retrySync: () => Promise<boolean>;
   deleteHabit: (habitId: string) => Promise<boolean>;
   deleteQuest: (questId: string) => Promise<boolean>;
+  /** Copies an unfinished quest from a past month into the current one and
+   *  marks the original as reviewed, so it stops showing up to ask about. */
+  carryQuestForward: (questId: string) => Promise<boolean>;
+  /** Marks a past quest's rollover decision as resolved without carrying
+   *  it forward — it stays exactly as it was, just in the archive now. */
+  declineQuestRollover: (questId: string) => Promise<boolean>;
   completeOnboarding: (newHabits: HabitSummary[], newQuests: QuestSummary[]) => Promise<boolean>;
   setHabitStatus: (habitId: string, status: "pending" | "complete" | "skipped", date?: Date) => void;
   saveReflection: (note: string, date?: Date) => Promise<boolean>;
 };
 
-const STORAGE_KEY = "aduvia-app-data-v1";
+// v2: side quests gained targetMonth/completedAt/carriedFromId/rolloverReviewedAt
+// as required fields — bumped so older cached shapes are discarded instead
+// of crashing the quests dashboard on read.
+const STORAGE_KEY = "aduvia-app-data-v2";
 const PENDING_SYNC_KEY = "aduvia-pending-sync-v1";
 const AppDataContext = createContext<AppData | null>(null);
 const weekdayKeys: HabitDay[] = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -53,7 +63,7 @@ export function shouldReloadForAuthEvent(event: AuthChangeEvent) {
 
 type RemoteCategory = { id: string; name: string; color: string | null };
 type RemoteHabit = { id: string; created_at: string; name: string; schedule: unknown; priority: number; status: "active" | "paused" | "archived"; category_id: string | null };
-type RemoteQuest = { id: string; title: string; target_date: string | null; estimated_minutes: number | null; status: string; category_id: string | null };
+type RemoteQuest = { id: string; title: string; target_date: string | null; target_month: string; estimated_minutes: number | null; status: string; category_id: string | null; completed_at: string | null; carried_from_id: string | null; rollover_reviewed_at: string | null };
 type RemoteCheckIn = { habit_id: string; scheduled_date: string; status: string };
 type RemoteReflection = { reflection_date: string; note: string | null };
 
@@ -245,7 +255,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       const [{ data: categoryRows, error: categoryError }, { data: habitRows, error: habitError }, { data: questRows, error: questError }, { data: checkInRows, error: checkInError }, { data: reflectionRows, error: reflectionError }] = await Promise.all([
         supabase.from("categories").select("id,name,color").eq("user_id", userId),
         supabase.from("habits").select("id,created_at,name,schedule,priority,status,category_id").eq("user_id", userId),
-        supabase.from("side_quests").select("id,title,target_date,estimated_minutes,status,category_id").eq("user_id", userId),
+        supabase.from("side_quests").select("id,title,target_date,target_month,estimated_minutes,status,category_id,completed_at,carried_from_id,rollover_reviewed_at").eq("user_id", userId),
         supabase.from("habit_check_ins").select("habit_id,scheduled_date,status").eq("user_id", userId),
         supabase.from("daily_reflections").select("reflection_date,note").eq("user_id", userId),
       ]);
@@ -265,7 +275,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       setQuests(((questRows ?? []) as RemoteQuest[]).map((row) => {
         const status = questStatusFromRemote(row.status);
         const category = row.category_id ? categoryById.get(row.category_id) : undefined;
-        return { id: row.id, title: row.title, category: category?.name ?? "Personal", status, dueLabel: dateLabel(row.target_date, status), effortHours: Math.max(1, Math.round((row.estimated_minutes ?? 60) / 60)), color: (category?.color as QuestSummary["color"]) ?? "green" };
+        return { id: row.id, title: row.title, category: category?.name ?? "Personal", status, dueLabel: dateLabel(row.target_date, status), effortHours: Math.max(1, Math.round((row.estimated_minutes ?? 60) / 60)), color: (category?.color as QuestSummary["color"]) ?? "green", targetMonth: row.target_month, completedAt: row.completed_at, carriedFromId: row.carried_from_id, rolloverReviewedAt: row.rollover_reviewed_at };
       }));
       const completionState: CompletionMap = {};
       checks.forEach((check) => {
@@ -350,9 +360,11 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   async function saveQuestsRemote(next: QuestSummary[]) {
     if (!remoteUserId) throw new Error("Your session is unavailable.");
     const categories = await ensureCategories(next.map((quest) => quest.category));
-    const month = new Date();
-    const targetMonth = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}-01`;
-    const { error } = await createBrowserSupabaseClient().from("side_quests").upsert(next.map((quest) => ({ id: quest.id, user_id: remoteUserId, category_id: categories[quest.category] ?? null, title: quest.title, target_month: targetMonth, estimated_minutes: quest.effortHours * 60, progress: quest.status === "completed" ? 1 : 0, status: questStatusForRemote(quest.status) })));
+    // target_month is intentionally omitted here: it's set once, either by
+    // the DB default (new quest) or when carrying a quest forward — an
+    // ordinary edit must never move a quest into a different month.
+    // completed_at is trigger-managed for the same reason.
+    const { error } = await createBrowserSupabaseClient().from("side_quests").upsert(next.map((quest) => ({ id: quest.id, user_id: remoteUserId, category_id: categories[quest.category] ?? null, title: quest.title, estimated_minutes: quest.effortHours * 60, progress: quest.status === "completed" ? 1 : 0, status: questStatusForRemote(quest.status) })));
     if (error) throw error;
   }
 
@@ -438,6 +450,39 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       setQuests((current) => current.filter((quest) => quest.id !== questId));
       return true;
     },
+    async carryQuestForward(questId) {
+      const source = quests.find((quest) => quest.id === questId);
+      if (!source) return false;
+      const reviewedAt = new Date().toISOString();
+      const carried: QuestSummary = { ...source, id: crypto.randomUUID(), targetMonth: monthKey(), dueLabel: getMonthContext().monthEndLabel, completedAt: null, carriedFromId: questId, rolloverReviewedAt: null };
+      if (remoteUserId) {
+        try {
+          const categories = await ensureCategories([carried.category]);
+          const supabase = createBrowserSupabaseClient();
+          const { error: insertError } = await supabase.from("side_quests").insert({ id: carried.id, user_id: remoteUserId, category_id: categories[carried.category] ?? null, title: carried.title, estimated_minutes: carried.effortHours * 60, progress: 0, status: questStatusForRemote(carried.status), carried_from_id: questId });
+          if (insertError) throw insertError;
+          const { error: reviewError } = await supabase.from("side_quests").update({ rollover_reviewed_at: reviewedAt }).eq("user_id", remoteUserId).eq("id", questId);
+          if (reviewError) throw reviewError;
+        } catch (error) {
+          setSyncError(errorMessage(error, "Could not carry that quest forward."));
+          return false;
+        }
+      }
+      setQuests((current) => [...current, carried].map((quest) => quest.id === questId ? { ...quest, rolloverReviewedAt: reviewedAt } : quest));
+      return true;
+    },
+    async declineQuestRollover(questId) {
+      const reviewedAt = new Date().toISOString();
+      if (remoteUserId) {
+        const { error } = await createBrowserSupabaseClient().from("side_quests").update({ rollover_reviewed_at: reviewedAt }).eq("user_id", remoteUserId).eq("id", questId);
+        if (error) {
+          setSyncError(error.message);
+          return false;
+        }
+      }
+      setQuests((current) => current.map((quest) => quest.id === questId ? { ...quest, rolloverReviewedAt: reviewedAt } : quest));
+      return true;
+    },
     async completeOnboarding(newHabits, newQuests) {
       try {
         if (hasRemoteConfiguration()) {
@@ -453,9 +498,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
             if (error) throw error;
           }
           if (newQuests.length) {
-            const month = new Date();
-            const targetMonth = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, "0")}-01`;
-            const { error } = await supabase.from("side_quests").upsert(newQuests.map((quest) => ({ id: quest.id, user_id: userId, category_id: ids[quest.category] ?? null, title: quest.title, target_month: targetMonth, estimated_minutes: quest.effortHours * 60, progress: 0, status: questStatusForRemote(quest.status) })));
+            const { error } = await supabase.from("side_quests").upsert(newQuests.map((quest) => ({ id: quest.id, user_id: userId, category_id: ids[quest.category] ?? null, title: quest.title, estimated_minutes: quest.effortHours * 60, progress: 0, status: questStatusForRemote(quest.status) })));
             if (error) throw error;
           }
           const { error: profileError } = await supabase.from("profiles").update({ onboarding_completed: true }).eq("id", userId);
