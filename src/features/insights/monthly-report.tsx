@@ -15,8 +15,6 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
-  Line,
-  LineChart,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -638,11 +636,11 @@ export function MonthlyReport() {
                 <thead><tr><th className="sticky left-0 z-10 w-44 border-b border-r border-black/[0.07] bg-[var(--theme-paper-warm)] px-4 py-3 text-left font-semibold">Habit</th>{Array.from({ length: daysInMonth }, (_, index) => { const isToday = viewingCurrentMonth && index + 1 === now.getDate(); return <th aria-current={isToday ? "date" : undefined} className={`w-10 border-b border-black/[0.06] py-3 text-center font-medium ${isToday ? "bg-[var(--theme-highlight)] text-[var(--chart-ink)]" : "text-[var(--soft-muted)]"}`} key={index}>{index + 1}</th>; })}<th className="sticky right-0 z-10 w-20 border-b border-l border-black/[0.07] bg-[var(--theme-paper-warm)] px-2 font-semibold">Score</th></tr></thead>
                 <tbody>{habits.map((habit) => <tr key={habit.id}><th className="sticky left-0 z-10 border-b border-r border-black/[0.06] bg-[var(--theme-paper)] px-4 py-3 text-left font-medium"><span className="mr-2 inline-block size-2 rounded-full" style={{ backgroundColor: habit.color }} />{habit.name}</th>{habit.days.map((state, dayIndex) => { const isToday = viewingCurrentMonth && dayIndex + 1 === now.getDate(); return <td className={`border-b border-black/[0.04] p-1 text-center ${isToday ? "bg-[color:color-mix(in_srgb,var(--theme-highlight)_55%,transparent)]" : ""}`} key={dayIndex}><span aria-label={`${habit.name}, ${monthName} ${dayIndex + 1}: ${state}`} className={`mx-auto grid size-8 place-items-center rounded-lg text-[11px] font-bold ${state === "done" ? "bg-[var(--chart-green)] text-white" : state === "missed" ? "bg-[var(--theme-missed)] text-[var(--chart-rust)]" : "bg-[var(--theme-muted-cell)] text-[var(--soft-muted)] opacity-55"}`}>{state === "done" ? "✓" : state === "missed" ? "·" : state === "pending" ? "○" : "–"}</span></td>; })}<td className="sticky right-0 z-10 border-b border-l border-black/[0.06] bg-[var(--theme-paper)] text-center font-semibold text-[var(--chart-green)]">{habitConsistency(habit)}%</td></tr>)}</tbody>
               </table>
-              <div aria-label={`Daily consistency across ${monthName}`} className="grid border-t border-white/10 bg-[var(--chart-deep)] text-white" style={{ gridTemplateColumns: `176px minmax(${daysInMonth * 40}px, 1fr) 80px`, minWidth: `${256 + daysInMonth * 40}px`, width: `max(100%, ${256 + daysInMonth * 40}px)` }}>
-                <div className="flex flex-col justify-center border-r border-white/10 px-5"><p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[var(--chart-primary)]">{daysInMonth}-day pulse</p><p className="mt-2 text-sm font-semibold leading-5">Daily<br />consistency</p></div>
-                <div className="flex h-52 items-center px-2"><ResponsiveContainer height={44} width="100%"><LineChart data={dailyConsistency}><Line dataKey="score" dot={false} isAnimationActive={false} stroke="var(--chart-primary)" strokeWidth={1.75} type="monotone" /></LineChart></ResponsiveContainer></div>
-                <div className="flex flex-col items-center justify-center border-l border-white/10 text-center"><p className="text-2xl font-semibold tracking-[-0.04em] text-[var(--chart-primary)]">{overallConsistency}%</p><p className="mt-1 text-[8px] font-semibold uppercase leading-3 tracking-[0.12em] text-white/55">Month<br />average</p></div>
-              </div>
+            </div>
+            <div aria-label={`Daily consistency across ${monthName}`} className="mt-3 grid overflow-hidden rounded-2xl bg-[var(--chart-deep)] text-white" style={{ gridTemplateColumns: `176px repeat(${daysInMonth}, minmax(0, 1fr)) 80px` }}>
+              <div className="flex flex-col justify-center border-r border-white/10 px-5 py-4"><p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[var(--chart-primary)]">{daysInMonth}-day pulse</p><p className="mt-2 text-sm font-semibold leading-5">Daily<br />consistency</p></div>
+              {dailyConsistency.map((point, index) => { const isToday = viewingCurrentMonth && index + 1 === now.getDate(); return <div className="flex h-32 items-end justify-center pb-3" key={index}><div aria-label={`${monthName} ${point.day} · ${point.score}%`} className={`w-1.5 rounded-t-[2px] transition-[height] ${isToday ? "bg-white" : "bg-[var(--chart-primary)]"}`} style={{ height: `${Math.max(3, point.score)}%`, opacity: isToday ? 1 : 0.35 + (point.score / 100) * 0.65 }} title={`${monthName} ${point.day} · ${point.score}%`} /></div>; })}
+              <div className="flex flex-col items-center justify-center border-l border-white/10 text-center"><p className="text-2xl font-semibold tracking-[-0.04em] text-[var(--chart-primary)]">{overallConsistency}%</p><p className="mt-1 text-[8px] font-semibold uppercase leading-3 tracking-[0.12em] text-white/55">Month<br />average</p></div>
             </div>
           </section>
 
