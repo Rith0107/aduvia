@@ -89,7 +89,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
       setQuests((current) => {
         const source = current.find((quest) => quest.id === questId);
         const next = current.map((quest) => quest.id === questId ? { ...quest, rolloverReviewedAt: reviewedAt } : quest);
-        return carryForward && source ? [...next, { ...source, id: crypto.randomUUID(), targetMonth: thisMonth, dueLabel: monthContext.monthEndLabel, completedAt: null, carriedFromId: questId, rolloverReviewedAt: null }] : next;
+        return carryForward && source ? [...next, { ...source, id: crypto.randomUUID(), targetMonth: thisMonth, dueLabel: "This month", completedAt: null, carriedFromId: questId, rolloverReviewedAt: null }] : next;
       });
       return;
     }
@@ -105,7 +105,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
           ? {
               ...quest,
               status: quest.status === "completed" ? "not-started" : "completed",
-              dueLabel: quest.status === "completed" ? monthContext.monthEndLabel : "Completed",
+              dueLabel: quest.status === "completed" ? "This month" : "Completed",
             }
           : quest,
       ),
@@ -119,7 +119,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
           ? {
               ...quest,
               status,
-              dueLabel: status === "completed" ? "Completed" : quest.dueLabel === "Completed" ? monthContext.monthEndLabel : quest.dueLabel,
+              dueLabel: status === "completed" ? "Completed" : quest.dueLabel === "Completed" ? "This month" : quest.dueLabel,
             }
           : quest,
       ),
@@ -137,7 +137,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
         title: title.trim(),
         category: inferQuestCategory(title),
         status: "not-started",
-        dueLabel: monthContext.monthEndLabel,
+        dueLabel: "This month",
         effortHours: 6,
         color: "green",
         targetMonth: monthKey(),

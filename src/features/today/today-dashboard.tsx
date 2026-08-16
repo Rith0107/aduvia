@@ -7,7 +7,6 @@ import { AppShell } from "@/components/app-shell";
 import { ActivityIcon } from "@/components/activity-icon";
 import { todaysHabits, useAppData } from "@/lib/app-data";
 import { calculateRoutineEfficiency } from "@/lib/metrics";
-import { getMonthContext } from "@/lib/month-context";
 import type { QuestSummary } from "@/features/quests/types";
 import type { SideQuestSummary, TodayHabit } from "./types";
 
@@ -17,13 +16,12 @@ function nextHabitState(habit: TodayHabit): TodayHabit {
   return habit.status === "complete" ? { ...habit, status: "pending", completion: 0 } : { ...habit, status: "complete", completion: 1 };
 }
 
-export function toggleQuestCompletionState(quest: QuestSummary, monthEndLabel: string): QuestSummary {
-  return { ...quest, status: quest.status === "completed" ? "not-started" : "completed", dueLabel: quest.status === "completed" ? monthEndLabel : "Completed" };
+export function toggleQuestCompletionState(quest: QuestSummary): QuestSummary {
+  return { ...quest, status: quest.status === "completed" ? "not-started" : "completed", dueLabel: quest.status === "completed" ? "This month" : "Completed" };
 }
 
 export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDashboardProps) {
   const appData = useAppData();
-  const monthContext = getMonthContext();
   const [localHabits, setLocalHabits] = useState(initialHabits);
   const habits = appData ? todaysHabits(appData.habits, appData.completions) : localHabits;
   const quests = appData?.quests ?? [];
@@ -44,7 +42,7 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
   }
 
   function toggleQuest(id: string) {
-    appData?.setQuests((current) => current.map((quest) => quest.id === id ? toggleQuestCompletionState(quest, monthContext.monthEndLabel) : quest));
+    appData?.setQuests((current) => current.map((quest) => quest.id === id ? toggleQuestCompletionState(quest) : quest));
   }
 
   async function saveReflection() {
