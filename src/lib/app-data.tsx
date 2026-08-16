@@ -11,7 +11,6 @@ import type { QuestSummary } from "@/features/quests/types";
 import type { TodayHabit } from "@/features/today/types";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import { browserTimeZone, calendarKey, calendarParts, monthKey } from "@/lib/calendar";
-import { getMonthContext } from "@/lib/month-context";
 
 type CompletionMap = Record<string, Record<string, "complete" | "skipped">>;
 type PendingMutation =
@@ -455,7 +454,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       const source = quests.find((quest) => quest.id === questId);
       if (!source) return false;
       const reviewedAt = new Date().toISOString();
-      const carried: QuestSummary = { ...source, id: crypto.randomUUID(), targetMonth: monthKey(), dueLabel: getMonthContext().monthEndLabel, completedAt: null, carriedFromId: questId, rolloverReviewedAt: null };
+      const carried: QuestSummary = { ...source, id: crypto.randomUUID(), targetMonth: monthKey(), dueLabel: "This month", completedAt: null, carriedFromId: questId, rolloverReviewedAt: null };
       if (remoteUserId) {
         try {
           const categories = await ensureCategories([carried.category]);

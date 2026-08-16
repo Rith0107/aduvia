@@ -2,7 +2,6 @@ export type MonthContext = {
   monthName: string;
   daysLeft: number;
   countdownLabel: string;
-  monthEndLabel: string;
 };
 
 export function getMonthContext(date = new Date()): MonthContext {
@@ -16,6 +15,5 @@ export function getMonthContext(date = new Date()): MonthContext {
     monthName,
     daysLeft,
     countdownLabel: daysLeft === 0 ? "Last day" : `${daysLeft} ${daysLeft === 1 ? "day" : "days"} left`,
-    monthEndLabel: new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(new Date(year, month, finalDay)),
   };
 }

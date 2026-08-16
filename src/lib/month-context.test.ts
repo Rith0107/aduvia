@@ -4,7 +4,7 @@ import { getMonthContext } from "./month-context";
 
 describe("getMonthContext", () => {
   it("counts only the dates after today", () => {
-    expect(getMonthContext(new Date(2026, 7, 11))).toMatchObject({ monthName: "August", daysLeft: 20, countdownLabel: "20 days left", monthEndLabel: "Aug 31" });
+    expect(getMonthContext(new Date(2026, 7, 11))).toMatchObject({ monthName: "August", daysLeft: 20, countdownLabel: "20 days left" });
   });
 
   it("handles the final day of a month", () => {

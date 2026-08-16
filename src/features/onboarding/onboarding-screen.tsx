@@ -84,9 +84,7 @@ export function OnboardingScreen() {
     const cleanQuestTitle = includeQuest ? questTitle.trim() : "";
     const selectedQuests: QuestSummary[] = [];
     if (cleanQuestTitle) {
-      const month = new Date();
-      const monthEnd = new Date(month.getFullYear(), month.getMonth() + 1, 0);
-      const quest: QuestSummary = { id: crypto.randomUUID(), title: cleanQuestTitle, category: "Personal", status: "not-started", dueLabel: monthEnd.toLocaleDateString("en-US", { month: "short", day: "numeric" }), effortHours: 1, color: "amber", targetMonth: monthKey(), completedAt: null, carriedFromId: null, rolloverReviewedAt: null };
+      const quest: QuestSummary = { id: crypto.randomUUID(), title: cleanQuestTitle, category: "Personal", status: "not-started", dueLabel: "This month", effortHours: 1, color: "amber", targetMonth: monthKey(), completedAt: null, carriedFromId: null, rolloverReviewedAt: null };
       selectedQuests.push(quest);
     }
     try {
