@@ -453,6 +453,10 @@ export function MonthlyReport() {
   const reportMonthStart = new Date(reportMonth.year, reportMonth.month, 1);
   const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const daysInMonth = reportDayCount(reportMonth.year, reportMonth.month, now);
+  // The total length of the viewed month, independent of how many days have
+  // actually elapsed (daysInMonth) — lets the UI show "16 of 31 days" instead
+  // of just the elapsed count, so it's obvious how far into the month you are.
+  const calendarDaysInMonth = new Date(reportMonth.year, reportMonth.month + 1, 0).getDate();
   const currentDateKey = dateStorageKey(now.getFullYear(), now.getMonth(), currentDay);
   const todayScheduledHabits = appData?.habits.filter((habit) => isHabitScheduledOn(habit, now)) ?? [];
   const todayAnswers = appData?.completions[currentDateKey] ?? {};
@@ -629,7 +633,7 @@ export function MonthlyReport() {
           </section>
 
           <section className="mt-7 rounded-[44px] border border-white/70 bg-[color:color-mix(in_srgb,var(--soft-surface)_80%,transparent)] p-4 shadow-[0_26px_70px_-48px_rgba(34,61,49,.42)] sm:p-7">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-xl font-semibold">Daily consistency map</h2><p className="mt-1 text-sm text-[var(--soft-muted)]">Read-only history from your daily check-ins.</p></div><div className="flex flex-wrap gap-3 text-xs text-[var(--soft-muted)]"><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--chart-green)]" />Done</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--theme-missed)]" />Missed</span><span className="flex items-center gap-1.5"><i className="size-3 rounded border border-[var(--soft-muted)]/25 bg-transparent" />Today pending</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--theme-muted-cell)]" />Not scheduled</span></div></div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-xl font-semibold">Daily consistency map</h2><p className="mt-1 text-sm text-[var(--soft-muted)]">Read-only history from your daily check-ins.</p></div><div className="flex flex-wrap items-center gap-3 text-xs text-[var(--soft-muted)]"><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--chart-green)]" />Done</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--theme-missed)]" />Missed</span><span className="flex items-center gap-1.5"><i className="size-3 rounded border border-[var(--soft-muted)]/25 bg-transparent" />Today pending</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--theme-muted-cell)]" />Not scheduled</span><span className="rounded-full bg-[var(--theme-paper-warm)] px-3 py-1.5 font-semibold text-[var(--chart-ink)]">{daysInMonth} of {calendarDaysInMonth} days</span></div></div>
             <div aria-label="Daily consistency table. Scroll horizontally to view every day." className="mt-6 overflow-x-auto rounded-2xl border border-black/[0.06] bg-[var(--theme-paper)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]" role="region" tabIndex={0}>
               <table className="table-fixed border-separate border-spacing-0 text-xs" style={{ minWidth: `${256 + daysInMonth * 40}px`, width: `max(100%, ${256 + daysInMonth * 40}px)` }}>
                 <colgroup><col style={{ width: 176 }} />{Array.from({ length: daysInMonth }, (_, index) => <col key={index} style={{ width: 40 }} />)}<col style={{ width: 80 }} /></colgroup>
