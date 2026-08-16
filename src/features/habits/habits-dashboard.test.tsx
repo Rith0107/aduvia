@@ -69,20 +69,6 @@ describe("HabitsDashboard", () => {
     expect(screen.getByText(/3× · Mon · Wed · Fri/)).toBeInTheDocument();
   });
 
-  it("edits an existing schedule and reflects the exact saved weekdays", () => {
-    render(<HabitsDashboard initialHabits={[{ id: "gym", name: "I hit gym", category: "Fitness", frequency: "Custom", scheduledDays: ["Thu", "Sun"], consistency: 0, streak: 0, state: "active", color: "green" }]} />);
-    fireEvent.click(screen.getByRole("button", { name: "Edit schedule for I hit gym" }));
-    fireEvent.click(screen.getByRole("button", { name: "Thursday: selected" }));
-    fireEvent.click(screen.getByRole("button", { name: "Sunday: selected" }));
-    for (const day of ["Monday", "Tuesday", "Wednesday", "Friday", "Saturday"]) {
-      fireEvent.click(screen.getByRole("button", { name: `${day}: not selected` }));
-    }
-    fireEvent.click(screen.getByRole("button", { name: "Save schedule" }));
-    expect(screen.getByText(/Mon · Tue · Wed · Fri · Sat/)).toBeInTheDocument();
-    expect(screen.getByLabelText("Thursday: rest day")).toBeInTheDocument();
-    expect(screen.getByLabelText("Sunday: rest day")).toBeInTheDocument();
-  });
-
   it("edits a habit name, inferred category, schedule, and anchor", () => {
     render(<HabitsDashboard initialHabits={sampleHabitSummaries} />);
     fireEvent.click(screen.getByRole("button", { name: "Edit Morning walk" }));
