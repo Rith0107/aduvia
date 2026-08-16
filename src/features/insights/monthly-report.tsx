@@ -15,6 +15,8 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  Line,
+  LineChart,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -63,12 +65,6 @@ function RhythmActiveBar({ height = 0, payload, width = 0, x = 0, y = 0 }: { hei
       <text fill="var(--chart-ink)" fontSize="11" fontWeight="700" textAnchor="middle" x={x + width / 2} y={y - 19}>{payload.name} · {payload.score}%</text>
     </g>
   );
-}
-
-function DailyConsistencyTooltip({ active, monthName, payload }: { active?: boolean; monthName: string; payload?: Array<{ payload: { day: number; score: number } }> }) {
-  if (!active || !payload?.[0]) return null;
-  const point = payload[0].payload;
-  return <div className="rounded-full border border-white/80 bg-[color:color-mix(in_srgb,var(--theme-paper)_95%,transparent)] px-4 py-2 text-xs font-bold text-[var(--chart-deep)] shadow-[0_12px_32px_-12px_rgba(23,63,50,.4)] backdrop-blur-xl">{monthName.slice(0, 3)} {point.day} · {point.score}%</div>;
 }
 
 function buildDays(seed: number, weekdaysOnly = false, year = 2026, month = 7): CellState[] {
@@ -644,7 +640,7 @@ export function MonthlyReport() {
               </table>
               <div aria-label={`Daily consistency across ${monthName}`} className="grid border-t border-white/10 bg-[var(--chart-deep)] text-white" style={{ gridTemplateColumns: `176px minmax(${daysInMonth * 40}px, 1fr) 80px`, minWidth: `${256 + daysInMonth * 40}px`, width: `max(100%, ${256 + daysInMonth * 40}px)` }}>
                 <div className="flex flex-col justify-center border-r border-white/10 px-5"><p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[var(--chart-primary)]">{daysInMonth}-day pulse</p><p className="mt-2 text-sm font-semibold leading-5">Daily<br />consistency</p></div>
-                <div className="h-52"><ResponsiveContainer height="100%" width="100%"><AreaChart data={dailyConsistency} margin={{ bottom: 8, left: 0, right: 0, top: 28 }}><defs><linearGradient id="dailyConsistencyFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="var(--chart-primary)" stopOpacity={0.5} /><stop offset="100%" stopColor="var(--chart-primary)" stopOpacity={0.03} /></linearGradient></defs><CartesianGrid stroke="rgba(255,255,255,.08)" strokeDasharray="3 7" vertical={false} /><XAxis axisLine={false} dataKey="day" domain={[0.5, daysInMonth + 0.5]} hide type="number" /><Tooltip content={<DailyConsistencyTooltip monthName={monthName} />} cursor={{ stroke: "var(--chart-primary)", strokeOpacity: .32, strokeWidth: 2 }} /><Area activeDot={{ fill: "var(--chart-primary)", r: 5, stroke: "#fffaf0", strokeWidth: 3 }} dataKey="score" fill="url(#dailyConsistencyFill)" isAnimationActive={false} stroke="var(--chart-primary)" strokeWidth={2.5} type="monotone" /></AreaChart></ResponsiveContainer></div>
+                <div className="flex h-52 items-center px-2"><ResponsiveContainer height={44} width="100%"><LineChart data={dailyConsistency}><Line dataKey="score" dot={false} isAnimationActive={false} stroke="var(--chart-primary)" strokeWidth={1.75} type="monotone" /></LineChart></ResponsiveContainer></div>
                 <div className="flex flex-col items-center justify-center border-l border-white/10 text-center"><p className="text-2xl font-semibold tracking-[-0.04em] text-[var(--chart-primary)]">{overallConsistency}%</p><p className="mt-1 text-[8px] font-semibold uppercase leading-3 tracking-[0.12em] text-white/55">Month<br />average</p></div>
               </div>
             </div>
