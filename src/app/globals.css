@@ -552,7 +552,7 @@ h3 {
 .creation-guidance > span { color: var(--soft-accent); font-size: 1.1rem; }
 .creation-guidance strong { color: var(--soft-ink); }
 .creation-actions { display: grid; grid-template-columns: .7fr 1.3fr; gap: .55rem; margin-top: auto; padding-top: .25rem; }
-.creation-actions button { min-height: 3.35rem; border-radius: 999px; background: rgb(37 48 42 / 6%); font-size: .73rem; font-weight: 850; }
+.creation-actions button { display: flex; align-items: center; justify-content: center; gap: .4rem; min-height: 3.35rem; border-radius: 999px; background: rgb(37 48 42 / 6%); font-size: .73rem; font-weight: 850; }
 .creation-actions button:last-child { display: flex; align-items: center; justify-content: space-between; background: var(--soft-ink); padding: 0 .65rem 0 1.3rem; color: white; }
 .creation-actions button:last-child > span:last-child { display: grid; width: 2.25rem; aspect-ratio: 1; place-items: center; border-radius: 50%; background: rgb(255 255 255 / 12%); }
 .creation-actions button:disabled { background: rgb(37 48 42 / 10%); color: var(--soft-muted); }
