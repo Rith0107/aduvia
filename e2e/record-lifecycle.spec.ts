@@ -31,11 +31,13 @@ test("a quest can move through every status and persists", async ({ page }) => {
   await page.getByRole("button", { name: "Create quest", exact: true }).click();
 
   const quest = page.getByRole("article").filter({ hasText: "Publish launch notes" });
-  for (const status of ["In progress", "Paused", "Blocked", "Completed"] as const) {
+  for (const status of ["Completed", "Not started"] as const) {
     await quest.getByRole("button", { name: "Change status for Publish launch notes" }).click();
     await page.getByRole("menuitem", { name: status }).click();
     await expect(quest).toContainText(status);
   }
+  await quest.getByRole("button", { name: "Change status for Publish launch notes" }).click();
+  await page.getByRole("menuitem", { name: "Completed" }).click();
 
   await page.reload();
   await expect(page.getByRole("article").filter({ hasText: "Publish launch notes" })).toContainText("Completed");

@@ -10,6 +10,7 @@ import type { HabitDay, HabitSummary } from "@/features/habits/types";
 import { inferHabitCategory } from "@/features/habits/infer-category";
 import type { QuestSummary } from "@/features/quests/types";
 import { useAppData } from "@/lib/app-data";
+import { monthKey } from "@/lib/calendar";
 
 const starters: Array<Omit<HabitSummary, "id" | "consistency" | "streak" | "state" | "isAnchor"> & { description: string }> = [
   { name: "Morning walk", category: "Fitness", frequency: "Daily", color: "green", description: "A gentle start, every day" },
@@ -85,7 +86,7 @@ export function OnboardingScreen() {
     if (cleanQuestTitle) {
       const month = new Date();
       const monthEnd = new Date(month.getFullYear(), month.getMonth() + 1, 0);
-      const quest: QuestSummary = { id: crypto.randomUUID(), title: cleanQuestTitle, category: "Personal", status: "not-started", dueLabel: monthEnd.toLocaleDateString("en-US", { month: "short", day: "numeric" }), effortHours: 1, color: "amber" };
+      const quest: QuestSummary = { id: crypto.randomUUID(), title: cleanQuestTitle, category: "Personal", status: "not-started", dueLabel: monthEnd.toLocaleDateString("en-US", { month: "short", day: "numeric" }), effortHours: 1, color: "amber", targetMonth: monthKey(), completedAt: null, carriedFromId: null, rolloverReviewedAt: null };
       selectedQuests.push(quest);
     }
     try {

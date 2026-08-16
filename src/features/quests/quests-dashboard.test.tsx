@@ -11,10 +11,10 @@ import { sampleQuests } from "./sample-data";
 afterEach(cleanup);
 
 describe("QuestsDashboard", () => {
-  it("filters blocked quests", () => {
+  it("filters completed quests", () => {
     render(<QuestsDashboard initialQuests={sampleQuests} />);
-    fireEvent.click(screen.getByRole("button", { name: "Blocked" }));
-    expect(screen.getByText("Read The Creative Act")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Completed" }));
+    expect(screen.getByText("Create a monthly budget")).toBeInTheDocument();
     expect(screen.queryByText("Build portfolio homepage")).not.toBeInTheDocument();
   });
 
@@ -27,11 +27,11 @@ describe("QuestsDashboard", () => {
     expect(portfolio).toHaveTextContent("Mark incomplete");
   });
 
-  it("updates a quest to paused", () => {
+  it("updates a quest status via the dropdown", () => {
     render(<QuestsDashboard initialQuests={sampleQuests} />);
     fireEvent.click(screen.getByRole("button", { name: "Change status for Build portfolio homepage" }));
-    fireEvent.click(screen.getByRole("menuitem", { name: "Paused" }));
-    expect(screen.getByText("Build portfolio homepage").closest("article")).toHaveTextContent("Paused");
+    fireEvent.click(screen.getByRole("menuitem", { name: "Completed" }));
+    expect(screen.getByText("Build portfolio homepage").closest("article")).toHaveTextContent("Completed");
   });
 
   it("creates a quest", () => {
@@ -52,7 +52,7 @@ describe("QuestsDashboard", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
     const quest = screen.getByText("Read a design book").closest("article");
     expect(quest).toHaveTextContent("Learning");
-    expect(quest).toHaveTextContent("In progress");
+    expect(quest).toHaveTextContent("Not started");
   });
 
   it("deletes a quest after confirmation", () => {
@@ -73,9 +73,10 @@ describe("QuestsDashboard", () => {
   });
 
   it("explains an empty filtered view without offering duplicate creation controls", () => {
-    render(<QuestsDashboard initialQuests={sampleQuests} />);
-    fireEvent.click(screen.getByRole("button", { name: "Paused" }));
-    expect(screen.getByText("No paused quests.")).toBeInTheDocument();
+    const quests = sampleQuests.filter((quest) => quest.status !== "not-started");
+    render(<QuestsDashboard initialQuests={quests} />);
+    fireEvent.click(screen.getByRole("button", { name: "Not started" }));
+    expect(screen.getByText("No not started quests.")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Create my first quest" })).not.toBeInTheDocument();
   });
 });

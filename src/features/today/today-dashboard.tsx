@@ -18,7 +18,7 @@ function nextHabitState(habit: TodayHabit): TodayHabit {
 }
 
 export function toggleQuestCompletionState(quest: QuestSummary, monthEndLabel: string): QuestSummary {
-  return { ...quest, status: quest.status === "completed" ? "in-progress" : "completed", dueLabel: quest.status === "completed" ? monthEndLabel : "Completed" };
+  return { ...quest, status: quest.status === "completed" ? "not-started" : "completed", dueLabel: quest.status === "completed" ? monthEndLabel : "Completed" };
 }
 
 export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDashboardProps) {
