@@ -194,16 +194,13 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
           <section className="mt-10 border-t border-black/[0.09] pt-7">
             <div className="flex flex-col gap-4 pb-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-semibold tracking-[-0.025em]">{view === "current" ? "Monthly board" : "Archive"}</h2>
-                  <div className="flex gap-1 rounded-full bg-white/45 p-1">
-                    <button aria-pressed={view === "current"} className={`rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-[.08em] transition ${view === "current" ? "bg-[var(--soft-ink)] text-white" : "text-[var(--soft-muted)]"}`} onClick={() => setView("current")} type="button">This month</button>
-                    <button aria-pressed={view === "archive"} className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-[.08em] transition ${view === "archive" ? "bg-[var(--soft-ink)] text-white" : "text-[var(--soft-muted)]"}`} onClick={() => setView("archive")} type="button"><Archive className="size-3" />Archive{archivedQuests.length > 0 ? ` (${archivedQuests.length})` : ""}</button>
-                  </div>
-                </div>
+                <h2 className="text-xl font-semibold tracking-[-0.025em]">{view === "current" ? "Monthly board" : "Archive"}</h2>
                 <p className="mt-1 text-sm text-stone-500">{view === "current" ? "Meaningful goals beyond the daily routine." : "Past months, kept for the record."}</p>
               </div>
-              {view === "current" && <div className="flex max-w-full gap-1 overflow-x-auto rounded-full bg-white/45 p-1">{(["all", "in-progress", "not-started", "paused", "blocked", "completed"] as const).map((option) => <button className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition ${filter === option ? "bg-[var(--soft-ink)] text-white" : "text-[var(--soft-muted)]"}`} key={option} onClick={() => setFilter(option)} type="button">{option === "all" ? "All" : statusLabels[option]}</button>)}</div>}
+              <div className="flex max-w-full flex-wrap gap-1 overflow-x-auto rounded-full bg-white/45 p-1">
+                {(["all", "not-started", "completed"] as const).map((option) => <button className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold transition ${view === "current" && filter === option ? "bg-[var(--soft-ink)] text-white" : "text-[var(--soft-muted)]"}`} key={option} onClick={() => { setView("current"); setFilter(option); }} type="button">{option === "all" ? "All" : statusLabels[option]}</button>)}
+                <button className={`inline-flex shrink-0 items-center gap-1 rounded-full px-4 py-2 text-xs font-bold transition ${view === "archive" ? "bg-[var(--soft-ink)] text-white" : "text-[var(--soft-muted)]"}`} onClick={() => setView("archive")} type="button"><Archive className="size-3" />Archive{archivedQuests.length > 0 ? ` (${archivedQuests.length})` : ""}</button>
+              </div>
             </div>
 
             {view === "archive" && (archivedQuests.length
