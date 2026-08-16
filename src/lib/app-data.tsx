@@ -105,11 +105,12 @@ function scheduleFromRemote(value: unknown): Pick<HabitSummary, "frequency" | "s
   return { frequency: schedule.type === "weekly" ? "3× weekly" : "Custom", scheduledDays };
 }
 
+// Older rows may still carry a status from before the status model was
+// trimmed to just not-started/completed (e.g. "in_progress", "blocked") —
+// anything but a literal "completed" folds into "not-started" rather than
+// producing a value the UI no longer knows how to render.
 function questStatusFromRemote(status: string): QuestSummary["status"] {
-  if (status === "not_started") return "not-started";
-  if (status === "in_progress") return "in-progress";
-  if (status === "paused" || status === "blocked" || status === "completed") return status;
-  return "paused";
+  return status === "completed" ? "completed" : "not-started";
 }
 
 function questStatusForRemote(status: QuestSummary["status"]) {

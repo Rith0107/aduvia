@@ -1,4 +1,4 @@
-export type QuestStatus = "not-started" | "in-progress" | "paused" | "blocked" | "completed";
+export type QuestStatus = "not-started" | "completed";
 
 export type QuestSummary = {
   id: string;

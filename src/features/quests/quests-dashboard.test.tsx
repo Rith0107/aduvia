@@ -27,11 +27,11 @@ describe("QuestsDashboard", () => {
     expect(portfolio).toHaveTextContent("Mark incomplete");
   });
 
-  it("updates a quest to paused", () => {
+  it("updates a quest status via the dropdown", () => {
     render(<QuestsDashboard initialQuests={sampleQuests} />);
     fireEvent.click(screen.getByRole("button", { name: "Change status for Build portfolio homepage" }));
-    fireEvent.click(screen.getByRole("menuitem", { name: "Paused" }));
-    expect(screen.getByText("Build portfolio homepage").closest("article")).toHaveTextContent("Paused");
+    fireEvent.click(screen.getByRole("menuitem", { name: "Completed" }));
+    expect(screen.getByText("Build portfolio homepage").closest("article")).toHaveTextContent("Completed");
   });
 
   it("creates a quest", () => {
@@ -52,7 +52,7 @@ describe("QuestsDashboard", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
     const quest = screen.getByText("Read a design book").closest("article");
     expect(quest).toHaveTextContent("Learning");
-    expect(quest).toHaveTextContent("In progress");
+    expect(quest).toHaveTextContent("Not started");
   });
 
   it("deletes a quest after confirmation", () => {

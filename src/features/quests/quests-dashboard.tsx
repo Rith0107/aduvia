@@ -27,17 +27,11 @@ function inferQuestCategory(title: string): QuestCategory {
 
 const statusLabels: Record<QuestStatus, string> = {
   "not-started": "Not started",
-  "in-progress": "In progress",
-  paused: "Paused",
-  blocked: "Blocked",
   completed: "Completed",
 };
 
 const statusColors: Record<QuestStatus, string> = {
   "not-started": "bg-stone-400",
-  "in-progress": "bg-[var(--soft-icon-green)]",
-  paused: "bg-[var(--soft-icon-gold)]",
-  blocked: "bg-[var(--soft-icon-clay)]",
   completed: "bg-[var(--soft-ink)]",
 };
 
@@ -110,7 +104,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
         quest.id === id
           ? {
               ...quest,
-              status: quest.status === "completed" ? "in-progress" : "completed",
+              status: quest.status === "completed" ? "not-started" : "completed",
               dueLabel: quest.status === "completed" ? monthContext.monthEndLabel : "Completed",
             }
           : quest,
