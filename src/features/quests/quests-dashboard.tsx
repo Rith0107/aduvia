@@ -238,20 +238,20 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
       {mounted && needsRolloverDecision.length > 0 && !dismissedRollover && createPortal(
         <div aria-modal="true" className="creation-overlay" role="dialog">
           <div className="w-full max-w-lg rounded-[28px] bg-[var(--theme-paper)] p-7 shadow-[0_40px_90px_-30px_rgba(24,43,35,.5)]">
-            <p className="soft-kicker text-[var(--soft-accent)]">New month, {monthContext.monthName}</p>
+            <p className="soft-kicker text-[var(--soft-ink)]">New month, {monthContext.monthName}</p>
             <h2 className="mt-2 text-2xl font-bold tracking-[-.03em]">A few quests are still open from last time.</h2>
             <p className="mt-2 text-sm leading-6 text-[var(--soft-muted)]">Carry each one into {monthContext.monthName}, or leave it where it is — either way it stays in your Archive.</p>
             <div className="mt-5 flex flex-col gap-2">
               {needsRolloverDecision.map((quest) => <div className="flex flex-wrap items-center gap-3 rounded-[18px] border border-black/[0.06] bg-white/60 px-4 py-3" key={quest.id}>
                 <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white/80"><ActivityIcon activity={`${quest.title} ${quest.category}`} className="size-4" /></span>
-                <div className="min-w-0 flex-1"><p className="truncate text-sm font-bold">{quest.title}</p><p className="text-[11px] text-[var(--soft-muted)]">{quest.category} · {statusLabels[quest.status]}</p></div>
+                <div className="min-w-0 flex-1"><p className="truncate text-sm font-bold">{quest.title}</p><p className="text-[11px] text-[var(--soft-ink)]">{quest.category} · {statusLabels[quest.status]}</p></div>
                 <div className="flex shrink-0 gap-2">
-                  <button className="rounded-full bg-white/70 px-3 py-2 text-[11px] font-bold text-[var(--soft-muted)] disabled:opacity-50" disabled={rolloverBusyId === quest.id} onClick={() => void resolveRollover(quest.id, false)} type="button">Let it go</button>
+                  <button className="rounded-full bg-white/70 px-3 py-2 text-[11px] font-bold text-[var(--soft-ink)] disabled:opacity-50" disabled={rolloverBusyId === quest.id} onClick={() => void resolveRollover(quest.id, false)} type="button">Let it go</button>
                   <button className="rounded-full bg-[var(--soft-ink)] px-3 py-2 text-[11px] font-bold text-white disabled:opacity-50" disabled={rolloverBusyId === quest.id} onClick={() => void resolveRollover(quest.id, true)} type="button">Carry forward</button>
                 </div>
               </div>)}
             </div>
-            <button className="mt-5 text-xs font-bold text-[var(--soft-muted)] underline underline-offset-2" onClick={() => setDismissedRollover(true)} type="button">Decide later</button>
+            <button className="mt-5 text-xs font-bold text-[var(--soft-ink)] underline underline-offset-2" onClick={() => setDismissedRollover(true)} type="button">Decide later</button>
           </div>
         </div>,
         document.body,
