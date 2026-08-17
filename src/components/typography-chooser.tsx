@@ -3,6 +3,8 @@
 import { Check, Type } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { useAppData } from "@/lib/app-data";
+
 const typographyPairs = [
   { id: "modern", label: "Modern Calm", display: "Manrope", body: "Inter", note: "Clear · effortless" },
   { id: "soft-journal", label: "Soft Journal", display: "Lora", body: "Inter", note: "Warm · readable" },
@@ -13,12 +15,24 @@ const typographyPairs = [
 type TypographyId = (typeof typographyPairs)[number]["id"];
 
 export function TypographyChooser({ embedded = false }: { embedded?: boolean } = {}) {
+  const appData = useAppData();
   const [selected, setSelected] = useState<TypographyId>(() => {
     if (typeof window === "undefined" || !window.localStorage) return "modern";
     const saved = window.localStorage.getItem("aduvia-typography") as TypographyId | null;
     return typographyPairs.some((pair) => pair.id === saved) ? saved! : "modern";
   });
   const [open, setOpen] = useState(false);
+
+  // The account's saved typography may differ from this device's local cache
+  // (e.g. it was last changed on another device). Adjusted during render
+  // (React's sanctioned pattern for syncing state to a changed prop) rather
+  // than in an effect, so it takes effect in the same pass instead of a
+  // flash of the old typography followed by a second render.
+  const [syncedTypography, setSyncedTypography] = useState(appData?.typography);
+  if (appData?.typography !== syncedTypography) {
+    setSyncedTypography(appData?.typography);
+    if (appData?.typography && typographyPairs.some((pair) => pair.id === appData.typography)) setSelected(appData.typography as TypographyId);
+  }
 
   useEffect(() => {
     document.documentElement.dataset.typography = selected;
@@ -42,5 +56,5 @@ export function TypographyChooser({ embedded = false }: { embedded?: boolean } =
     }
   }
 
-  return <div className="relative"><button aria-expanded={open} aria-haspopup="menu" aria-label="Choose typography" className="grid size-10 place-items-center rounded-full bg-white/45 text-[var(--soft-ink)] shadow-[inset_0_1px_0_rgba(255,255,255,.6)] backdrop-blur-xl transition hover:bg-white/65" onClick={toggleMenu} type="button"><Type className="size-4" strokeWidth={1.8} /></button>{open && <div aria-label="Typography pairs" className="absolute right-0 top-12 z-50 max-h-[min(70vh,520px)] w-72 overflow-y-auto rounded-[24px] border border-white/70 bg-[color:color-mix(in_srgb,var(--soft-surface)_94%,transparent)] p-2 shadow-[0_24px_65px_-24px_rgba(28,43,35,.48)] backdrop-blur-2xl" role="menu"><div className="px-3 pb-2 pt-1"><p className="text-[10px] font-black uppercase tracking-[.18em] text-[var(--soft-accent)]">Display + reading</p><p className="mt-1 text-[10px] text-[var(--soft-muted)]">Four low-stress, highly readable pairs.</p></div>{typographyPairs.map((pair) => <button className={`flex w-full items-center gap-3 rounded-[17px] px-3 py-3 text-left transition hover:bg-white/55 ${selected === pair.id ? "bg-white/65" : ""}`} key={pair.id} onClick={() => { setSelected(pair.id); setOpen(false); }} role="menuitem" type="button"><span className="grid size-11 place-items-center rounded-xl bg-[var(--soft-tint-a)] font-[var(--font-display)] text-xl font-semibold text-[var(--soft-ink)]">Ag</span><span className="min-w-0 flex-1"><span className="block text-xs font-bold text-[var(--soft-ink)]">{pair.label}</span><span className="mt-0.5 block truncate text-[10px] text-[var(--soft-muted)]">{pair.display} + {pair.body}</span><span className="block text-[9px] text-[var(--soft-muted)]/70">{pair.note}</span></span>{selected === pair.id && <Check className="size-4 shrink-0 text-[var(--soft-accent)]" strokeWidth={2.5} />}</button>)}</div>}</div>;
+  return <div className="relative"><button aria-expanded={open} aria-haspopup="menu" aria-label="Choose typography" className="grid size-10 place-items-center rounded-full bg-white/45 text-[var(--soft-ink)] shadow-[inset_0_1px_0_rgba(255,255,255,.6)] backdrop-blur-xl transition hover:bg-white/65" onClick={toggleMenu} type="button"><Type className="size-4" strokeWidth={1.8} /></button>{open && <div aria-label="Typography pairs" className="absolute right-0 top-12 z-50 max-h-[min(70vh,520px)] w-72 overflow-y-auto rounded-[24px] border border-white/70 bg-[color:color-mix(in_srgb,var(--soft-surface)_94%,transparent)] p-2 shadow-[0_24px_65px_-24px_rgba(28,43,35,.48)] backdrop-blur-2xl" role="menu"><div className="px-3 pb-2 pt-1"><p className="text-[10px] font-black uppercase tracking-[.18em] text-[var(--soft-accent)]">Display + reading</p><p className="mt-1 text-[10px] text-[var(--soft-muted)]">Four low-stress, highly readable pairs.</p></div>{typographyPairs.map((pair) => <button className={`flex w-full items-center gap-3 rounded-[17px] px-3 py-3 text-left transition hover:bg-white/55 ${selected === pair.id ? "bg-white/65" : ""}`} key={pair.id} onClick={() => { setSelected(pair.id); appData?.setTypography(pair.id); setOpen(false); }} role="menuitem" type="button"><span className="grid size-11 place-items-center rounded-xl bg-[var(--soft-tint-a)] font-[var(--font-display)] text-xl font-semibold text-[var(--soft-ink)]">Ag</span><span className="min-w-0 flex-1"><span className="block text-xs font-bold text-[var(--soft-ink)]">{pair.label}</span><span className="mt-0.5 block truncate text-[10px] text-[var(--soft-muted)]">{pair.display} + {pair.body}</span><span className="block text-[9px] text-[var(--soft-muted)]/70">{pair.note}</span></span>{selected === pair.id && <Check className="size-4 shrink-0 text-[var(--soft-accent)]" strokeWidth={2.5} />}</button>)}</div>}</div>;
 }

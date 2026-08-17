@@ -25,6 +25,12 @@ type AppData = {
   setQuests: React.Dispatch<React.SetStateAction<QuestSummary[]>>;
   completions: CompletionMap;
   reflections: Record<string, string>;
+  /** Null means no preference saved to the account yet — caller falls back
+   *  to its own local default. Non-null once loaded or after the user picks one. */
+  palette: string | null;
+  typography: string | null;
+  setPalette: (value: string) => void;
+  setTypography: (value: string) => void;
   isLoading: boolean;
   isSyncing: boolean;
   syncError: string | null;
@@ -180,6 +186,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [quests, setQuests] = useState(() => hasRemoteConfiguration() ? [] : sampleQuests);
   const [completions, setCompletions] = useState<CompletionMap>({});
   const [reflections, setReflections] = useState<Record<string, string>>({});
+  const [palette, setPaletteState] = useState<string | null>(null);
+  const [typography, setTypographyState] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [remoteUserId, setRemoteUserId] = useState<string | null>(null);
   const [categoryIds, setCategoryIds] = useState<Record<string, string>>({});
@@ -235,6 +243,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       setCompletions({});
       setReflections({});
       setCategoryIds({});
+      setPaletteState(null);
+      setTypographyState(null);
       setRemoteUserId(null);
       setSyncError(null);
     };
@@ -252,16 +262,19 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       const userId = authData.user.id;
       const detectedTimeZone = browserTimeZone();
       void supabase.from("profiles").update({ timezone: detectedTimeZone }).eq("id", userId);
-      const [{ data: categoryRows, error: categoryError }, { data: habitRows, error: habitError }, { data: questRows, error: questError }, { data: checkInRows, error: checkInError }, { data: reflectionRows, error: reflectionError }] = await Promise.all([
+      const [{ data: categoryRows, error: categoryError }, { data: habitRows, error: habitError }, { data: questRows, error: questError }, { data: checkInRows, error: checkInError }, { data: reflectionRows, error: reflectionError }, { data: profileRow, error: profileError }] = await Promise.all([
         supabase.from("categories").select("id,name,color").eq("user_id", userId),
         supabase.from("habits").select("id,created_at,name,schedule,priority,status,category_id").eq("user_id", userId),
         supabase.from("side_quests").select("id,title,target_date,target_month,estimated_minutes,status,category_id,completed_at,carried_from_id,rollover_reviewed_at").eq("user_id", userId),
         supabase.from("habit_check_ins").select("habit_id,scheduled_date,status").eq("user_id", userId),
         supabase.from("daily_reflections").select("reflection_date,note").eq("user_id", userId),
+        supabase.from("profiles").select("palette,typography").eq("id", userId).maybeSingle(),
       ]);
-      const error = categoryError || habitError || questError || checkInError || reflectionError;
+      const error = categoryError || habitError || questError || checkInError || reflectionError || profileError;
       if (error) throw error;
       if (!active) return;
+      setPaletteState(profileRow?.palette ?? null);
+      setTypographyState(profileRow?.typography ?? null);
       const categories = (categoryRows ?? []) as RemoteCategory[];
       const categoryById = new Map(categories.map((category) => [category.id, category]));
       const checks = (checkInRows ?? []) as RemoteCheckIn[];
@@ -403,7 +416,15 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   }
 
   const value = useMemo<AppData>(() => ({
-    habits, setHabits: updateHabits, quests, setQuests: updateQuests, completions, reflections, isLoading: !hydrated, isSyncing, syncError, pendingSyncCount: pendingMutations.length,
+    habits, setHabits: updateHabits, quests, setQuests: updateQuests, completions, reflections, palette, typography, isLoading: !hydrated, isSyncing, syncError, pendingSyncCount: pendingMutations.length,
+    setPalette(next) {
+      setPaletteState(next);
+      if (remoteUserId) void createBrowserSupabaseClient().from("profiles").update({ palette: next }).eq("id", remoteUserId);
+    },
+    setTypography(next) {
+      setTypographyState(next);
+      if (remoteUserId) void createBrowserSupabaseClient().from("profiles").update({ typography: next }).eq("id", remoteUserId);
+    },
     async retrySync() {
       if (!remoteUserId || !pendingMutations.length || isSyncing) return pendingMutations.length === 0;
       setIsSyncing(true);
@@ -554,7 +575,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     },
   // The dispatcher functions intentionally use the latest render's remote identity and category map.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [categoryIds, completions, habits, hydrated, isSyncing, pendingMutations, quests, reflections, remoteUserId, syncError]);
+  }), [categoryIds, completions, habits, hydrated, isSyncing, palette, pendingMutations, quests, reflections, remoteUserId, syncError, typography]);
 
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;
 }
