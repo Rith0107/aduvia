@@ -3,6 +3,8 @@
 import { Check, Palette } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { useAppData } from "@/lib/app-data";
+
 const palettes = [
   { id: "forest", label: "Forest Dawn", colors: ["#e7e8e3", "#29322c", "#a86f5b", "#d7e3dc"] },
   { id: "coastal", label: "Coastal Quiet", colors: ["#e5edef", "#18324a", "#d88467", "#badfd8"] },
@@ -14,6 +16,7 @@ const palettes = [
 type PaletteId = (typeof palettes)[number]["id"];
 
 export function PaletteChooser({ embedded = false }: { embedded?: boolean } = {}) {
+  const appData = useAppData();
   const [selected, setSelected] = useState<PaletteId>(() => {
     if (typeof window === "undefined") return "forest";
     try {
@@ -22,6 +25,17 @@ export function PaletteChooser({ embedded = false }: { embedded?: boolean } = {}
     } catch { return "forest"; }
   });
   const [open, setOpen] = useState(false);
+
+  // The account's saved palette may differ from this device's local cache
+  // (e.g. it was last changed on another device). Adjusted during render
+  // (React's sanctioned pattern for syncing state to a changed prop) rather
+  // than in an effect, so it takes effect in the same pass instead of a
+  // flash of the old palette followed by a second render.
+  const [syncedPalette, setSyncedPalette] = useState(appData?.palette);
+  if (appData?.palette !== syncedPalette) {
+    setSyncedPalette(appData?.palette);
+    if (appData?.palette && palettes.some((item) => item.id === appData.palette)) setSelected(appData.palette as PaletteId);
+  }
 
   useEffect(() => {
     document.documentElement.dataset.palette = selected;
@@ -39,6 +53,7 @@ export function PaletteChooser({ embedded = false }: { embedded?: boolean } = {}
 
   function choose(palette: PaletteId) {
     setSelected(palette);
+    appData?.setPalette(palette);
     setOpen(false);
   }
 
