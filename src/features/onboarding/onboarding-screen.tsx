@@ -74,12 +74,13 @@ export function OnboardingScreen() {
       scheduledDays: starter.scheduledDays,
       color: starter.color,
       consistency: 0,
+      checkInCount: 0,
       streak: 0,
       state: "active",
     } satisfies HabitSummary));
     if (customHabit) {
       const inferred = inferHabitCategory(customHabit);
-      selectedHabits.push({ id: crypto.randomUUID(), createdAt: new Date().toISOString(), isAnchor: customHabit === selectedAnchor, name: customHabit, category: inferred.category, frequency: customDays.length === 7 ? "Daily" : "Custom", scheduledDays: customDays, color: inferred.color, consistency: 0, streak: 0, state: "active" });
+      selectedHabits.push({ id: crypto.randomUUID(), createdAt: new Date().toISOString(), isAnchor: customHabit === selectedAnchor, name: customHabit, category: inferred.category, frequency: customDays.length === 7 ? "Daily" : "Custom", scheduledDays: customDays, color: inferred.color, consistency: 0, checkInCount: 0, streak: 0, state: "active" });
     }
     const cleanQuestTitle = includeQuest ? questTitle.trim() : "";
     const selectedQuests: QuestSummary[] = [];

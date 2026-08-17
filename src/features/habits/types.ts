@@ -11,6 +11,12 @@ export type HabitSummary = {
   scheduledDays?: HabitDay[];
   isAnchor?: boolean;
   consistency: number;
+  /** How many check-in records `consistency` is based on. Lets an average
+   * across habits weight a long-tracked habit more than a brand-new one
+   * with no history yet, instead of a fresh habit's unearned 0% dragging
+   * the average down starting the moment it's created. Undefined means
+   * "weight normally" (1), for demo data and habits where this isn't tracked. */
+  checkInCount?: number;
   streak: number;
   state: HabitState;
   color: "green" | "amber" | "rose" | "blue";

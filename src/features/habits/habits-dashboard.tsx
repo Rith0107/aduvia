@@ -36,8 +36,12 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
     () => habits.filter((habit) => filter === "all" || habit.state === filter),
     [filter, habits],
   );
-  const averageConsistency = habits.length
-    ? Math.round(habits.reduce((sum, habit) => sum + habit.consistency, 0) / habits.length)
+  // Weighted by each habit's own check-in count so a habit added mid-month
+  // starts contributing once it has real history, instead of an unearned 0%
+  // dragging the average down the moment it's created.
+  const consistencyWeight = habits.reduce((sum, habit) => sum + (habit.checkInCount ?? 1), 0);
+  const averageConsistency = consistencyWeight
+    ? Math.round(habits.reduce((sum, habit) => sum + habit.consistency * (habit.checkInCount ?? 1), 0) / consistencyWeight)
     : 0;
 
   function toggleState(id: string) {
@@ -93,6 +97,7 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
         scheduledDays: frequency === "Custom" || frequency === "3× weekly" ? selectedDays : undefined,
         isAnchor,
         consistency: 0,
+        checkInCount: 0,
         streak: 0,
         state: "active",
         color: inferred.color,
