@@ -26,6 +26,13 @@ describe("HabitsDashboard", () => {
     expect(screen.getByText("Drink water")).toBeInTheDocument();
   });
 
+  it("doesn't let a brand-new habit's unearned 0% drag down the overall consistency stat", () => {
+    const established = { id: "old", name: "Old habit", category: "Fitness", frequency: "Daily" as const, consistency: 90, checkInCount: 20, streak: 5, state: "active" as const, color: "green" as const };
+    const fresh = { id: "new", name: "New habit", category: "Learning", frequency: "Daily" as const, consistency: 0, checkInCount: 0, streak: 0, state: "active" as const, color: "blue" as const };
+    render(<HabitsDashboard initialHabits={[established, fresh]} />);
+    expect(screen.getByText("Consistency", { selector: "p.metric-label" }).nextElementSibling).toHaveTextContent("90%");
+  });
+
   it("allows a new habit to become the anchor", () => {
     render(<HabitsDashboard initialHabits={sampleHabitSummaries} />);
     fireEvent.click(screen.getByRole("button", { name: "+ New habit" }));

@@ -130,7 +130,7 @@ function metricsForHabit(habitId: string, checkIns: RemoteCheckIn[]) {
     if (record.status !== "complete") break;
     streak += 1;
   }
-  return { consistency: records.length ? Math.round(complete / records.length * 100) : 0, streak };
+  return { consistency: records.length ? Math.round(complete / records.length * 100) : 0, checkInCount: records.length, streak };
 }
 
 export function scheduledDaysFor(habit: HabitSummary): HabitDay[] {
