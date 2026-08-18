@@ -42,11 +42,14 @@ describe("shared app scheduling", () => {
     ]);
   });
 
-  it("reloads account data when authentication changes without requiring a page refresh", () => {
+  it("reloads account data when the signed-in identity changes, not on every token refresh", () => {
     expect(shouldReloadForAuthEvent("SIGNED_IN")).toBe(true);
-    expect(shouldReloadForAuthEvent("TOKEN_REFRESHED")).toBe(true);
     expect(shouldReloadForAuthEvent("USER_UPDATED")).toBe(true);
     expect(shouldReloadForAuthEvent("SIGNED_OUT")).toBe(true);
+    // A background token rotation doesn't mean habits/quests/etc. changed —
+    // reloading on every refresh turned routine token rotation into a
+    // continuous reload loop against Supabase.
+    expect(shouldReloadForAuthEvent("TOKEN_REFRESHED")).toBe(false);
     expect(shouldReloadForAuthEvent("INITIAL_SESSION")).toBe(false);
     expect(shouldReloadForAuthEvent("PASSWORD_RECOVERY")).toBe(false);
   });

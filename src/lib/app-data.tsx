@@ -62,8 +62,13 @@ export function mergePendingMutation<T extends { key: string }>(current: T[], mu
   return [...current.filter((item) => item.key !== mutation.key), mutation];
 }
 
+// TOKEN_REFRESHED fires every time the access token silently rotates in the
+// background — routine and frequent, not a sign that habits/quests/etc.
+// changed. Reloading all remote data on every refresh turned a background
+// token rotation into a full data-layer reload loop, hammering Supabase on
+// a timer instead of only when the signed-in identity actually changes.
 export function shouldReloadForAuthEvent(event: AuthChangeEvent) {
-  return event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED" || event === "SIGNED_OUT";
+  return event === "SIGNED_IN" || event === "USER_UPDATED" || event === "SIGNED_OUT";
 }
 
 type RemoteCategory = { id: string; name: string; color: string | null };
@@ -302,12 +307,20 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       setHydrated(true);
     };
 
-    const loadSafely = () => void loadRemoteData().catch((error: unknown) => {
-      if (!active) return;
-      clearRemoteData();
-      setSyncError(errorMessage(error, "Unable to load your Aduvia data."));
-      setHydrated(true);
-    });
+    // Belt-and-suspenders against any burst of auth events still landing
+    // close together: a reload already in flight absorbs the rest rather
+    // than each one kicking off its own overlapping fetch.
+    let loadInFlight = false;
+    const loadSafely = () => {
+      if (loadInFlight) return;
+      loadInFlight = true;
+      void loadRemoteData().catch((error: unknown) => {
+        if (!active) return;
+        clearRemoteData();
+        setSyncError(errorMessage(error, "Unable to load your Aduvia data."));
+        setHydrated(true);
+      }).finally(() => { loadInFlight = false; });
+    };
 
     loadSafely();
     const { data: authListener } = supabase.auth.onAuthStateChange((event: AuthChangeEvent) => {
