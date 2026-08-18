@@ -42,6 +42,18 @@ export function PaletteChooser({ embedded = false }: { embedded?: boolean } = {}
     try { window.localStorage.setItem("aduvia-palette", selected); } catch { /* The visual preference still applies for this session. */ }
   }, [selected]);
 
+  // The account may predate this syncing feature, in which case its saved
+  // palette is genuinely null rather than just "still loading" — every
+  // device would otherwise keep showing its own local cache forever, since
+  // there's nothing to adopt. Seed the account from whichever device
+  // notices this first, so every other device then has something to sync to.
+  useEffect(() => {
+    if (!appData || appData.isLoading || appData.palette) return;
+    let saved: PaletteId | null = null;
+    try { saved = window.localStorage.getItem("aduvia-palette") as PaletteId | null; } catch { /* No local cache to seed from. */ }
+    if (saved && palettes.some((item) => item.id === saved)) appData.setPalette(saved);
+  }, [appData, appData?.isLoading, appData?.palette]);
+
   useEffect(() => {
     const closeOtherMenus = (event: Event) => {
       const ownMenu = embedded ? "account-palette" : "palette";
