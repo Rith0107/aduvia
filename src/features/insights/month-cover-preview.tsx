@@ -15,11 +15,12 @@ type MonthCoverPreviewProps = {
 export function MonthCoverPreview({ completedQuests, consistency, daysShownUp, format, habitCount, monthName, year }: MonthCoverPreviewProps) {
   const isStory = format === "story";
   const isCompactQuestIndex = completedQuests.length > 3;
-  // Story stacks quest rows in a single column (Square uses two), so each
-  // extra row costs roughly twice the vertical space inside a card whose
-  // height is fixed by its own aspect ratio. A generous cap here is exactly
-  // what pushes the footer below the card's visible, clipped bounds.
-  const visibleQuestLimit = isStory ? 3 : (completedQuests.length > 6 ? 5 : 6);
+  // Matches the downloaded card's own row cap (see renderShareCard's
+  // "cover" trim in monthly-report.tsx), which already fits 5 story rows
+  // without pushing the footer past the card's fixed height. The lower cap
+  // that used to live here just left unused space above the footer instead
+  // of showing quests that were already available.
+  const visibleQuestLimit = isStory ? 5 : (completedQuests.length > 6 ? 5 : 6);
   const visibleQuests = completedQuests.slice(0, visibleQuestLimit);
   const remainingQuests = Math.max(0, completedQuests.length - visibleQuests.length);
   const shell = isStory ? "aspect-[9/16] w-full max-w-[310px]" : "aspect-square w-full max-w-[560px]";
