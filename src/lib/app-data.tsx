@@ -432,11 +432,23 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     habits, setHabits: updateHabits, quests, setQuests: updateQuests, completions, reflections, palette, typography, isLoading: !hydrated, isSyncing, syncError, pendingSyncCount: pendingMutations.length,
     setPalette(next) {
       setPaletteState(next);
-      if (remoteUserId) void createBrowserSupabaseClient().from("profiles").update({ palette: next }).eq("id", remoteUserId);
+      if (!remoteUserId) return;
+      // A previous version of this call never checked its result — a
+      // failed write, or an update that matched zero rows (e.g. because
+      // remoteUserId no longer matches the row RLS allows), looked
+      // identical to success and left the account silently un-synced.
+      void createBrowserSupabaseClient().from("profiles").update({ palette: next }).eq("id", remoteUserId).select("id").then(({ data, error }: { data: unknown[] | null; error: unknown }) => {
+        if (error) setSyncError(errorMessage(error, "Could not save your palette."));
+        else if (!data?.length) setSyncError("Your palette didn't save — please try again.");
+      });
     },
     setTypography(next) {
       setTypographyState(next);
-      if (remoteUserId) void createBrowserSupabaseClient().from("profiles").update({ typography: next }).eq("id", remoteUserId);
+      if (!remoteUserId) return;
+      void createBrowserSupabaseClient().from("profiles").update({ typography: next }).eq("id", remoteUserId).select("id").then(({ data, error }: { data: unknown[] | null; error: unknown }) => {
+        if (error) setSyncError(errorMessage(error, "Could not save your typography."));
+        else if (!data?.length) setSyncError("Your typography didn't save — please try again.");
+      });
     },
     async retrySync() {
       if (!remoteUserId || !pendingMutations.length || isSyncing) return pendingMutations.length === 0;
