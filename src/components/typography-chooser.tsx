@@ -39,6 +39,17 @@ export function TypographyChooser({ embedded = false }: { embedded?: boolean } =
     window.localStorage?.setItem("aduvia-typography", selected);
   }, [selected]);
 
+  // The account may predate this syncing feature, in which case its saved
+  // typography is genuinely null rather than just "still loading" — every
+  // device would otherwise keep showing its own local cache forever, since
+  // there's nothing to adopt. Seed the account from whichever device
+  // notices this first, so every other device then has something to sync to.
+  useEffect(() => {
+    if (!appData || appData.isLoading || appData.typography) return;
+    const saved = window.localStorage?.getItem("aduvia-typography") as TypographyId | null;
+    if (saved && typographyPairs.some((pair) => pair.id === saved)) appData.setTypography(saved);
+  }, [appData, appData?.isLoading, appData?.typography]);
+
   useEffect(() => {
     const closeOtherMenus = (event: Event) => {
       const ownMenu = embedded ? "account-typography" : "typography";
