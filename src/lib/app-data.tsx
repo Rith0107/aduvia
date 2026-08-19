@@ -127,6 +127,16 @@ function questStatusForRemote(status: QuestSummary["status"]) {
   return status.replace("-", "_");
 }
 
+// The DB's habit_status enum already had a third value ("archived") that the
+// client never wired up — "completed" reuses it rather than adding a new one.
+function habitStateFromRemote(status: string): HabitSummary["state"] {
+  return status === "paused" ? "paused" : status === "archived" ? "completed" : "active";
+}
+
+function habitStateForRemote(state: HabitSummary["state"]) {
+  return state === "completed" ? "archived" : state;
+}
+
 function dateLabel(value: string | null, status: QuestSummary["status"]) {
   if (status === "completed") return "Completed";
   if (!value) return "This month";
@@ -288,7 +298,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         const category = row.category_id ? categoryById.get(row.category_id) : undefined;
         const inferred = inferHabitCategory(row.name);
         const useInferred = !category || category.name === "Personal";
-        return { id: row.id, createdAt: row.created_at, name: row.name, category: useInferred ? inferred.category : category.name, ...scheduleFromRemote(row.schedule), isAnchor: row.priority === 3, ...metricsForHabit(row.id, checks), state: row.status === "paused" ? "paused" : "active", color: useInferred ? inferred.color : (category.color as HabitSummary["color"]) ?? inferred.color };
+        return { id: row.id, createdAt: row.created_at, name: row.name, category: useInferred ? inferred.category : category.name, ...scheduleFromRemote(row.schedule), isAnchor: row.priority === 3, ...metricsForHabit(row.id, checks), state: habitStateFromRemote(row.status), color: useInferred ? inferred.color : (category.color as HabitSummary["color"]) ?? inferred.color };
       }));
       setQuests(((questRows ?? []) as RemoteQuest[]).map((row) => {
         const status = questStatusFromRemote(row.status);
@@ -379,7 +389,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   async function saveHabitsRemote(next: HabitSummary[]) {
     if (!remoteUserId) throw new Error("Your session is unavailable.");
     const categories = await ensureCategories(next.map((habit) => habit.category));
-    const { error } = await createBrowserSupabaseClient().from("habits").upsert(next.map((habit) => ({ id: habit.id, user_id: remoteUserId, category_id: categories[habit.category] ?? null, name: habit.name, schedule: scheduleForRemote(habit), priority: habit.isAnchor ? 3 : 2, status: habit.state })));
+    const { error } = await createBrowserSupabaseClient().from("habits").upsert(next.map((habit) => ({ id: habit.id, user_id: remoteUserId, category_id: categories[habit.category] ?? null, name: habit.name, schedule: scheduleForRemote(habit), priority: habit.isAnchor ? 3 : 2, status: habitStateForRemote(habit.state) })));
     if (error) throw error;
   }
 
@@ -540,7 +550,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           if (categoryError) throw categoryError;
           const ids = Object.fromEntries(((categories ?? []) as Pick<RemoteCategory, "id" | "name">[]).map((category) => [category.name, category.id]));
           if (newHabits.length) {
-            const { error } = await supabase.from("habits").upsert(newHabits.map((habit) => ({ id: habit.id, user_id: userId, category_id: ids[habit.category] ?? null, name: habit.name, schedule: scheduleForRemote(habit), priority: habit.isAnchor ? 3 : 2, status: habit.state })));
+            const { error } = await supabase.from("habits").upsert(newHabits.map((habit) => ({ id: habit.id, user_id: userId, category_id: ids[habit.category] ?? null, name: habit.name, schedule: scheduleForRemote(habit), priority: habit.isAnchor ? 3 : 2, status: habitStateForRemote(habit.state) })));
             if (error) throw error;
           }
           if (newQuests.length) {

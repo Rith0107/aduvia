@@ -90,6 +90,19 @@ describe("HabitsDashboard", () => {
     expect(screen.getAllByText("Anchor")).toHaveLength(1);
   });
 
+  it("marks a habit complete from the edit form and stops offering to complete it again", () => {
+    render(<HabitsDashboard initialHabits={sampleHabitSummaries} />);
+    fireEvent.click(screen.getByRole("button", { name: "active" }));
+    expect(screen.getByText("Morning walk")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Edit Morning walk" }));
+    fireEvent.click(screen.getByRole("button", { name: "Mark complete" }));
+    expect(screen.queryByText("Morning walk")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "completed" }));
+    expect(screen.getByText("Morning walk")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Edit Morning walk" }));
+    expect(screen.queryByRole("button", { name: "Mark complete" })).not.toBeInTheDocument();
+  });
+
   it("requires explicit confirmation before deleting a habit", () => {
     render(<HabitsDashboard initialHabits={sampleHabitSummaries} />);
     fireEvent.click(screen.getByRole("button", { name: "Edit Morning walk" }));

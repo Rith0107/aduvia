@@ -6,4 +6,5 @@ export const sampleHabitSummaries: HabitSummary[] = [
   { id: "read", name: "Read 20 pages", category: "Learning", frequency: "Daily", consistency: 71, streak: 3, state: "active", color: "amber" },
   { id: "meditate", name: "Meditate", category: "Mindfulness", frequency: "3× weekly", consistency: 64, streak: 2, state: "active", color: "rose" },
   { id: "journal", name: "Evening journal", category: "Mindfulness", frequency: "Daily", consistency: 79, streak: 0, state: "paused", color: "rose" },
+  { id: "5k", name: "Train for the 5k", category: "Fitness", frequency: "3× weekly", consistency: 100, streak: 0, state: "completed", color: "amber" },
 ];
