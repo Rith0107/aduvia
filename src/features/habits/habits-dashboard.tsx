@@ -32,10 +32,14 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
   const [selectedDays, setSelectedDays] = useState<HabitDay[]>([]);
   const [isAnchor, setIsAnchor] = useState(false);
 
-  const visibleHabits = useMemo(
-    () => habits.filter((habit) => filter === "all" || habit.state === filter),
-    [filter, habits],
-  );
+  const visibleHabits = useMemo(() => {
+    const filtered = habits.filter((habit) => filter === "all" || habit.state === filter);
+    // Completed habits stay visible in "All" rather than disappearing, but
+    // sink to the bottom so the library reads as "what I'm doing" first.
+    // Within a single-state filter tab there's nothing to reorder.
+    if (filter !== "all") return filtered;
+    return [...filtered].sort((a, b) => Number(a.state === "completed") - Number(b.state === "completed"));
+  }, [filter, habits]);
   const editingHabit = editingHabitId ? habits.find((habit) => habit.id === editingHabitId) : undefined;
   // Weighted by each habit's own check-in count so a habit added mid-month
   // starts contributing once it has real history, instead of an unearned 0%
