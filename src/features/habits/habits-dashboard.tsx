@@ -23,7 +23,7 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
   const [localHabits, setLocalHabits] = useState(initialHabits);
   const habits = appData?.habits ?? localHabits;
   const setHabits = appData?.setHabits ?? setLocalHabits;
-  const [filter, setFilter] = useState<"all" | "active" | "paused">("all");
+  const [filter, setFilter] = useState<"all" | "active" | "paused" | "completed">("all");
   const [isCreating, setIsCreating] = useState(false);
   const [editingHabitId, setEditingHabitId] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -36,6 +36,7 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
     () => habits.filter((habit) => filter === "all" || habit.state === filter),
     [filter, habits],
   );
+  const editingHabit = editingHabitId ? habits.find((habit) => habit.id === editingHabitId) : undefined;
   // Weighted by each habit's own check-in count so a habit added mid-month
   // starts contributing once it has real history, instead of an unearned 0%
   // dragging the average down the moment it's created.
@@ -113,6 +114,12 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
     if (deleted) resetHabitForm();
   }
 
+  function markEditingHabitComplete() {
+    if (!editingHabitId) return;
+    setHabits((current) => current.map((habit) => habit.id === editingHabitId ? { ...habit, state: "completed" } : habit));
+    resetHabitForm();
+  }
+
   return (
     <AppShell active="Habits" eyebrow="Build your rhythm" title={<>Habits that feel<br />like your own.</>} action={<button className="rounded-full bg-[var(--soft-ink)] px-6 py-4 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5" onClick={openCreateHabit} type="button">+ New habit</button>}>
           <section className="mt-12 grid border-y border-black/[0.09] sm:grid-cols-[.7fr_1fr_1fr]">
@@ -125,7 +132,7 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
             <div className="flex flex-col gap-4 pb-5 sm:flex-row sm:items-center sm:justify-between">
               <div><h2 className="text-xl font-semibold tracking-[-0.025em]">Habit library</h2><p className="mt-1 text-sm text-stone-500">Small systems that shape your days.</p></div>
               <div className="flex rounded-full bg-white/45 p-1">
-                {(["all", "active", "paused"] as const).map((option) => (
+                {(["all", "active", "paused", "completed"] as const).map((option) => (
                   <button className={`rounded-full px-4 py-2 text-xs font-bold capitalize transition ${filter === option ? "bg-[var(--soft-ink)] text-white" : "text-[var(--soft-muted)]"}`} key={option} onClick={() => setFilter(option)} type="button">{option}</button>
                 ))}
               </div>
@@ -136,7 +143,7 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
                 const scheduled = scheduledDaysFor(habit);
                 return (
                   <article className="grid min-h-36 gap-5 border border-white/50 p-5 sm:p-6 lg:grid-cols-[minmax(250px,.9fr)_minmax(270px,1.1fr)_180px_90px_100px] lg:items-center xl:grid-cols-[minmax(300px,.9fr)_minmax(340px,1.2fr)_200px_100px_110px] xl:px-8" key={habit.id}>
-                    <div className="flex items-center gap-5"><span className="grid size-12 shrink-0 place-items-center"><ActivityIcon activity={`${habit.name} ${habit.category}`} className="size-8" /></span><div><div className="flex flex-wrap items-center gap-2"><h3 className="text-lg font-bold tracking-[-0.025em]">{habit.name}</h3>{habit.isAnchor && <span className="inline-flex items-center gap-1 rounded-full bg-[var(--soft-tint-b)] px-2 py-1 text-[9px] font-black uppercase tracking-[0.12em] text-[var(--soft-icon-clay)]"><Flag size={10} fill="currentColor" />Anchor</span>}</div><p className="mt-1 text-sm text-[var(--soft-muted)]">{habit.category} · {habit.scheduledDays?.length ? `${habit.frequency === "3× weekly" ? "3× · " : ""}${habit.scheduledDays.join(" · ")}` : habit.frequency}</p></div></div>
+                    <div className="flex items-center gap-5"><span className="grid size-12 shrink-0 place-items-center"><ActivityIcon activity={`${habit.name} ${habit.category}`} className="size-8" /></span><div><div className="flex flex-wrap items-center gap-2"><h3 className={`text-lg font-bold tracking-[-0.025em] ${habit.state === "completed" ? "text-[var(--soft-muted)] line-through" : ""}`}>{habit.name}</h3>{habit.isAnchor && <span className="inline-flex items-center gap-1 rounded-full bg-[var(--soft-tint-b)] px-2 py-1 text-[9px] font-black uppercase tracking-[0.12em] text-[var(--soft-icon-clay)]"><Flag size={10} fill="currentColor" />Anchor</span>}</div><p className="mt-1 text-sm text-[var(--soft-muted)]">{habit.category} · {habit.scheduledDays?.length ? `${habit.frequency === "3× weekly" ? "3× · " : ""}${habit.scheduledDays.join(" · ")}` : habit.frequency}</p></div></div>
                     <div><p className="text-[10px] font-bold uppercase tracking-[0.13em] text-[var(--soft-muted)]">Weekly cadence</p><div className="mt-2.5 grid max-w-sm grid-cols-7 gap-1.5">{days.map((day) => { const isScheduled = scheduled.includes(day.short); return <span aria-label={`${day.label}: ${isScheduled ? "scheduled" : "rest day"}`} className={`grid aspect-square max-w-9 place-items-center rounded-[10px] text-[10px] font-bold ${isScheduled ? "bg-[var(--soft-icon-green)] text-white" : "bg-white/45 text-[var(--soft-muted)] opacity-45"}`} key={day.short}>{day.short.slice(0, 2)}</span>; })}</div></div>
                     <div><p className="text-xs text-[var(--soft-muted)]">Consistency</p><div className="mt-2 flex items-center gap-2"><div className="h-2 flex-1 overflow-hidden rounded-full bg-white/55"><div className="h-full rounded-full bg-[var(--soft-icon-green)]" style={{ width: `${habit.consistency}%` }} /></div><span className="text-xs font-semibold">{habit.consistency}%</span></div></div>
                     <div><p className="text-xs text-stone-400">Streak</p><p className="mt-1 text-base font-semibold">{habit.streak} days</p></div>
@@ -165,7 +172,7 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
               <fieldset><legend className="creation-field-label">Frequency</legend><div className="creation-options">{(["Daily", "Weekdays", "3× weekly", "Custom"] as HabitFrequency[]).map((option) => <button aria-pressed={frequency === option} key={option} onClick={() => { setFrequency(option); if (option === "3× weekly") setSelectedDays((current) => current.slice(0, 3)); }} type="button">{option}</button>)}</div></fieldset>
               {(frequency === "Custom" || frequency === "3× weekly") && <fieldset className="creation-days"><legend className="creation-field-label">{frequency === "3× weekly" ? "Choose three days" : "Choose your days"}</legend><div>{days.map((day) => { const active = selectedDays.includes(day.short); return <button aria-label={`${day.label}: ${active ? "selected" : "not selected"}`} aria-pressed={active} disabled={frequency === "3× weekly" && selectedDays.length === 3 && !active} key={day.short} onClick={() => setSelectedDays((current) => current.includes(day.short) ? current.filter((item) => item !== day.short) : [...current, day.short])} type="button">{day.short.slice(0, 2)}</button>; })}</div><p>{frequency === "3× weekly" ? `${selectedDays.length} of 3 selected` : selectedDays.length ? selectedDays.join(" · ") : "Select at least one day"}</p></fieldset>}
               <button aria-pressed={isAnchor} className={`flex w-full items-center gap-4 rounded-[18px] border p-4 text-left transition ${isAnchor ? "border-[color:color-mix(in_srgb,var(--soft-accent)_35%,transparent)] bg-[var(--soft-tint-b)]" : "border-[color:color-mix(in_srgb,var(--soft-icon-green)_12%,transparent)] bg-[var(--soft-tint-a)] hover:brightness-[.98]"}`} onClick={() => setIsAnchor((current) => !current)} type="button"><span className={`grid size-10 shrink-0 place-items-center rounded-full ${isAnchor ? "bg-[var(--soft-icon-clay)] text-white" : "bg-white/70 text-[var(--soft-icon-green)]"}`}><Flag size={17} fill={isAnchor ? "currentColor" : "none"} /></span><span className="flex-1"><span className="block text-sm font-bold">Make this my anchor</span><span className="mt-1 block text-xs leading-5 text-[var(--soft-muted)]">Highlight it as your highest-priority commitment on scheduled days.</span></span><span className={`h-6 w-11 rounded-full p-1 transition ${isAnchor ? "bg-[var(--soft-icon-clay)]" : "bg-[color:color-mix(in_srgb,var(--soft-icon-green)_14%,transparent)]"}`}><span className={`block size-4 rounded-full bg-white transition-transform ${isAnchor ? "translate-x-5" : ""}`} /></span></button>
-              {editingHabitId && (confirmingDelete ? <div className="rounded-[18px] border border-[var(--soft-icon-clay)]/25 bg-[var(--soft-tint-b)] p-4"><p className="text-sm font-bold">Delete this habit and its check-in history?</p><p className="mt-1 text-xs text-[var(--soft-muted)]">This cannot be undone.</p><div className="mt-3 flex gap-2"><button className="rounded-full bg-white/60 px-4 py-2 text-xs font-bold" onClick={() => setConfirmingDelete(false)} type="button">Keep habit</button><button className="rounded-full bg-[var(--soft-icon-clay)] px-4 py-2 text-xs font-bold text-white" onClick={() => void deleteEditingHabit()} type="button">Delete permanently</button></div></div> : <button className="self-start text-xs font-bold text-[var(--soft-icon-clay)]" onClick={() => setConfirmingDelete(true)} type="button">Delete habit</button>)}
+              {editingHabitId && (confirmingDelete ? <div className="rounded-[18px] border border-[var(--soft-icon-clay)]/25 bg-[var(--soft-tint-b)] p-4"><p className="text-sm font-bold">Delete this habit and its check-in history?</p><p className="mt-1 text-xs text-[var(--soft-muted)]">This cannot be undone.</p><div className="mt-3 flex gap-2"><button className="rounded-full bg-white/60 px-4 py-2 text-xs font-bold" onClick={() => setConfirmingDelete(false)} type="button">Keep habit</button><button className="rounded-full bg-[var(--soft-icon-clay)] px-4 py-2 text-xs font-bold text-white" onClick={() => void deleteEditingHabit()} type="button">Delete permanently</button></div></div> : <div className="flex items-center justify-between"><button className="text-xs font-bold text-[var(--soft-icon-clay)]" onClick={() => setConfirmingDelete(true)} type="button">Delete habit</button>{editingHabit?.state !== "completed" && <button className="text-xs font-bold text-[var(--soft-icon-green)]" onClick={markEditingHabitComplete} type="button">Mark complete</button>}</div>)}
               <div className="creation-actions"><button onClick={resetHabitForm} type="button">Cancel</button><button disabled={!name.trim() || (frequency === "Custom" && selectedDays.length === 0) || (frequency === "3× weekly" && selectedDays.length !== 3)} type="submit"><span>{editingHabitId ? "Save changes" : "Create habit"}</span><span aria-hidden>→</span></button></div>
             </div>
           </form>

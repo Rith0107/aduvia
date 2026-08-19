@@ -1,6 +1,6 @@
 export type HabitFrequency = "Daily" | "Weekdays" | "3× weekly" | "Custom";
 export type HabitDay = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
-export type HabitState = "active" | "paused";
+export type HabitState = "active" | "paused" | "completed";
 
 export type HabitSummary = {
   id: string;
