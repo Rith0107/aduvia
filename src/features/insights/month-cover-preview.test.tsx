@@ -52,4 +52,20 @@ describe("MonthCoverPreview", () => {
     expect(screen.getByText("+3 more achievements in this issue")).toBeInTheDocument();
     expect(screen.getByText("Small steps became visible proof.")).toBeInTheDocument();
   });
+
+  it("shows four story achievements and summarizes the remainder", () => {
+    render(<MonthCoverPreview {...baseProps} format="story" completedQuests={[
+      "Build a portfolio",
+      "Finish a course",
+      "Hike a trail",
+      "Read a book",
+      "Create a budget",
+      "Publish an essay",
+    ]} />);
+
+    expect(screen.getByText("Built a portfolio")).toBeInTheDocument();
+    expect(screen.getByText("Read a book")).toBeInTheDocument();
+    expect(screen.queryByText("Created a budget")).not.toBeInTheDocument();
+    expect(screen.getByText("+2 more achievements in this issue")).toBeInTheDocument();
+  });
 });

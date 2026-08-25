@@ -15,7 +15,7 @@ type MonthCoverPreviewProps = {
 export function MonthCoverPreview({ completedQuests, consistency, daysShownUp, format, habitCount, monthName, year }: MonthCoverPreviewProps) {
   const isStory = format === "story";
   const isCompactQuestIndex = completedQuests.length > 3;
-  const visibleQuestLimit = completedQuests.length > 6 ? 5 : 6;
+  const visibleQuestLimit = isStory ? 4 : completedQuests.length > 6 ? 5 : 6;
   const visibleQuests = completedQuests.slice(0, visibleQuestLimit);
   const remainingQuests = Math.max(0, completedQuests.length - visibleQuests.length);
   const shell = isStory ? "aspect-[9/16] w-full max-w-[310px]" : "aspect-square w-full max-w-[560px]";
