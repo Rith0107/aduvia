@@ -6,6 +6,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { MonthCoverPreview } from "./month-cover-preview";
+import styles from "./month-cover-preview.module.css";
 
 afterEach(cleanup);
 
@@ -19,6 +20,13 @@ const baseProps = {
 };
 
 describe("MonthCoverPreview", () => {
+  it("isolates proportional story layout from the square card", () => {
+    const { rerender } = render(<MonthCoverPreview {...baseProps} format="story" completedQuests={[]} />);
+    expect(screen.getByRole("article")).toHaveClass(styles.story);
+    expect(screen.getByText("Small steps became visible proof.")).toBeInTheDocument();
+    rerender(<MonthCoverPreview {...baseProps} completedQuests={[]} />);
+    expect(screen.getByRole("article")).not.toHaveClass(styles.story);
+  });
   it("shows as many as six completed quests using achievement wording", () => {
     render(<MonthCoverPreview {...baseProps} completedQuests={[
       "Build portfolio homepage",

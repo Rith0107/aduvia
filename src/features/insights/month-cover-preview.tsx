@@ -1,6 +1,7 @@
 import { ActivityIcon } from "@/components/activity-icon";
 
 import { toAchievementTitle } from "./achievement-title";
+import styles from "./month-cover-preview.module.css";
 
 type MonthCoverPreviewProps = {
   completedQuests: string[];
@@ -18,7 +19,7 @@ export function MonthCoverPreview({ completedQuests, consistency, daysShownUp, f
   const visibleQuestLimit = isStory ? 4 : completedQuests.length > 6 ? 5 : 6;
   const visibleQuests = completedQuests.slice(0, visibleQuestLimit);
   const remainingQuests = Math.max(0, completedQuests.length - visibleQuests.length);
-  const shell = isStory ? "aspect-[9/16] w-full max-w-[310px]" : "aspect-square w-full max-w-[560px]";
+  const shell = isStory ? `${styles.story} aspect-[9/16] w-full max-w-[310px]` : "aspect-square w-full max-w-[560px]";
 
   return <article aria-label="Month Cover share preview" className={`${shell} relative overflow-hidden rounded-[20px] bg-[linear-gradient(145deg,color-mix(in_srgb,var(--chart-surface)_88%,var(--chart-blue)),var(--chart-surface))] p-5 text-[var(--chart-deep)] shadow-[11px_11px_0_var(--chart-deep)] transition-all duration-500 sm:p-7`}>
     <div className="absolute -right-[16%] -top-[15%] size-[58%] rounded-full border border-[var(--chart-rust)]/25" /><div className="absolute -right-[5%] -top-[4%] size-[36%] rounded-full border border-[var(--chart-rust)]/30" /><div className="absolute right-[5%] top-[6%] size-[17%] rounded-full border border-[var(--chart-rust)]/35" />
