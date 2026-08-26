@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { AuroraSkyPreview } from "./aurora-sky-preview";
 import { MonthCoverPreview } from "./month-cover-preview";
-import { isHabitAvailableOn, isHabitScheduledOn, scheduledDaysFor, useAppData } from "@/lib/app-data";
+import { isHabitScheduledOn, useAppData } from "@/lib/app-data";
+import { consistencyCell } from "@/lib/habit-consistency";
 import type { HabitSummary } from "@/features/habits/types";
 import { Download, Share2, Smartphone, Square } from "lucide-react";
 import { toBlob } from "html-to-image";
@@ -34,7 +35,7 @@ type ReportHabit = {
   days: CellState[];
 };
 
-type HistoricalHabit = Pick<HabitSummary, "id" | "createdAt" | "frequency" | "scheduledDays" | "state">;
+type HistoricalHabit = Pick<HabitSummary, "id" | "createdAt" | "frequency" | "scheduledDays" | "state" | "statusHistory">;
 
 const fallbackCompletedQuests = ["Created a monthly budget", "Shipped my portfolio homepage"];
 
@@ -89,13 +90,7 @@ function dateStorageKey(year: number, month: number, day: number) {
 }
 
 export function reportCellState(habit: HistoricalHabit, date: Date, answer?: "complete" | "skipped", todayPending = false): CellState {
-  // Imported or backfilled answers are authoritative even when they predate
-  // the habit row. This preserves real history created during onboarding or migration.
-  if (answer) return answer === "complete" ? "done" : "missed";
-  if (!isHabitAvailableOn(habit as HabitSummary, date)) return "off";
-  const weekday = (["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const)[date.getDay()];
-  if (!scheduledDaysFor(habit as HabitSummary).includes(weekday)) return "off";
-  return todayPending ? "pending" : "missed";
+  return consistencyCell(habit as HabitSummary, date, answer, todayPending);
 }
 
 function habitConsistency(habit: ReportHabit) {
@@ -528,11 +523,11 @@ export function MonthlyReport() {
     appData.habits.forEach((habit) => {
       for (let day = 1; day <= count; day += 1) {
         const date = new Date(previous.getFullYear(), previous.getMonth(), day);
-        if (!isHabitAvailableOn(habit, date)) continue;
-        const weekday = (["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const)[date.getDay()];
-        if (!scheduledDaysFor(habit).includes(weekday)) continue;
+        const answer = appData.completions[dateStorageKey(previous.getFullYear(), previous.getMonth(), day)]?.[habit.id];
+        const cell = consistencyCell(habit, date, answer);
+        if (cell === "off" || cell === "pending") continue;
         scheduled += 1;
-        if (appData.completions[dateStorageKey(previous.getFullYear(), previous.getMonth(), day)]?.[habit.id] === "complete") completed += 1;
+        if (cell === "done") completed += 1;
       }
     });
     return scheduled ? Math.round((completed / scheduled) * 100) : 0;

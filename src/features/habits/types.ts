@@ -1,10 +1,12 @@
 export type HabitFrequency = "Daily" | "Weekdays" | "3× weekly" | "Custom";
 export type HabitDay = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
 export type HabitState = "active" | "paused" | "completed";
+export type HabitStatusEvent = { status: HabitState; effectiveAt: string };
 
 export type HabitSummary = {
   id: string;
   createdAt?: string;
+  statusHistory?: HabitStatusEvent[];
   name: string;
   category: string;
   frequency: HabitFrequency;
