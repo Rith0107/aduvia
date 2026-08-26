@@ -43,5 +43,16 @@ describe("AuroraSkyPreview", () => {
     expect(screen.queryByText("Hiked Stone Mountain")).not.toBeInTheDocument();
     expect(screen.getByText("A month written in light.")).toBeInTheDocument();
     expect(container.querySelector("feGaussianBlur")).not.toBeInTheDocument();
+    const orbits = container.querySelectorAll("[data-aurora-orbit]");
+    expect(orbits).toHaveLength(props.habits.length);
+    for (const orbit of orbits) {
+      expect(orbit.querySelectorAll("[data-orbit-marker]")).toHaveLength(1);
+    }
+    expect(screen.getByLabelText("3 habit auroras")).toHaveClass("absolute", "top-1/2", "-translate-y-1/2");
+    expect(screen.getByLabelText("3 habit auroras")).not.toHaveClass("relative");
+    expect(screen.getByLabelText("Completed quest symbols")).toHaveClass("items-center", "h-10", "bottom-[44px]");
+    const footerText = screen.getByText("A month written in light.");
+    expect(footerText.closest("footer")).toHaveClass("items-center", "h-8");
+    expect(footerText).toHaveStyle({ whiteSpace: "nowrap", flexShrink: 0, lineHeight: 1 });
   });
 });
