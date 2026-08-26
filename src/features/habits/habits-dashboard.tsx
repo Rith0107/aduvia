@@ -7,6 +7,7 @@ import { Flag, Flame, Gauge, ListChecks, Pencil } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { ActivityIcon } from "@/components/activity-icon";
 import { scheduledDaysFor, useAppData } from "@/lib/app-data";
+import { monthlyConsistency } from "@/lib/habit-consistency";
 import { inferHabitCategory } from "./infer-category";
 import type { HabitDay, HabitFrequency, HabitSummary } from "./types";
 
@@ -41,13 +42,16 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
     return [...filtered].sort((a, b) => Number(a.state === "completed") - Number(b.state === "completed"));
   }, [filter, habits]);
   const editingHabit = editingHabitId ? habits.find((habit) => habit.id === editingHabitId) : undefined;
-  // Weighted by each habit's own check-in count so a habit added mid-month
-  // starts contributing once it has real history, instead of an unearned 0%
-  // dragging the average down the moment it's created.
-  const consistencyWeight = habits.reduce((sum, habit) => sum + (habit.checkInCount ?? 1), 0);
-  const averageConsistency = consistencyWeight
-    ? Math.round(habits.reduce((sum, habit) => sum + habit.consistency * (habit.checkInCount ?? 1), 0) / consistencyWeight)
-    : 0;
+  const now = new Date();
+  const averageConsistency = appData
+    ? monthlyConsistency(habits, appData.completions, now.getFullYear(), now.getMonth(), now)
+    : (() => {
+        const weight = habits.reduce((sum, habit) => sum + (habit.checkInCount ?? 1), 0);
+        return weight ? Math.round(habits.reduce((sum, habit) => sum + habit.consistency * (habit.checkInCount ?? 1), 0) / weight) : 0;
+      })();
+  const displayedConsistency = (habit: HabitSummary) => appData
+    ? monthlyConsistency([habit], appData.completions, now.getFullYear(), now.getMonth(), now)
+    : habit.consistency;
 
   function toggleState(id: string) {
     setHabits((current) =>
@@ -129,7 +133,7 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
           <section className="mt-12 grid border-y border-black/[0.09] sm:grid-cols-[.7fr_1fr_1fr]">
             <div className="py-6 sm:border-r sm:border-black/[0.09] sm:pr-6"><p className="metric-label"><ListChecks aria-hidden className="text-[var(--soft-icon-green)]" />Active</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{habits.filter((habit) => habit.state === "active").length}</p></div>
             <div className="border-t border-black/[0.09] py-6 sm:border-r sm:border-t-0 sm:px-6"><p className="metric-label"><Flame aria-hidden className="text-[var(--soft-icon-clay)]" />Best streak</p><p className="mt-4 text-4xl font-semibold tracking-[-0.05em]">{Math.max(0, ...habits.map((habit) => habit.streak))} days</p></div>
-            <div className="border-t border-black/[0.09] py-6 sm:border-t-0 sm:pl-6"><p className="metric-label"><Gauge aria-hidden className="text-[var(--soft-icon-blue)]" />Consistency</p><p className="mt-4 text-4xl font-semibold tracking-[-0.05em]">{averageConsistency}%</p></div>
+            <div className="border-t border-black/[0.09] py-6 sm:border-t-0 sm:pl-6"><p className="metric-label"><Gauge aria-hidden className="text-[var(--soft-icon-blue)]" />Monthly consistency</p><p className="mt-4 text-4xl font-semibold tracking-[-0.05em]">{averageConsistency}%</p></div>
           </section>
 
           <section className="mt-10 border-t border-black/[0.09] pt-7">
@@ -149,7 +153,7 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
                   <article className="grid min-h-36 gap-5 border border-white/50 p-5 sm:p-6 lg:grid-cols-[minmax(250px,.9fr)_minmax(270px,1.1fr)_180px_90px_100px] lg:items-center xl:grid-cols-[minmax(300px,.9fr)_minmax(340px,1.2fr)_200px_100px_110px] xl:px-8" key={habit.id}>
                     <div className="flex items-center gap-5"><span className="grid size-12 shrink-0 place-items-center"><ActivityIcon activity={`${habit.name} ${habit.category}`} className="size-8" /></span><div><div className="flex flex-wrap items-center gap-2"><h3 className={`text-lg font-bold tracking-[-0.025em] ${habit.state === "completed" ? "text-[var(--soft-muted)] line-through" : ""}`}>{habit.name}</h3>{habit.isAnchor && <span className="inline-flex items-center gap-1 rounded-full bg-[var(--soft-tint-b)] px-2 py-1 text-[9px] font-black uppercase tracking-[0.12em] text-[var(--soft-icon-clay)]"><Flag size={10} fill="currentColor" />Anchor</span>}</div><p className="mt-1 text-sm text-[var(--soft-muted)]">{habit.category} · {habit.scheduledDays?.length ? `${habit.frequency === "3× weekly" ? "3× · " : ""}${habit.scheduledDays.join(" · ")}` : habit.frequency}</p></div></div>
                     <div><p className="text-[10px] font-bold uppercase tracking-[0.13em] text-[var(--soft-muted)]">Weekly cadence</p><div className="mt-2.5 grid max-w-sm grid-cols-7 gap-1.5">{days.map((day) => { const isScheduled = scheduled.includes(day.short); return <span aria-label={`${day.label}: ${isScheduled ? "scheduled" : "rest day"}`} className={`grid aspect-square max-w-9 place-items-center rounded-[10px] text-[10px] font-bold ${isScheduled ? "bg-[var(--soft-icon-green)] text-white" : "bg-white/45 text-[var(--soft-muted)] opacity-45"}`} key={day.short}>{day.short.slice(0, 2)}</span>; })}</div></div>
-                    <div><p className="text-xs text-[var(--soft-muted)]">Consistency</p><div className="mt-2 flex items-center gap-2"><div className="h-2 flex-1 overflow-hidden rounded-full bg-white/55"><div className="h-full rounded-full bg-[var(--soft-icon-green)]" style={{ width: `${habit.consistency}%` }} /></div><span className="text-xs font-semibold">{habit.consistency}%</span></div></div>
+                    <div><p className="text-xs text-[var(--soft-muted)]">This month</p><div className="mt-2 flex items-center gap-2"><div className="h-2 flex-1 overflow-hidden rounded-full bg-white/55"><div className="h-full rounded-full bg-[var(--soft-icon-green)]" style={{ width: `${displayedConsistency(habit)}%` }} /></div><span className="text-xs font-semibold">{displayedConsistency(habit)}%</span></div></div>
                     <div><p className="text-xs text-stone-400">Streak</p><p className="mt-1 text-base font-semibold">{habit.streak} days</p></div>
                     <div className="grid gap-2"><button aria-label={`Edit ${habit.name}`} className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[var(--soft-icon-green)]/20 bg-white/70 px-3 py-2.5 text-xs font-bold text-[var(--soft-icon-green)] shadow-sm transition hover:-translate-y-0.5 hover:bg-white" onClick={() => openEditHabit(habit)} type="button"><Pencil aria-hidden className="size-3" />Edit habit</button><button className={`rounded-full px-3 py-2.5 text-xs font-bold transition ${habit.state === "active" ? "bg-white/55" : "bg-[var(--soft-ink)] text-white"}`} onClick={() => toggleState(habit.id)} type="button">{habit.state === "active" ? "Pause" : "Resume"}</button></div>
                   </article>
