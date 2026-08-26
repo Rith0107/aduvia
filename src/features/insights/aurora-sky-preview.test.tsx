@@ -50,6 +50,7 @@ describe("AuroraSkyPreview", () => {
     }
     expect(screen.getByLabelText("3 habit auroras")).toHaveClass("absolute", "top-1/2", "-translate-y-1/2");
     expect(screen.getByLabelText("3 habit auroras")).not.toHaveClass("relative");
-    expect(screen.getByLabelText("Completed quest symbols")).toHaveClass("items-center", "h-9");
+    expect(screen.getByLabelText("Completed quest symbols")).toHaveClass("items-center", "h-10", "bottom-[44px]");
+    expect(screen.getByText("A month written in light.").closest("footer")).toHaveClass("items-baseline", "h-8");
   });
 });
