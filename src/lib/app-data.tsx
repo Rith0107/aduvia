@@ -72,7 +72,7 @@ export function shouldReloadForAuthEvent(event: AuthChangeEvent) {
 }
 
 type RemoteCategory = { id: string; name: string; color: string | null };
-type RemoteHabit = { id: string; created_at: string; name: string; schedule: unknown; priority: number; status: "active" | "paused" | "archived"; category_id: string | null };
+type RemoteHabit = { id: string; created_at: string; updated_at: string; name: string; schedule: unknown; priority: number; status: "active" | "paused" | "archived"; category_id: string | null };
 type RemoteHabitStatus = { habit_id: string; status: "active" | "paused" | "archived"; effective_at: string };
 type RemoteQuest = { id: string; title: string; target_date: string | null; target_month: string; estimated_minutes: number | null; status: string; category_id: string | null; completed_at: string | null; carried_from_id: string | null; rollover_reviewed_at: string | null };
 type RemoteCheckIn = { habit_id: string; scheduled_date: string; status: string };
@@ -278,16 +278,20 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       const userId = authData.user.id;
       const detectedTimeZone = browserTimeZone();
       void supabase.from("profiles").update({ timezone: detectedTimeZone }).eq("id", userId);
-      const [{ data: categoryRows, error: categoryError }, { data: habitRows, error: habitError }, { data: questRows, error: questError }, { data: checkInRows, error: checkInError }, { data: reflectionRows, error: reflectionError }, { data: profileRow, error: profileError }, { data: statusRows, error: statusError }] = await Promise.all([
+      const [{ data: categoryRows, error: categoryError }, { data: habitRows, error: habitError }, { data: questRows, error: questError }, { data: checkInRows, error: checkInError }, { data: reflectionRows, error: reflectionError }, { data: profileRow, error: profileError }] = await Promise.all([
         supabase.from("categories").select("id,name,color").eq("user_id", userId),
-        supabase.from("habits").select("id,created_at,name,schedule,priority,status,category_id").eq("user_id", userId),
+        supabase.from("habits").select("id,created_at,updated_at,name,schedule,priority,status,category_id").eq("user_id", userId),
         supabase.from("side_quests").select("id,title,target_date,target_month,estimated_minutes,status,category_id,completed_at,carried_from_id,rollover_reviewed_at").eq("user_id", userId),
         supabase.from("habit_check_ins").select("habit_id,scheduled_date,status").eq("user_id", userId),
         supabase.from("daily_reflections").select("reflection_date,note").eq("user_id", userId),
         supabase.from("profiles").select("palette,typography").eq("id", userId).maybeSingle(),
-        supabase.from("habit_status_history").select("habit_id,status,effective_at").eq("user_id", userId).order("effective_at"),
       ]);
-      const error = categoryError || habitError || questError || checkInError || reflectionError || profileError || statusError;
+      const { data: statusRows, error: statusError } = await supabase.from("habit_status_history").select("habit_id,status,effective_at").eq("user_id", userId).order("effective_at");
+      // Deployments remain readable while the additive lifecycle migration is
+      // rolling out. PGRST205 is PostgREST's "table not found in schema cache";
+      // all other errors still surface because they indicate a real auth/data issue.
+      const historyTableUnavailable = statusError?.code === "PGRST205" || statusError?.code === "42P01";
+      const error = categoryError || habitError || questError || checkInError || reflectionError || profileError || (historyTableUnavailable ? null : statusError);
       if (error) throw error;
       if (!active) return;
       setPaletteState(profileRow?.palette ?? null);
@@ -301,7 +305,10 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         const category = row.category_id ? categoryById.get(row.category_id) : undefined;
         const inferred = inferHabitCategory(row.name);
         const useInferred = !category || category.name === "Personal";
-        return { id: row.id, createdAt: row.created_at, statusHistory: statuses.filter((event) => event.habit_id === row.id).map((event) => ({ status: habitStateFromRemote(event.status), effectiveAt: event.effective_at })), name: row.name, category: useInferred ? inferred.category : category.name, ...scheduleFromRemote(row.schedule), isAnchor: row.priority === 3, ...metricsForHabit(row.id, checks), state: habitStateFromRemote(row.status), color: useInferred ? inferred.color : (category.color as HabitSummary["color"]) ?? inferred.color };
+        const state = habitStateFromRemote(row.status);
+        const storedHistory = statuses.filter((event) => event.habit_id === row.id).map((event) => ({ status: habitStateFromRemote(event.status), effectiveAt: event.effective_at }));
+        const fallbackHistory = [{ status: "active" as const, effectiveAt: row.created_at }, ...(state === "active" ? [] : [{ status: state, effectiveAt: row.updated_at }])];
+        return { id: row.id, createdAt: row.created_at, statusHistory: storedHistory.length ? storedHistory : fallbackHistory, name: row.name, category: useInferred ? inferred.category : category.name, ...scheduleFromRemote(row.schedule), isAnchor: row.priority === 3, ...metricsForHabit(row.id, checks), state, color: useInferred ? inferred.color : (category.color as HabitSummary["color"]) ?? inferred.color };
       }));
       setQuests(((questRows ?? []) as RemoteQuest[]).map((row) => {
         const status = questStatusFromRemote(row.status);
