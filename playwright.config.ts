@@ -1,5 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const runsInGitHubActions = Boolean(process.env.GITHUB_ACTIONS);
+
+const serverCommand = runsInGitHubActions
+  ? "NEXT_PUBLIC_SUPABASE_URL='' NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY='' NEXT_PUBLIC_SUPABASE_ANON_KEY='' pnpm start --hostname 127.0.0.1 --port 3100"
+  : "NEXT_PUBLIC_SUPABASE_URL='' NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY='' NEXT_PUBLIC_SUPABASE_ANON_KEY='' pnpm dev --hostname 127.0.0.1 --port 3100";
+
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
@@ -21,9 +27,11 @@ export default defineConfig({
     { name: "tablet", use: { ...devices["iPad Pro 11"] } },
   ],
   webServer: {
-    command: "NEXT_PUBLIC_SUPABASE_URL='' NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY='' NEXT_PUBLIC_SUPABASE_ANON_KEY='' pnpm dev --hostname 127.0.0.1 --port 3100",
+    // CI already built `.next`; test that production artifact instead of
+    // making seven browser profiles compete with dev-server compilation.
+    command: serverCommand,
     url: "http://127.0.0.1:3100",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !runsInGitHubActions,
     timeout: 120_000,
   },
 });
