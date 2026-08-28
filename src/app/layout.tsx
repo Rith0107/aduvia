@@ -35,6 +35,10 @@ export const metadata: Metadata = {
   description: "Track daily habits, finish meaningful monthly side quests, and understand your consistency without turning life into a scoreboard.",
   applicationName: "Aduvia",
   manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: [{ url: "/icon.svg", type: "image/svg+xml" }],
+  },
   appleWebApp: { capable: true, statusBarStyle: "default", title: "Aduvia" },
   formatDetection: { telephone: false },
   openGraph: { type: "website", siteName: "Aduvia", title: "Aduvia — a calmer way to build consistency", description: "Daily habits and monthly side quests in one calm place.", url: "/" },
