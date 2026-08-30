@@ -63,3 +63,31 @@ export function monthlyConsistency(
   const counted = cells.filter((cell) => cell === "done" || cell === "missed");
   return counted.length ? Math.round(counted.filter((cell) => cell === "done").length / counted.length * 100) : 0;
 }
+
+export function overallHabitConsistency(habits: HabitSummary[], completions: HabitCompletionMap, today = new Date()) {
+  const completionDates = Object.keys(completions).sort();
+  const createdDates = habits.map((habit) => habit.createdAt).filter((value): value is string => Boolean(value)).map((value) => calendarKey(new Date(value))).sort();
+  const firstKey = [...createdDates, ...completionDates].sort()[0];
+  if (!firstKey) return 0;
+
+  const [year, month, day] = firstKey.split("-").map(Number);
+  const cursor = new Date(year, month - 1, day);
+  const endKey = calendarKey(today);
+  const todayScheduled = habits.filter((habit) => consistencyCell(habit, today) !== "off");
+  const todayClosed = todayScheduled.length > 0 && todayScheduled.every((habit) => completions[endKey]?.[habit.id]);
+  let completed = 0;
+  let eligible = 0;
+
+  while (calendarKey(cursor) <= endKey) {
+    const key = calendarKey(cursor);
+    for (const habit of habits) {
+      const cell = consistencyCell(habit, cursor, completions[key]?.[habit.id], key === endKey && !todayClosed);
+      if (cell === "done") {
+        completed += 1;
+        eligible += 1;
+      } else if (cell === "missed") eligible += 1;
+    }
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return eligible ? Math.round(completed / eligible * 100) : 0;
+}

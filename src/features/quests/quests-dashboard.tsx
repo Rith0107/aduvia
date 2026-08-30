@@ -63,6 +63,13 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
   );
   const completed = currentQuests.filter((quest) => quest.status === "completed").length;
   const overallProgress = currentQuests.length ? Math.round((completed / currentQuests.length) * 100) : 0;
+  const resolvedQuests = useMemo(
+    () => quests.filter((quest) => quest.targetMonth < thisMonth || quest.status === "completed"),
+    [quests, thisMonth],
+  );
+  const overallCompleted = resolvedQuests.filter((quest) => quest.status === "completed").length;
+  const overallIncomplete = resolvedQuests.length - overallCompleted;
+  const overallCompletion = resolvedQuests.length ? Math.round(overallCompleted / resolvedQuests.length * 100) : 0;
 
   function toggleQuestCompletion(id: string) {
     setQuests((current) =>
@@ -145,10 +152,11 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
 
   return (
     <AppShell active="Quests" eyebrow={`${monthContext.monthName} · ${monthContext.countdownLabel}`} title={<>A few things worth<br />finishing.</>} action={<button className="rounded-full bg-[var(--soft-ink)] px-6 py-4 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5" onClick={() => setIsCreating(true)} type="button">+ New quest</button>}>
-          <section className="mt-12 grid border-y border-black/[0.09] sm:grid-cols-[1fr_1fr_1.4fr]">
+          <section className="mt-12 grid border-y border-black/[0.09] sm:grid-cols-2 xl:grid-cols-[.8fr_.8fr_1.2fr_1.2fr]">
             <div className="py-6 sm:border-r sm:border-black/[0.09] sm:pr-6"><p className="metric-label"><Flag aria-hidden className="text-[var(--soft-icon-clay)]" />Committed</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{currentQuests.length}</p></div>
             <div className="border-t border-black/[0.09] py-6 sm:border-r sm:border-t-0 sm:px-6"><p className="metric-label"><CircleCheckBig aria-hidden className="text-[var(--soft-icon-green)]" />Completed</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{completed}</p></div>
-            <div className="border-t border-black/[0.09] py-6 sm:border-t-0 sm:pl-6"><div className="flex items-start justify-between"><p className="metric-label"><ChartNoAxesColumnIncreasing aria-hidden className="text-[var(--soft-icon-blue)]" />Month progress</p><p className="text-4xl font-semibold tracking-[-0.05em]">{overallProgress}%</p></div><div className="mt-8 h-2 overflow-hidden rounded-full bg-black/[0.07]"><div className="h-full rounded-full bg-[var(--soft-ink)]" style={{ width: `${overallProgress}%` }} /></div></div>
+            <div className="border-t border-black/[0.09] py-6 sm:border-r sm:px-6 xl:border-t-0"><div className="flex items-start justify-between"><p className="metric-label"><ChartNoAxesColumnIncreasing aria-hidden className="text-[var(--soft-icon-blue)]" />Month completion</p><p className="text-4xl font-semibold tracking-[-0.05em]">{overallProgress}%</p></div><div className="mt-8 h-2 overflow-hidden rounded-full bg-black/[0.07]"><div className="h-full rounded-full bg-[var(--soft-ink)]" style={{ width: `${overallProgress}%` }} /></div></div>
+            <div className="border-t border-black/[0.09] py-6 sm:pl-6 xl:border-t-0"><div className="flex items-start justify-between gap-4"><div><p className="metric-label"><CircleCheckBig aria-hidden className="text-[var(--soft-icon-green)]" />Overall completion</p><p className="mt-3 text-xs font-semibold text-[var(--soft-muted)]">{overallCompleted} completed · {overallIncomplete} incomplete</p></div><p className="text-4xl font-semibold tracking-[-0.05em]">{overallCompletion}%</p></div><div className="mt-8 h-2 overflow-hidden rounded-full bg-black/[0.07]"><div className="h-full rounded-full bg-[var(--soft-icon-green)]" style={{ width: `${overallCompletion}%` }} /></div></div>
           </section>
 
           <section className="mt-10 border-t border-black/[0.09] pt-7">

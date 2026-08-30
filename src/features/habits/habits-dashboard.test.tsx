@@ -31,6 +31,7 @@ describe("HabitsDashboard", () => {
     const fresh = { id: "new", name: "New habit", category: "Learning", frequency: "Daily" as const, consistency: 0, checkInCount: 0, streak: 0, state: "active" as const, color: "blue" as const };
     render(<HabitsDashboard initialHabits={[established, fresh]} />);
     expect(screen.getByText("Monthly consistency", { selector: "p.metric-label" }).nextElementSibling).toHaveTextContent("90%");
+    expect(screen.getByText("Overall consistency", { selector: "p.metric-label" }).nextElementSibling).toHaveTextContent("90%");
   });
 
   it("allows a new habit to become the anchor", () => {

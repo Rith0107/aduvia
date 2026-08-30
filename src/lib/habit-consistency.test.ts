@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { HabitSummary } from "@/features/habits/types";
-import { consistencyCell, monthlyConsistency } from "./habit-consistency";
+import { consistencyCell, monthlyConsistency, overallHabitConsistency } from "./habit-consistency";
 
 const habit: HabitSummary = {
   id: "habit-1", createdAt: "2026-08-01T10:00:00Z", name: "Walk", category: "Fitness",
@@ -35,5 +35,6 @@ describe("habit consistency", () => {
       "2026-08-09": { "habit-1": "complete" as const },
     };
     expect(monthlyConsistency([habit], completions, 2026, 7, new Date(2026, 7, 11))).toBe(83);
+    expect(overallHabitConsistency([habit], completions, new Date(2026, 7, 11))).toBe(83);
   });
 });

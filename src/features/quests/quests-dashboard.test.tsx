@@ -72,6 +72,21 @@ describe("QuestsDashboard", () => {
     expect(screen.getByLabelText("Quest title")).toHaveFocus();
   });
 
+  it("calculates overall completion from closed months and completed current quests", () => {
+    const current = sampleQuests[0].targetMonth;
+    const previous = new Date(`${current}T00:00:00`);
+    previous.setMonth(previous.getMonth() - 1);
+    const previousKey = `${previous.getFullYear()}-${String(previous.getMonth() + 1).padStart(2, "0")}-01`;
+    const quests = [
+      { ...sampleQuests[0], id: "past-done", targetMonth: previousKey, status: "completed" as const, completedAt: previous.toISOString() },
+      { ...sampleQuests[0], id: "past-incomplete", targetMonth: previousKey, status: "not-started" as const, completedAt: null },
+      { ...sampleQuests[0], id: "current-open", targetMonth: current, status: "not-started" as const, completedAt: null },
+    ];
+    render(<QuestsDashboard initialQuests={quests} />);
+    expect(screen.getByText("50%")).toBeInTheDocument();
+    expect(screen.getByText("1 completed · 1 incomplete")).toBeInTheDocument();
+  });
+
   it("explains an empty filtered view without offering duplicate creation controls", () => {
     const quests = sampleQuests.filter((quest) => quest.status !== "not-started");
     render(<QuestsDashboard initialQuests={quests} />);

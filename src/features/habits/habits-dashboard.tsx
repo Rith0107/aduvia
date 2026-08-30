@@ -2,12 +2,12 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { Flag, Flame, Gauge, ListChecks, Pencil } from "lucide-react";
+import { ChartNoAxesColumnIncreasing, Flag, Flame, Gauge, ListChecks, Pencil } from "lucide-react";
 
 import { AppShell } from "@/components/app-shell";
 import { ActivityIcon } from "@/components/activity-icon";
 import { scheduledDaysFor, useAppData } from "@/lib/app-data";
-import { monthlyConsistency } from "@/lib/habit-consistency";
+import { monthlyConsistency, overallHabitConsistency } from "@/lib/habit-consistency";
 import { inferHabitCategory } from "./infer-category";
 import type { HabitDay, HabitFrequency, HabitSummary } from "./types";
 
@@ -45,6 +45,12 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
   const now = new Date();
   const averageConsistency = appData
     ? monthlyConsistency(habits, appData.completions, now.getFullYear(), now.getMonth(), now)
+    : (() => {
+        const weight = habits.reduce((sum, habit) => sum + (habit.checkInCount ?? 1), 0);
+        return weight ? Math.round(habits.reduce((sum, habit) => sum + habit.consistency * (habit.checkInCount ?? 1), 0) / weight) : 0;
+      })();
+  const lifetimeConsistency = appData
+    ? overallHabitConsistency(habits, appData.completions, now)
     : (() => {
         const weight = habits.reduce((sum, habit) => sum + (habit.checkInCount ?? 1), 0);
         return weight ? Math.round(habits.reduce((sum, habit) => sum + habit.consistency * (habit.checkInCount ?? 1), 0) / weight) : 0;
@@ -130,10 +136,11 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
 
   return (
     <AppShell active="Habits" eyebrow="Build your rhythm" title={<>Habits that feel<br />like your own.</>} action={<button className="rounded-full bg-[var(--soft-ink)] px-6 py-4 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5" onClick={openCreateHabit} type="button">+ New habit</button>}>
-          <section className="mt-12 grid border-y border-black/[0.09] sm:grid-cols-[.7fr_1fr_1fr]">
+          <section className="mt-12 grid border-y border-black/[0.09] sm:grid-cols-2 xl:grid-cols-[.7fr_1fr_1fr_1fr]">
             <div className="py-6 sm:border-r sm:border-black/[0.09] sm:pr-6"><p className="metric-label"><ListChecks aria-hidden className="text-[var(--soft-icon-green)]" />Active</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{habits.filter((habit) => habit.state === "active").length}</p></div>
             <div className="border-t border-black/[0.09] py-6 sm:border-r sm:border-t-0 sm:px-6"><p className="metric-label"><Flame aria-hidden className="text-[var(--soft-icon-clay)]" />Best streak</p><p className="mt-4 text-4xl font-semibold tracking-[-0.05em]">{Math.max(0, ...habits.map((habit) => habit.streak))} days</p></div>
-            <div className="border-t border-black/[0.09] py-6 sm:border-t-0 sm:pl-6"><p className="metric-label"><Gauge aria-hidden className="text-[var(--soft-icon-blue)]" />Monthly consistency</p><p className="mt-4 text-4xl font-semibold tracking-[-0.05em]">{averageConsistency}%</p></div>
+            <div className="border-t border-black/[0.09] py-6 sm:border-r sm:px-6 xl:border-t-0"><p className="metric-label"><Gauge aria-hidden className="text-[var(--soft-icon-blue)]" />Monthly consistency</p><p className="mt-4 text-4xl font-semibold tracking-[-0.05em]">{averageConsistency}%</p></div>
+            <div className="border-t border-black/[0.09] py-6 sm:pl-6 xl:border-t-0"><p className="metric-label"><ChartNoAxesColumnIncreasing aria-hidden className="text-[var(--soft-icon-green)]" />Overall consistency</p><p className="mt-4 text-4xl font-semibold tracking-[-0.05em]">{lifetimeConsistency}%</p></div>
           </section>
 
           <section className="mt-10 border-t border-black/[0.09] pt-7">
