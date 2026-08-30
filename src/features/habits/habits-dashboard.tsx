@@ -19,6 +19,11 @@ const days: { short: HabitDay; label: string }[] = [
   { short: "Sun", label: "Sunday" },
 ];
 
+export function sortHabitsForLibrary(habits: HabitSummary[]) {
+  const rank = { active: 0, paused: 1, completed: 2 } satisfies Record<HabitSummary["state"], number>;
+  return [...habits].sort((a, b) => rank[a.state] - rank[b.state]);
+}
+
 export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
   const appData = useAppData();
   const [localHabits, setLocalHabits] = useState(initialHabits);
@@ -35,11 +40,10 @@ export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
 
   const visibleHabits = useMemo(() => {
     const filtered = habits.filter((habit) => filter === "all" || habit.state === filter);
-    // Completed habits stay visible in "All" rather than disappearing, but
-    // sink to the bottom so the library reads as "what I'm doing" first.
+    // Keep the active rhythm first, then paused habits, then completed history.
     // Within a single-state filter tab there's nothing to reorder.
     if (filter !== "all") return filtered;
-    return [...filtered].sort((a, b) => Number(a.state === "completed") - Number(b.state === "completed"));
+    return sortHabitsForLibrary(filtered);
   }, [filter, habits]);
   const editingHabit = editingHabitId ? habits.find((habit) => habit.id === editingHabitId) : undefined;
   const now = new Date();

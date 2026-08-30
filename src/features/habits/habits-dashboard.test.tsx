@@ -5,12 +5,21 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { HabitsDashboard } from "./habits-dashboard";
+import { HabitsDashboard, sortHabitsForLibrary } from "./habits-dashboard";
 import { sampleHabitSummaries } from "./sample-data";
 
 afterEach(cleanup);
 
 describe("HabitsDashboard", () => {
+  it("orders active habits before paused and completed habits", () => {
+    const mixed = [
+      { ...sampleHabitSummaries[0], id: "paused", state: "paused" as const },
+      { ...sampleHabitSummaries[1], id: "completed", state: "completed" as const },
+      { ...sampleHabitSummaries[2], id: "active", state: "active" as const },
+    ];
+    expect(sortHabitsForLibrary(mixed).map((habit) => habit.id)).toEqual(["active", "paused", "completed"]);
+  });
+
   it("filters paused habits", () => {
     render(<HabitsDashboard initialHabits={sampleHabitSummaries} />);
     fireEvent.click(screen.getByRole("button", { name: "paused" }));
