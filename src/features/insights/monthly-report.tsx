@@ -132,6 +132,13 @@ export function reportDayCount(reportYear: number, reportMonth: number, today = 
   return reportStart < currentStart ? calendarDays : 0;
 }
 
+export function defaultReportPeriod(today = new Date()) {
+  const reportDate = today.getDate() <= 4
+    ? new Date(today.getFullYear(), today.getMonth() - 1, 1)
+    : new Date(today.getFullYear(), today.getMonth(), 1);
+  return { year: reportDate.getFullYear(), month: reportDate.getMonth() };
+}
+
 function cardDimensions(format: ShareFormat) {
   return format === "story" ? { width: 1080, height: 1920 } : { width: 1080, height: 1080 };
 }
@@ -439,8 +446,11 @@ export function MonthlyReport() {
   const appData = useAppData();
   const now = new Date();
   const currentDay = now.getDate();
-  const [reportMonth, setReportMonth] = useState({ year: now.getFullYear(), month: now.getMonth() });
-  const [fallbackHabits, setFallbackHabits] = useState(() => createReportHabits(now.getFullYear(), now.getMonth()));
+  const [reportMonth, setReportMonth] = useState(() => defaultReportPeriod(now));
+  const [fallbackHabits, setFallbackHabits] = useState(() => {
+    const initialPeriod = defaultReportPeriod(now);
+    return createReportHabits(initialPeriod.year, initialPeriod.month);
+  });
   const [format, setFormat] = useState<ShareFormat>("square");
   const [auroraReady, setAuroraReady] = useState(false);
   const [shareTrim, setShareTrim] = useState<ShareTrim>("orbit");

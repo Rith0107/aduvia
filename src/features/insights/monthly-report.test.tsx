@@ -5,7 +5,7 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { consistencyFromHabits, dailyConsistencyFromHabits, heatmapState, MonthlyReport, reportCellState, reportDayCount } from "./monthly-report";
+import { consistencyFromHabits, dailyConsistencyFromHabits, defaultReportPeriod, heatmapState, MonthlyReport, reportCellState, reportDayCount } from "./monthly-report";
 
 afterEach(cleanup);
 
@@ -59,6 +59,13 @@ describe("MonthlyReport", () => {
     expect(reportDayCount(2026, 7, futureToday)).toBe(31);
     expect(reportDayCount(2026, 7, new Date(2026, 7, 12))).toBe(12);
     expect(reportDayCount(2026, 8, new Date(2026, 7, 12))).toBe(0);
+  });
+
+  it("opens the completed month during the first four days of a new month", () => {
+    expect(defaultReportPeriod(new Date(2026, 8, 1))).toEqual({ year: 2026, month: 7 });
+    expect(defaultReportPeriod(new Date(2026, 8, 4))).toEqual({ year: 2026, month: 7 });
+    expect(defaultReportPeriod(new Date(2026, 8, 5))).toEqual({ year: 2026, month: 8 });
+    expect(defaultReportPeriod(new Date(2027, 0, 3))).toEqual({ year: 2026, month: 11 });
   });
 
   it("does not navigate into future months", () => {

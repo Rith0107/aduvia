@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState, useSyncExternalStore } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import { Archive, ChartNoAxesColumnIncreasing, Check, ChevronDown, CircleCheckBig, Flag, Pencil, Trash2 } from "lucide-react";
 import { createPortal } from "react-dom";
 
@@ -63,40 +63,6 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
   );
   const completed = currentQuests.filter((quest) => quest.status === "completed").length;
   const overallProgress = currentQuests.length ? Math.round((completed / currentQuests.length) * 100) : 0;
-
-  // Unfinished quests from a month that's already passed, where nobody has
-  // decided yet whether to carry them into this month or let them go.
-  // Ordinary edits never touch rolloverReviewedAt, so this list only ever
-  // shrinks via an explicit decision below — it can't reappear once resolved.
-  const needsRolloverDecision = useMemo(
-    () => quests.filter((quest) => quest.targetMonth < thisMonth && quest.status !== "completed" && !quest.rolloverReviewedAt),
-    [quests, thisMonth],
-  );
-  const [dismissedRollover, setDismissedRollover] = useState(false);
-  const [rolloverBusyId, setRolloverBusyId] = useState<string | null>(null);
-  // The other portals here default to closed, so they never reach
-  // createPortal during SSR. This one can be open on first render (a
-  // fresh month with an already-loaded quest list), so it needs an
-  // explicit client-only guard — useSyncExternalStore is the sanctioned
-  // way to read a value that's legitimately false on the server and
-  // during hydration, then true right after, with no setState-in-effect.
-  const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
-
-  async function resolveRollover(questId: string, carryForward: boolean) {
-    if (!appData) {
-      // Local-preview mode: no backend to reconcile, so just resolve in place.
-      const reviewedAt = new Date().toISOString();
-      setQuests((current) => {
-        const source = current.find((quest) => quest.id === questId);
-        const next = current.map((quest) => quest.id === questId ? { ...quest, rolloverReviewedAt: reviewedAt } : quest);
-        return carryForward && source ? [...next, { ...source, id: crypto.randomUUID(), targetMonth: thisMonth, dueLabel: "This month", completedAt: null, carriedFromId: questId, rolloverReviewedAt: null }] : next;
-      });
-      return;
-    }
-    setRolloverBusyId(questId);
-    await (carryForward ? appData.carryQuestForward(questId) : appData.declineQuestRollover(questId));
-    setRolloverBusyId(null);
-  }
 
   function toggleQuestCompletion(id: string) {
     setQuests((current) =>
@@ -226,27 +192,6 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
               {!visibleQuests.length && <div className="xl:col-span-2 flex min-h-64 flex-col items-center justify-center rounded-[34px] border border-dashed border-[var(--soft-accent)]/25 bg-white/30 px-6 py-12 text-center"><span className="grid size-14 place-items-center rounded-full bg-[var(--soft-tint-b)] text-[var(--soft-icon-clay)]"><Flag className="size-6" /></span><p className="mt-6 text-[10px] font-black uppercase tracking-[.2em] text-[var(--soft-accent)]">{currentQuests.length ? "Nothing in this view" : "Your orbit is open"}</p><h3 className="mt-3 text-3xl font-semibold tracking-[-.04em]">{currentQuests.length ? `No ${filter === "all" ? "" : statusLabels[filter].toLowerCase()} quests.` : "Add one meaningful finish."}</h3><p className="mt-3 max-w-md text-sm leading-6 text-[var(--soft-muted)]">{currentQuests.length ? "Choose another status above to see the rest of your monthly board." : "A side quest is optional. When something feels worth finishing this month, give it a clear name and start from there."}</p>{!currentQuests.length && <button className="mt-6 rounded-full bg-[var(--soft-ink)] px-6 py-3 text-sm font-bold text-white" onClick={() => setIsCreating(true)} type="button">Create my first quest</button>}</div>}
             </div>}
           </section>
-      {mounted && needsRolloverDecision.length > 0 && !dismissedRollover && createPortal(
-        <div aria-modal="true" className="creation-overlay" role="dialog">
-          <div className="w-full max-w-lg rounded-[28px] bg-[var(--theme-paper)] p-7 shadow-[0_40px_90px_-30px_rgba(24,43,35,.5)]">
-            <p className="soft-kicker text-[var(--soft-ink)]">New month, {monthContext.monthName}</p>
-            <h2 className="mt-2 text-2xl font-bold tracking-[-.03em]">A few quests are still open from last time.</h2>
-            <p className="mt-2 text-sm leading-6 text-[var(--soft-muted)]">Carry each one into {monthContext.monthName}, or leave it where it is — either way it stays in your Archive.</p>
-            <div className="mt-5 flex flex-col gap-2">
-              {needsRolloverDecision.map((quest) => <div className="flex flex-wrap items-center gap-3 rounded-[18px] border border-black/[0.06] bg-white/60 px-4 py-3" key={quest.id}>
-                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white/80"><ActivityIcon activity={`${quest.title} ${quest.category}`} className="size-4" /></span>
-                <div className="min-w-0 flex-1"><p className="truncate text-sm font-bold">{quest.title}</p><p className="text-[11px] text-[var(--soft-ink)]">{quest.category} · {statusLabels[quest.status]}</p></div>
-                <div className="flex shrink-0 gap-2">
-                  <button className="rounded-full bg-white/70 px-3 py-2 text-[11px] font-bold text-[var(--soft-ink)] disabled:opacity-50" disabled={rolloverBusyId === quest.id} onClick={() => void resolveRollover(quest.id, false)} type="button">Let it go</button>
-                  <button className="rounded-full bg-[var(--soft-ink)] px-3 py-2 text-[11px] font-bold text-white disabled:opacity-50" disabled={rolloverBusyId === quest.id} onClick={() => void resolveRollover(quest.id, true)} type="button">Carry forward</button>
-                </div>
-              </div>)}
-            </div>
-            <button className="mt-5 text-xs font-bold text-[var(--soft-ink)] underline underline-offset-2" onClick={() => setDismissedRollover(true)} type="button">Decide later</button>
-          </div>
-        </div>,
-        document.body,
-      )}
       {isCreating && createPortal(
         <div aria-modal="true" className="creation-overlay" role="dialog">
           <form className="creation-sheet" onSubmit={createQuest}>
