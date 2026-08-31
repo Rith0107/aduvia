@@ -1,5 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
+    <radialGradient id="bg" cx="0" cy="0" r="1" gradientTransform="translate(256 225) rotate(90) scale(310)">
+      <stop stop-color="#18211f"/>
+      <stop offset="0.7" stop-color="#101916"/>
+      <stop offset="1" stop-color="#183f34"/>
+    </radialGradient>
     <linearGradient id="metal" x1="112" y1="112" x2="400" y2="384" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#fffef7"/>
       <stop offset="0.34" stop-color="#c8ced1"/>
@@ -15,7 +20,8 @@
       <stop offset="1" stop-color="#aeb8bc"/>
     </radialGradient>
   </defs>
-  <rect width="512" height="512" rx="120" fill="#10392e"/>
+  <rect width="512" height="512" rx="120" fill="url(#bg)"/>
+  <rect x="12" y="12" width="488" height="488" rx="110" fill="none" stroke="#aeb8bc" stroke-opacity=".48" stroke-width="12"/>
   <path d="M112 374 241 118c8-16 30-16 38 0l121 256" fill="none" stroke="url(#metal)" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
   <circle cx="157" cy="284" r="27" fill="url(#silver)"/>
   <circle cx="256" cy="183" r="27" fill="url(#gold)"/>
