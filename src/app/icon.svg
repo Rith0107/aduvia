@@ -1,7 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="120" fill="#143d31"/>
-  <path d="M116 370 242 120c7-14 27-14 34 0l120 250" fill="none" stroke="#fffdf8" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="160" cy="282" r="22" fill="#8eb5a6"/>
-  <circle cx="256" cy="184" r="22" fill="#d89a42"/>
-  <circle cx="352" cy="282" r="22" fill="#a86f5b"/>
+  <defs>
+    <linearGradient id="metal" x1="105" y1="0" x2="407" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#687278"/>
+      <stop offset="0.14" stop-color="#f9ffff"/>
+      <stop offset="0.3" stop-color="#9ba5aa"/>
+      <stop offset="0.43" stop-color="#ffffff"/>
+      <stop offset="0.495" stop-color="#bcc4c8"/>
+      <stop offset="0.505" stop-color="#8f5b09"/>
+      <stop offset="0.64" stop-color="#ffe994"/>
+      <stop offset="0.78" stop-color="#b87910"/>
+      <stop offset="0.9" stop-color="#fff2a8"/>
+      <stop offset="1" stop-color="#c48719"/>
+    </linearGradient>
+    <radialGradient id="gold" cx="0" cy="0" r="1" gradientTransform="translate(247 173) rotate(52) scale(45)">
+      <stop stop-color="#fff4ba"/>
+      <stop offset="1" stop-color="#d89a2f"/>
+    </radialGradient>
+    <radialGradient id="silver" cx="0" cy="0" r="1" gradientTransform="translate(151 269) rotate(52) scale(42)">
+      <stop stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#aeb8bc"/>
+    </radialGradient>
+  </defs>
+  <path d="M112 374 241 118c8-16 30-16 38 0l121 256" fill="none" stroke="#18211f" stroke-opacity=".9" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M112 374 241 118c8-16 30-16 38 0l121 256" fill="none" stroke="url(#metal)" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M117 368 244 120c5-10 18-12 26-5" fill="none" stroke="#ffffff" stroke-opacity=".55" stroke-width="7" stroke-linecap="round"/>
+  <path d="M274 121 395 369" fill="none" stroke="#fff3b0" stroke-opacity=".52" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="157" cy="284" r="32" fill="#18211f"/>
+  <circle cx="256" cy="183" r="32" fill="#18211f"/>
+  <circle cx="355" cy="284" r="32" fill="#18211f"/>
+  <circle cx="157" cy="284" r="25" fill="url(#silver)"/>
+  <circle cx="256" cy="183" r="25" fill="url(#gold)"/>
+  <circle cx="355" cy="284" r="25" fill="url(#silver)"/>
 </svg>

@@ -36,8 +36,8 @@ export const metadata: Metadata = {
   applicationName: "Aduvia",
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: [{ url: "/icon.svg?v=5", type: "image/svg+xml" }],
-    shortcut: [{ url: "/icon.svg?v=5", type: "image/svg+xml" }],
+    icon: [{ url: "/icon.svg?v=6", type: "image/svg+xml" }],
+    shortcut: [{ url: "/icon.svg?v=6", type: "image/svg+xml" }],
   },
   appleWebApp: { capable: true, statusBarStyle: "default", title: "Aduvia" },
   formatDetection: { telephone: false },
