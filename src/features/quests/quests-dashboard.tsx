@@ -15,6 +15,24 @@ type QuestsDashboardProps = { initialQuests: QuestSummary[] };
 
 type QuestCategory = "Career" | "Learning" | "Personal" | "Creative" | "Finance" | "Wellness";
 
+type ArchivedQuestMonth = {
+  completed: number;
+  label: string;
+  monthKey: string;
+  quests: QuestSummary[];
+};
+
+export function groupArchivedQuests(quests: QuestSummary[]): ArchivedQuestMonth[] {
+  const months = new Map<string, QuestSummary[]>();
+  quests.forEach((quest) => months.set(quest.targetMonth, [...(months.get(quest.targetMonth) ?? []), quest]));
+  return [...months.entries()].sort(([a], [b]) => b.localeCompare(a)).map(([targetMonth, monthQuests]) => ({
+    completed: monthQuests.filter((quest) => quest.status === "completed").length,
+    label: new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(new Date(`${targetMonth}T00:00:00`)),
+    monthKey: targetMonth,
+    quests: monthQuests,
+  }));
+}
+
 function inferQuestCategory(title: string): QuestCategory {
   const value = title.toLowerCase();
   if (/budget|saving|save |invest|money|finance|debt|expense|income/.test(value)) return "Finance";
@@ -57,6 +75,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
     () => quests.filter((quest) => quest.targetMonth !== thisMonth).sort((a, b) => b.targetMonth.localeCompare(a.targetMonth)),
     [quests, thisMonth],
   );
+  const archivedMonths = useMemo(() => groupArchivedQuests(archivedQuests), [archivedQuests]);
   const visibleQuests = useMemo(
     () => currentQuests.filter((quest) => filter === "all" || quest.status === filter),
     [filter, currentQuests],
@@ -171,16 +190,30 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
               </div>
             </div>
 
-            {view === "archive" && (archivedQuests.length
-              ? <div className="soft-flow mt-5 flex flex-col gap-2">
-                  {archivedQuests.map((quest) => <div className="flex flex-wrap items-center gap-3 rounded-[20px] border border-white/50 bg-white/35 px-5 py-4" key={quest.id}>
-                    <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white/60"><ActivityIcon activity={`${quest.title} ${quest.category}`} className="size-4" /></span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-bold">{quest.title}</p>
-                      <p className="mt-0.5 text-[11px] text-[var(--soft-muted)]">{new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(new Date(`${quest.targetMonth}T00:00:00`))} · {quest.category}</p>
-                    </div>
-                    <span className={`shrink-0 rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-[.08em] ${quest.status === "completed" ? "bg-[var(--soft-icon-green)]/15 text-[var(--soft-icon-green)]" : "bg-black/[0.06] text-[var(--soft-muted)]"}`}>{quest.status === "completed" && quest.completedAt ? `Completed ${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(new Date(quest.completedAt))}` : statusLabels[quest.status]}</span>
-                  </div>)}
+            {view === "archive" && (archivedMonths.length
+              ? <div className="mt-5 space-y-6">
+                  {archivedMonths.map((month) => {
+                    const completion = Math.round(month.completed / month.quests.length * 100);
+                    return <article className="overflow-hidden rounded-[34px] border border-white/65 bg-white/30 shadow-[0_24px_70px_-52px_rgba(25,47,38,.65)]" key={month.monthKey}>
+                      <header className="relative grid gap-6 overflow-hidden bg-[var(--chart-deep)] px-6 py-7 text-white sm:grid-cols-[1fr_auto] sm:items-end sm:px-8">
+                        <div className="absolute -right-14 -top-20 size-52 rounded-full border-[34px] border-[color-mix(in_srgb,var(--chart-primary)_14%,transparent)]" />
+                        <div className="relative"><p className="text-[10px] font-black uppercase tracking-[.2em] text-[var(--chart-primary)]">Monthly record</p><h3 className="mt-3 text-4xl font-semibold tracking-[-.055em]">{month.label}</h3><p className="mt-2 text-sm text-white/48">{month.quests.length} {month.quests.length === 1 ? "quest" : "quests"} committed · {month.completed} landed</p></div>
+                        <div className="relative min-w-44"><div className="flex items-end justify-between gap-5"><span className="text-[10px] font-black uppercase tracking-[.15em] text-white/45">Completion</span><strong className="text-4xl font-semibold tracking-[-.06em] text-[var(--chart-primary)]">{completion}%</strong></div><div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/10"><span className="block h-full rounded-full bg-[var(--chart-primary)]" style={{ width: `${completion}%` }} /></div></div>
+                      </header>
+                      <div className="grid gap-px bg-black/[0.07] sm:grid-cols-2">
+                        {month.quests.map((quest, index) => {
+                          const isComplete = quest.status === "completed";
+                          return <div className="group relative min-h-44 bg-[color:color-mix(in_srgb,var(--soft-surface)_86%,transparent)] p-6 transition hover:bg-white/65 sm:p-7" key={quest.id}>
+                            <div className="flex items-start justify-between gap-4"><span className={`grid size-11 place-items-center rounded-[16px] ${isComplete ? "bg-[var(--soft-icon-green)] text-white" : "bg-[var(--soft-tint-b)] text-[var(--soft-icon-clay)]"}`}><ActivityIcon activity={`${quest.title} ${quest.category}`} className="size-5" /></span><span className="font-mono text-[10px] font-bold tracking-[.14em] text-[var(--soft-muted)]/55">{String(index + 1).padStart(2, "0")}</span></div>
+                            <p className="mt-6 text-[9px] font-black uppercase tracking-[.17em] text-[var(--soft-accent)]">{quest.category}</p>
+                            <h4 className="mt-2 max-w-md text-xl font-semibold tracking-[-.035em]">{quest.title}</h4>
+                            <div className="mt-5 flex items-center gap-2 text-[10px] font-black uppercase tracking-[.1em]"><span className={`grid size-5 place-items-center rounded-full ${isComplete ? "bg-[var(--soft-icon-green)]/15 text-[var(--soft-icon-green)]" : "bg-black/[0.06] text-[var(--soft-muted)]"}`}>{isComplete ? "✓" : "·"}</span><span className={isComplete ? "text-[var(--soft-icon-green)]" : "text-[var(--soft-muted)]"}>{isComplete && quest.completedAt ? `Completed ${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(new Date(quest.completedAt))}` : "Incomplete at month end"}</span></div>
+                          </div>;
+                        })}
+                      </div>
+                      <footer className="flex items-center justify-between border-t border-black/[0.07] px-6 py-4 text-[9px] font-bold uppercase tracking-[.16em] text-[var(--soft-muted)] sm:px-8"><span>Kept for the record</span><span>{month.completed === month.quests.length ? "All finish lines crossed" : `${month.quests.length - month.completed} left unfinished`}</span></footer>
+                    </article>;
+                  })}
                 </div>
               : <div className="mt-5 flex min-h-40 flex-col items-center justify-center rounded-[34px] border border-dashed border-[var(--soft-accent)]/25 bg-white/30 px-6 py-10 text-center"><Archive className="size-6 text-[var(--soft-icon-clay)]" /><p className="mt-4 text-sm text-[var(--soft-muted)]">Nothing archived yet — past months will collect here.</p></div>
             )}
