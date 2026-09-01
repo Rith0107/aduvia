@@ -9,6 +9,7 @@ import { ActivityIcon } from "@/components/activity-icon";
 import { useAppData } from "@/lib/app-data";
 import { monthKey } from "@/lib/calendar";
 import { getMonthContext } from "@/lib/month-context";
+import { monthPhaseGuidance } from "@/lib/month-phase";
 import type { QuestStatus, QuestSummary } from "./types";
 
 type QuestsDashboardProps = { initialQuests: QuestSummary[] };
@@ -66,6 +67,7 @@ const statusColors: Record<QuestStatus, string> = {
 
 export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
   const monthContext = getMonthContext();
+  const monthPhase = monthPhaseGuidance();
   const appData = useAppData();
   const [localQuests, setLocalQuests] = useState(initialQuests);
   const quests = appData?.quests ?? localQuests;
@@ -181,7 +183,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
   }
 
   return (
-    <AppShell active="Quests" eyebrow={`${monthContext.monthName} · ${monthContext.countdownLabel}`} title={<>A few things worth<br />finishing.</>} action={<button className="rounded-full bg-[var(--soft-ink)] px-6 py-4 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5" onClick={() => setIsCreating(true)} type="button">+ New quest</button>}>
+    <AppShell active="Quests" eyebrow={`${monthContext.monthName} · ${monthPhase.label} · ${monthContext.countdownLabel}`} title={<>{monthPhase.questHeadline}</>} action={<div className="flex max-w-sm flex-col items-start gap-4 sm:items-end"><p className="text-left text-sm leading-6 text-[var(--soft-muted)] sm:text-right">{monthPhase.questPrompt}</p><button className="rounded-full bg-[var(--soft-ink)] px-6 py-4 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5" onClick={() => setIsCreating(true)} type="button">+ New quest</button></div>}>
           <section className="mt-12 grid border-y border-black/[0.09] sm:grid-cols-2 xl:grid-cols-[.8fr_.8fr_1.2fr_1.2fr]">
             <div className="py-6 sm:border-r sm:border-black/[0.09] sm:pr-6"><p className="metric-label"><Flag aria-hidden className="text-[var(--soft-icon-clay)]" />Committed</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{currentQuests.length}</p></div>
             <div className="border-t border-black/[0.09] py-6 sm:border-r sm:border-t-0 sm:px-6"><p className="metric-label"><CircleCheckBig aria-hidden className="text-[var(--soft-icon-green)]" />Completed</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{completed}</p></div>
