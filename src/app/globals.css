@@ -567,21 +567,25 @@ h3 {
   .habits-screen .habits-filters::-webkit-scrollbar { display: none; }
   .habits-screen .habits-filters button { flex: 1 0 auto; padding: .55rem .8rem; font-size: .65rem; }
   .habits-screen .habits-card-list { gap: .75rem; }
-  .habits-screen .habit-library-card { grid-template-columns: minmax(0,1fr) auto; min-height: 13.25rem; align-content: start; gap: .85rem 1rem; border-radius: 1.5rem; padding: 1rem; }
+  .habits-screen .habit-library-card { position: relative; grid-template-columns: minmax(0,1fr) auto; min-height: 13.25rem; align-content: start; gap: .85rem 1rem; border-radius: 1.5rem; padding: 1rem; }
   .habits-screen .habit-identity { grid-column: 1 / -1; gap: .75rem; }
+  .habits-screen .habit-identity > div { min-width: 0; padding-right: 3.6rem; }
   .habits-screen .habit-identity > span { width: 2.5rem; height: 2.5rem; border-radius: .9rem; background: rgb(255 255 255 / 38%); }
   .habits-screen .habit-identity svg { width: 1.5rem; height: 1.5rem; }
   .habits-screen .habit-identity h3 { font-size: 1.02rem; }
   .habits-screen .habit-identity p { font-size: .68rem; }
   .habits-screen .habit-anchor { gap: .15rem; padding: .16rem .3rem; font-size: .4rem; letter-spacing: .06em; }
   .habits-screen .habit-anchor svg { width: .42rem; height: .42rem; }
+  .habits-screen .habit-mobile-efficiency { position: absolute; top: 1rem; right: 1rem; display: block; text-align: right; }
+  .habits-screen .habit-mobile-efficiency small { display: block; color: var(--soft-muted); font-size: .44rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .habits-screen .habit-mobile-efficiency strong { display: block; margin-top: .15rem; font-size: 1.15rem; line-height: 1; letter-spacing: -.04em; }
   .habits-screen .habit-cadence { grid-column: 1 / -1; }
   .habits-screen .habit-cadence > div { width: min(100%,13.5rem); gap: .25rem; }
   .habits-screen .habit-cadence span { width: 1.65rem; max-width: 1.65rem; border-radius: .42rem; font-size: .48rem; }
-  .habits-screen .habit-mobile-summary { grid-column: 1 / -1; display: grid; grid-template-columns: 8px minmax(0,1.4fr) .75fr .75fr 18px; align-items: center; gap: .55rem; width: 100%; border-top: 1px solid rgb(37 48 42 / 7%); padding-top: .7rem; text-align: left; }
+  .habits-screen .habit-mobile-summary { grid-column: 1 / -1; display: grid; grid-template-columns: 8px minmax(0,1fr) .75fr 18px; align-items: center; gap: .55rem; width: 100%; border-top: 1px solid rgb(37 48 42 / 7%); padding-top: .7rem; text-align: left; }
   .habits-screen .habit-mobile-summary small { display: block; color: var(--soft-muted); font-size: .48rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
   .habits-screen .habit-mobile-summary strong { display: block; margin-top: .15rem; overflow: hidden; font-size: .68rem; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
-  .habits-screen .habit-mobile-summary > span:nth-child(3) strong { font-size: .92rem; line-height: 1; }
+  .habits-screen .habit-mobile-summary > span:nth-child(3) { display: none; }
   .habits-screen .habit-mobile-summary svg { width: 1rem; transition: transform .2s ease; }
   .habits-screen .habit-library-card.is-expanded .habit-mobile-summary svg { transform: rotate(180deg); }
   .habits-screen .habit-status-dot { width: 8px; height: 8px; border-width: 0; border-radius: 999px; padding: 0; }
@@ -596,6 +600,7 @@ h3 {
 .metric-label { display: flex; align-items: center; gap: .55rem; color: var(--soft-muted); font-size: .625rem; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; }
 .metric-label svg { width: 1rem; height: 1rem; stroke-width: 2; }
 .habit-mobile-summary { display: none; }
+.habit-mobile-efficiency { display: none; }
 
 .creation-overlay { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; overflow-y: auto; background: rgb(31 42 36 / 32%); padding: 1rem; backdrop-filter: blur(18px) saturate(90%); }
 .creation-sheet { position: relative; display: grid; width: min(100%, 62rem); max-height: calc(100vh - 2rem); overflow: auto; border: 1px solid rgb(255 255 255 / 72%); border-radius: clamp(1.8rem,4vw,3rem); background: color-mix(in srgb, var(--soft-surface) 96%, white); box-shadow: 0 42px 120px rgb(21 34 27 / 30%), inset 0 1px 0 white; }
