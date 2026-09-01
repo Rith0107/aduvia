@@ -27,6 +27,17 @@ describe("HabitsDashboard", () => {
     expect(screen.queryByText("Morning walk")).not.toBeInTheDocument();
   });
 
+  it("expands and collapses mobile habit details", () => {
+    render(<HabitsDashboard initialHabits={sampleHabitSummaries} />);
+    const expand = screen.getByRole("button", { name: "Show details for Morning walk" });
+    expect(expand).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(expand);
+    const collapse = screen.getByRole("button", { name: "Hide details for Morning walk" });
+    expect(collapse).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(collapse);
+    expect(screen.getByRole("button", { name: "Show details for Morning walk" })).toHaveAttribute("aria-expanded", "false");
+  });
+
   it("creates a habit", () => {
     render(<HabitsDashboard initialHabits={sampleHabitSummaries} />);
     fireEvent.click(screen.getByRole("button", { name: "+ New habit" }));
