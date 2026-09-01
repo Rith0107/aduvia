@@ -20,15 +20,16 @@ type AppShellProps = {
   eyebrow: string;
   title: ReactNode;
   action?: ReactNode;
+  screenClassName?: string;
 };
 
-export function AppShell({ active, children, eyebrow, title, action }: AppShellProps) {
+export function AppShell({ active, children, eyebrow, title, action, screenClassName = "" }: AppShellProps) {
   const appData = useAppData();
   const syncError = appData?.syncError;
   const pendingSyncCount = appData?.pendingSyncCount ?? 0;
   const isLoading = appData?.isLoading === true;
   return (
-    <main className="soft-canvas min-h-screen text-[var(--soft-ink)]">
+    <main className={`soft-canvas min-h-screen text-[var(--soft-ink)] ${screenClassName}`}>
       <a className="skip-link" href="#main-content">Skip to main content</a>
       <div className="soft-shell min-h-screen overflow-hidden">
         <header className="premium-toolbar sticky top-0 z-40 flex w-full items-center justify-between px-5 py-5 sm:px-9 lg:px-14">

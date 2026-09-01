@@ -72,9 +72,9 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
   }
 
   return (
-    <AppShell active="Today" eyebrow={dateLabel} title={<>{guidance.greeting}<span className="mt-2 block max-w-3xl text-[.62em] leading-[1.02] tracking-[-.045em] text-[var(--soft-muted)]">{guidance.headline}</span></>} action={<div className="max-w-sm border-l border-black/[0.12] pl-5"><p className="text-[10px] font-black uppercase tracking-[.17em] text-[var(--soft-accent)]">{monthPhase.label}</p><p className="mt-2 text-sm leading-6 text-[var(--soft-muted)]">{guidance.supporting}</p><p className="mt-2 text-xs leading-5 text-[var(--soft-muted)]/80">{monthPhase.todayNote}</p></div>}>
+    <AppShell active="Today" eyebrow={dateLabel} screenClassName="today-screen" title={<>{guidance.greeting}<span className="mt-2 block max-w-3xl text-[.62em] leading-[1.02] tracking-[-.045em] text-[var(--soft-muted)]">{guidance.headline}</span></>} action={<div className="today-phase-copy max-w-sm border-l border-black/[0.12] pl-5"><p className="text-[10px] font-black uppercase tracking-[.17em] text-[var(--soft-accent)]">{monthPhase.label}</p><p className="mt-2 text-sm leading-6 text-[var(--soft-muted)]">{guidance.supporting}</p><p className="mt-2 text-xs leading-5 text-[var(--soft-muted)]/80">{monthPhase.todayNote}</p></div>}>
       <NewMonthWelcome summary={newMonthSummary} />
-      <section className="mt-12">
+      <section className="today-habit-section mt-12">
         <div className="soft-flow soft-task-cards grid gap-3 sm:grid-cols-2">
           {habits.map((habit) => (
             <article className="group relative grid min-h-36 grid-cols-[52px_1fr_auto] items-center gap-4 border border-white/50 p-5 sm:min-h-36 sm:grid-cols-[58px_1fr_auto] sm:gap-5 sm:px-7 sm:py-5 xl:min-h-40 xl:grid-cols-[64px_1fr_auto] xl:px-10" key={habit.id}>

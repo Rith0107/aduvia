@@ -41,7 +41,7 @@ export function NewMonthWelcome({ summary }: { summary: NewMonthSummary | null }
   const currentMonth = summary.currentMonthLabel.replace(/ \d{4}$/, "");
 
   return (
-    <section aria-label={`${currentMonth} welcome`} className="relative mt-8 overflow-hidden rounded-[30px] bg-[var(--soft-ink)] px-6 py-6 text-white shadow-[0_26px_70px_-44px_rgba(20,43,35,.9)] sm:px-8 sm:py-7">
+    <section aria-label={`${currentMonth} welcome`} className="new-month-welcome relative mt-8 overflow-hidden rounded-[30px] bg-[var(--soft-ink)] px-6 py-6 text-white shadow-[0_26px_70px_-44px_rgba(20,43,35,.9)] sm:px-8 sm:py-7">
       <span aria-hidden="true" className="absolute -right-12 -top-20 size-52 rounded-full border-[34px] border-[var(--soft-accent)]/20" />
       <div className="relative grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
