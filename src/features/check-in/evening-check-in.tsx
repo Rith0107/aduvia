@@ -10,11 +10,14 @@ import { BrandLogo } from "@/components/brand-logo";
 import { PaletteChooser } from "@/components/palette-chooser";
 import { TypographyChooser } from "@/components/typography-chooser";
 import { todaysHabits, useAppData } from "@/lib/app-data";
+import { eveningGuidance } from "@/lib/guidance";
+import { useViewerFirstName } from "@/lib/use-viewer-name";
 
 type EveningCheckInProps = { initialHabits: TodayHabit[] };
 
 export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
   const appData = useAppData();
+  const firstName = useViewerFirstName();
   const sharedHabits = appData ? todaysHabits(appData.habits, appData.completions) : null;
   const [localHabits, setLocalHabits] = useState<TodayHabit[]>(initialHabits.map((habit) => ({ ...habit, completion: 0, status: "pending" })));
   const habits = sharedHabits ?? localHabits;
@@ -24,6 +27,7 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
   const efficiency = useMemo(() => calculateRoutineEfficiency(habits.map(({ completion, priority }) => ({ completion, priority }))), [habits]);
   const allAnswered = habits.length > 0 && habits.every((habit) => habit.status !== "pending");
   const completionRatio = habits.length ? completedCount / habits.length : 0;
+  const guidance = eveningGuidance({ answered: answeredCount, firstName, total: habits.length });
 
   function setHabitStatus(id: string, completed: boolean) {
     if (appData) appData.setHabitStatus(id, completed ? "complete" : "skipped");
@@ -42,7 +46,7 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
           <div className="relative">
             <span className="mx-auto grid size-20 place-items-center rounded-full bg-[var(--soft-ink)] text-2xl text-white">✓</span>
             <p className="mt-8 text-[11px] font-black uppercase tracking-[0.22em] text-[var(--soft-accent)]">Today is closed</p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-[-0.055em]">Let the day be enough.</h1>
+            <h1 className="mt-3 text-4xl font-semibold tracking-[-0.055em]">{guidance.finished}</h1>
             <p className="mx-auto mt-4 max-w-sm text-sm leading-6 text-[var(--soft-muted)]">{completedCount} habits completed · {efficiency}% routine efficiency. You can leave the rest here and come back fresh tomorrow.</p>
             <Link className="mt-9 inline-flex min-h-13 items-center justify-center rounded-full bg-[var(--soft-ink)] px-7 text-sm font-bold text-white" href="/today">Return to Today</Link>
           </div>
@@ -62,14 +66,14 @@ export function EveningCheckIn({ initialHabits }: EveningCheckInProps) {
           </header>
           <div className="evening-intro">
             <div>
-              <p className="soft-kicker text-[var(--soft-accent)]">Your evening reset · under a minute</p>
-              <h1>{habits.length ? <>{habits.length} {habits.length === 1 ? "choice" : "choices"}.<br />Then rest.</> : <>Nothing due.<br />Simply rest.</>}</h1>
+              <p className="soft-kicker text-[var(--soft-accent)]">{guidance.salutation} · your evening reset</p>
+              <h1>{guidance.headline}</h1>
             </div>
             <div className="evening-progress-dial" style={{ "--check-progress": `${completionRatio * 360}deg` } as React.CSSProperties}>
               <div><strong>{completedCount}</strong><span>of {habits.length} done</span></div>
             </div>
             <div className="evening-intro-copy">
-              <p>Choose what happened.<br />No scoring. No explanations.</p>
+              <p>{guidance.prompt}</p>
               <div aria-label="Completed habits" aria-valuemax={habits.length} aria-valuemin={0} aria-valuenow={completedCount} className="evening-progress-line" role="progressbar"><span style={{ width: `${completionRatio * 100}%` }} /></div>
               <small>{allAnswered ? "Ready to let go" : `${habits.length - answeredCount} choices left`}</small>
             </div>

@@ -8,6 +8,8 @@ import { ActivityIcon } from "@/components/activity-icon";
 import { todaysHabits, useAppData } from "@/lib/app-data";
 import { calculateRoutineEfficiency } from "@/lib/metrics";
 import { monthKey } from "@/lib/calendar";
+import { todayGuidance } from "@/lib/guidance";
+import { useViewerFirstName } from "@/lib/use-viewer-name";
 import type { QuestSummary } from "@/features/quests/types";
 import type { SideQuestSummary, TodayHabit } from "./types";
 
@@ -28,6 +30,7 @@ export function questsForCurrentMonth(quests: QuestSummary[], today = new Date()
 
 export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDashboardProps) {
   const appData = useAppData();
+  const firstName = useViewerFirstName();
   const [localHabits, setLocalHabits] = useState(initialHabits);
   const habits = appData ? todaysHabits(appData.habits, appData.completions) : localHabits;
   const quests = questsForCurrentMonth(appData?.quests ?? []);
@@ -36,6 +39,7 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
   const reflection = reflectionDraft ?? appData?.reflections[todayKey] ?? "";
   const [reflectionStatus, setReflectionStatus] = useState<"idle" | "saving" | "saved">("idle");
   const completedCount = habits.filter((habit) => habit.status === "complete").length;
+  const guidance = todayGuidance({ completed: completedCount, firstName, total: habits.length });
   const efficiency = useMemo(() => calculateRoutineEfficiency(habits.map(({ completion, priority }) => ({ completion, priority }))), [habits]);
   const completedQuests = quests.filter((quest) => quest.status === "completed").length;
   const questProgress = quests.length ? Math.round((completedQuests / quests.length) * 100) : appData ? 0 : Math.round((sideQuest.completedMilestones / sideQuest.totalMilestones) * 100);
@@ -59,7 +63,7 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
   }
 
   return (
-    <AppShell active="Today" eyebrow={dateLabel} title={<>A softer way<br />to show up.</>} action={<div className="max-w-xs border-l border-black/[0.12] pl-5"><p className="text-sm leading-6 text-[var(--soft-muted)]">{habits.length ? <>You’ve already done {completedCount === 0 ? "the hard part: starting" : `${completedCount} of ${habits.length}`}. The rest can be light.</> : "Nothing is scheduled today. Your rhythm can include rest."}</p></div>}>
+    <AppShell active="Today" eyebrow={dateLabel} title={<>{guidance.greeting}<span className="mt-2 block max-w-3xl text-[.62em] leading-[1.02] tracking-[-.045em] text-[var(--soft-muted)]">{guidance.headline}</span></>} action={<div className="max-w-sm border-l border-black/[0.12] pl-5"><p className="text-sm leading-6 text-[var(--soft-muted)]">{guidance.supporting}</p></div>}>
       <section className="mt-12">
         <div className="soft-flow soft-task-cards grid gap-3 sm:grid-cols-2">
           {habits.map((habit) => (
@@ -81,7 +85,7 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
           </div>
           <div className="soft-signal-copy">
             <p className="soft-kicker">Today’s signal</p>
-            <h2>{!habits.length ? "Rest is part of the rhythm." : completedCount === habits.length ? "You kept your word today." : "A gentle finish is still a finish."}</h2>
+            <h2>{guidance.signal}</h2>
             <p>{habits.length ? <>{completedCount} of {habits.length} rituals complete. Take a breath, leave one thought, and let today be enough.</> : "There is nothing to check off today. You can still leave one quiet note, or simply return tomorrow."}</p>
             <span className="sr-only">{completedCount} of {habits.length} complete</span>
             {habits.length > 0 && <Link className="soft-close-action" href="/check-in"><span>Close the day</span><span aria-hidden="true">↗</span></Link>}
