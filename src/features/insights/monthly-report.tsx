@@ -6,6 +6,7 @@ import { AuroraSkyPreview } from "./aurora-sky-preview";
 import { MonthCoverPreview } from "./month-cover-preview";
 import { isHabitScheduledOn, useAppData } from "@/lib/app-data";
 import { consistencyCell } from "@/lib/habit-consistency";
+import { calendarParts } from "@/lib/calendar";
 import type { HabitSummary } from "@/features/habits/types";
 import type { QuestSummary } from "@/features/quests/types";
 import { Download, Share2, Smartphone, Square } from "lucide-react";
@@ -138,6 +139,36 @@ export function defaultReportPeriod(today = new Date()) {
     ? new Date(today.getFullYear(), today.getMonth() - 1, 1)
     : new Date(today.getFullYear(), today.getMonth(), 1);
   return { year: reportDate.getFullYear(), month: reportDate.getMonth() };
+}
+
+type ReportPeriod = { year: number; month: number };
+
+const periodIndex = ({ year, month }: ReportPeriod) => year * 12 + month;
+
+export function accountCreationPeriod(accountCreatedAt: string | null): ReportPeriod | null {
+  if (!accountCreatedAt) return null;
+  const created = new Date(accountCreatedAt);
+  if (Number.isNaN(created.getTime())) return null;
+  const parts = calendarParts(created);
+  return { year: parts.year, month: parts.month - 1 };
+}
+
+export function clampReportPeriod(period: ReportPeriod, accountCreatedAt: string | null) {
+  const earliest = accountCreationPeriod(accountCreatedAt);
+  return earliest && periodIndex(period) < periodIndex(earliest) ? earliest : period;
+}
+
+export function insightsNarrative({ completedQuests, consistency, daysShownUp, delta, monthName }: { completedQuests: number; consistency: number; daysShownUp: number; delta: number | null; monthName: string }) {
+  const headline = consistency >= 85 ? "A strong rhythm took shape." : consistency >= 65 ? "Your rhythm is becoming visible." : consistency > 0 ? "Every return gave the month shape." : "This month is ready to be understood.";
+  const comparison = delta === null
+    ? "This is your first recorded month, so it becomes the baseline for what comes next."
+    : delta === 0
+      ? "Your consistency held level with the previous recorded month."
+      : `Consistency moved ${Math.abs(delta)} ${Math.abs(delta) === 1 ? "point" : "points"} ${delta > 0 ? "up" : "down"} from the previous month.`;
+  const quests = completedQuests
+    ? `You completed ${completedQuests} ${completedQuests === 1 ? "side quest" : "side quests"}.`
+    : "No side quests were completed, leaving a clear signal for what to choose next.";
+  return { headline, detail: `You showed up on ${daysShownUp} ${daysShownUp === 1 ? "day" : "days"} in ${monthName}. ${comparison} ${quests}` };
 }
 
 export function completedQuestTitlesForReport(quests: QuestSummary[], reportYear: number, reportMonth: number) {
@@ -452,7 +483,8 @@ export function MonthlyReport() {
   const appData = useAppData();
   const now = new Date();
   const currentDay = now.getDate();
-  const [reportMonth, setReportMonth] = useState(() => defaultReportPeriod(now));
+  const [selectedReportMonth, setReportMonth] = useState(() => defaultReportPeriod(now));
+  const reportMonth = clampReportPeriod(selectedReportMonth, appData?.accountCreatedAt ?? null);
   const [fallbackHabits, setFallbackHabits] = useState(() => {
     const initialPeriod = defaultReportPeriod(now);
     return createReportHabits(initialPeriod.year, initialPeriod.month);
@@ -550,11 +582,16 @@ export function MonthlyReport() {
     return scheduled ? Math.round((completed / scheduled) * 100) : 0;
   }, [appData, overallConsistency, reportMonth.month, reportMonth.year]);
   const consistencyDelta = overallConsistency - previousMonthConsistency;
+  const creationPeriod = accountCreationPeriod(appData?.accountCreatedAt ?? null);
+  const hasPreviousComparison = !creationPeriod || periodIndex(reportMonth) > periodIndex(creationPeriod);
+  const narrative = insightsNarrative({ completedQuests: completedQuestTitles.length, consistency: overallConsistency, daysShownUp, delta: hasPreviousComparison ? consistencyDelta : null, monthName });
+  const atEarliestMonth = Boolean(creationPeriod && periodIndex(reportMonth) <= periodIndex(creationPeriod));
 
   function changeMonth(offset: number) {
     const next = new Date(reportMonth.year, reportMonth.month + offset, 1);
     const year = next.getFullYear();
     const month = next.getMonth();
+    if (creationPeriod && periodIndex({ year, month }) < periodIndex(creationPeriod)) return;
     setReportMonth({ year, month });
     setFallbackHabits(createReportHabits(year, month));
   }
@@ -605,13 +642,17 @@ export function MonthlyReport() {
   const remainingShareQuests = completedQuestTitles.length - visibleShareQuests.length;
 
   return (
-    <AppShell active="Insights" eyebrow={isPreviousMonthReport ? `Previous month review · ${monthLabel}` : "Monthly review"} title={isPreviousMonthReport ? <>{monthName},<br />in review.</> : <>Your month,<br />in motion.</>} action={<div className="flex items-center gap-2 rounded-full bg-white/45 p-1 text-xs font-bold"><button aria-label="Previous month" className="rounded-full px-3 py-2 transition hover:bg-white/60" onClick={() => changeMonth(-1)} type="button">←</button><span className="min-w-28 px-2 text-center">{monthLabel}</span><button aria-label="Next month" className="rounded-full px-3 py-2 transition hover:bg-white/60 disabled:cursor-not-allowed disabled:opacity-30" disabled={viewingCurrentMonth} onClick={() => changeMonth(1)} type="button">→</button></div>}>
+    <AppShell active="Insights" eyebrow={isPreviousMonthReport ? `Previous month review · ${monthLabel}` : "Monthly review"} title={isPreviousMonthReport ? <>{monthName},<br />in review.</> : <>Your month,<br />in motion.</>} action={<div className="flex items-center gap-2 rounded-full bg-white/45 p-1 text-xs font-bold"><button aria-label="Previous month" className="rounded-full px-3 py-2 transition hover:bg-white/60 disabled:cursor-not-allowed disabled:opacity-30" disabled={atEarliestMonth} onClick={() => changeMonth(-1)} type="button">←</button><span className="min-w-28 px-2 text-center">{monthLabel}</span><button aria-label="Next month" className="rounded-full px-3 py-2 transition hover:bg-white/60 disabled:cursor-not-allowed disabled:opacity-30" disabled={viewingCurrentMonth} onClick={() => changeMonth(1)} type="button">→</button></div>}>
       <div className="insights-flow">
+          <section className="mt-10 grid overflow-hidden rounded-[34px] border border-white/65 bg-white/35 shadow-[0_24px_65px_-48px_rgba(34,61,49,.55)] md:grid-cols-[.42fr_1fr]">
+            <div className="bg-[var(--chart-primary)] px-6 py-6 text-[var(--chart-deep)] sm:px-8"><p className="text-[10px] font-black uppercase tracking-[.2em] opacity-60">{monthName} in one thought</p><p className="mt-3 text-3xl font-semibold tracking-[-.045em]">{overallConsistency}%</p><p className="mt-1 text-xs font-bold uppercase tracking-[.13em] opacity-65">monthly consistency</p></div>
+            <div className="px-6 py-6 sm:px-8"><h2 className="text-2xl font-semibold tracking-[-.035em] text-[var(--chart-ink)]">{narrative.headline}</h2><p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--soft-muted)]">{narrative.detail}</p></div>
+          </section>
           <section className="mt-12 grid gap-4 xl:grid-cols-[1.35fr_0.75fr]">
             <article className="relative overflow-hidden rounded-[44px_44px_96px_44px] bg-[var(--chart-deep)] p-6 text-white shadow-[0_28px_70px_-30px_rgba(20,61,49,0.55)] sm:p-8">
               <div className="absolute -right-20 -top-20 size-64 rounded-full border-[46px] border-[color-mix(in_srgb,var(--chart-primary)_12%,transparent)]" />
               <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-                <div><p className="text-xs font-semibold uppercase tracking-[0.17em] text-[var(--chart-primary)]">{isPreviousMonthReport ? `${monthName} consistency` : "Consistency signal"}</p><p className="mt-4 text-6xl font-semibold tracking-[-0.065em]">{overallConsistency}%</p><p className="mt-1 text-sm text-white/50">{consistencyDelta === 0 ? `Level with ${isPreviousMonthReport ? `the month before ${monthName}` : "last month"}` : `${consistencyDelta > 0 ? "Up" : "Down"} ${Math.abs(consistencyDelta)} points from ${isPreviousMonthReport ? `the month before ${monthName}` : "last month"}`}</p><p className="mt-5 inline-flex rounded-full bg-white/[0.08] px-3 py-2 text-xs font-medium text-white/70">You showed up on {daysShownUp} {daysShownUp === 1 ? "day" : "days"} {isPreviousMonthReport ? `in ${monthName}` : "this month"}</p></div>
+                <div><p className="text-xs font-semibold uppercase tracking-[0.17em] text-[var(--chart-primary)]">{isPreviousMonthReport ? `${monthName} consistency` : "Consistency signal"}</p><p className="mt-4 text-6xl font-semibold tracking-[-0.065em]">{overallConsistency}%</p><p className="mt-1 text-sm text-white/50">{!hasPreviousComparison ? "Your first recorded month" : consistencyDelta === 0 ? `Level with ${isPreviousMonthReport ? `the month before ${monthName}` : "last month"}` : `${consistencyDelta > 0 ? "Up" : "Down"} ${Math.abs(consistencyDelta)} points from ${isPreviousMonthReport ? `the month before ${monthName}` : "last month"}`}</p><p className="mt-5 inline-flex rounded-full bg-white/[0.08] px-3 py-2 text-xs font-medium text-white/70">You showed up on {daysShownUp} {daysShownUp === 1 ? "day" : "days"} {isPreviousMonthReport ? `in ${monthName}` : "this month"}</p></div>
                 <div className="grid grid-cols-7 gap-1.5 rounded-2xl bg-white/[0.08] p-4" aria-label={`${monthName} activity heatmap`} role="img">{Array.from({ length: Math.ceil(daysInMonth / 7) * 7 }, (_, index) => { const point = dailyConsistency[index]; const state = heatmapState(point); return <span aria-hidden="true" className={`size-3 rounded-[4px] ${state === "complete" ? "bg-[var(--heatmap-high)]" : state === "partial" ? "bg-[var(--heatmap-mid)]" : state === "none" ? "bg-[var(--heatmap-low)]" : "bg-transparent"}`} key={index} title={point ? `${monthName} ${point.day} · ${point.completed} of ${point.scheduled} completed` : undefined} />; })}</div>
               </div>
               <div className="relative mt-7"><p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/45">Daily consistency trend · {isPreviousMonthReport ? `${monthName} complete` : "month to date"}</p></div>

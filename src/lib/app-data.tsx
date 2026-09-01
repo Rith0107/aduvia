@@ -19,6 +19,7 @@ type PendingMutation =
   | { key: string; kind: "check-in"; habitId: string; date: string; status: "pending" | "complete" | "skipped" }
   | { key: string; kind: "reflection"; date: string; note: string };
 type AppData = {
+  accountCreatedAt: string | null;
   habits: HabitSummary[];
   setHabits: React.Dispatch<React.SetStateAction<HabitSummary[]>>;
   quests: QuestSummary[];
@@ -206,6 +207,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   const [typography, setTypographyState] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [remoteUserId, setRemoteUserId] = useState<string | null>(null);
+  const [accountCreatedAt, setAccountCreatedAt] = useState<string | null>(null);
   const [categoryIds, setCategoryIds] = useState<Record<string, string>>({});
   const [syncError, setSyncError] = useState<string | null>(null);
   const [pendingMutations, setPendingMutations] = useState<PendingMutation[]>([]);
@@ -262,6 +264,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       setPaletteState(null);
       setTypographyState(null);
       setRemoteUserId(null);
+      setAccountCreatedAt(null);
       setSyncError(null);
     };
 
@@ -276,6 +279,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         return;
       }
       const userId = authData.user.id;
+      setAccountCreatedAt(authData.user.created_at ?? null);
       const detectedTimeZone = browserTimeZone();
       void supabase.from("profiles").update({ timezone: detectedTimeZone }).eq("id", userId);
       const [{ data: categoryRows, error: categoryError }, { data: habitRows, error: habitError }, { data: questRows, error: questError }, { data: checkInRows, error: checkInError }, { data: reflectionRows, error: reflectionError }, { data: profileRow, error: profileError }] = await Promise.all([
@@ -455,7 +459,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   }
 
   const value = useMemo<AppData>(() => ({
-    habits, setHabits: updateHabits, quests, setQuests: updateQuests, completions, reflections, palette, typography, isLoading: !hydrated, isSyncing, syncError, pendingSyncCount: pendingMutations.length,
+    accountCreatedAt, habits, setHabits: updateHabits, quests, setQuests: updateQuests, completions, reflections, palette, typography, isLoading: !hydrated, isSyncing, syncError, pendingSyncCount: pendingMutations.length,
     setPalette(next) {
       setPaletteState(next);
       if (!remoteUserId) return;
@@ -626,7 +630,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     },
   // The dispatcher functions intentionally use the latest render's remote identity and category map.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [categoryIds, completions, habits, hydrated, isSyncing, palette, pendingMutations, quests, reflections, remoteUserId, syncError, typography]);
+  }), [accountCreatedAt, categoryIds, completions, habits, hydrated, isSyncing, palette, pendingMutations, quests, reflections, remoteUserId, syncError, typography]);
 
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;
 }

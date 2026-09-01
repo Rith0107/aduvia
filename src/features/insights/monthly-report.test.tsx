@@ -5,7 +5,7 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { completedQuestTitlesForReport, consistencyFromHabits, dailyConsistencyFromHabits, defaultReportPeriod, heatmapState, MonthlyReport, reportCellState, reportDayCount } from "./monthly-report";
+import { accountCreationPeriod, clampReportPeriod, completedQuestTitlesForReport, consistencyFromHabits, dailyConsistencyFromHabits, defaultReportPeriod, heatmapState, insightsNarrative, MonthlyReport, reportCellState, reportDayCount } from "./monthly-report";
 
 afterEach(cleanup);
 
@@ -66,6 +66,19 @@ describe("MonthlyReport", () => {
     expect(defaultReportPeriod(new Date(2026, 8, 4))).toEqual({ year: 2026, month: 7 });
     expect(defaultReportPeriod(new Date(2026, 8, 5))).toEqual({ year: 2026, month: 8 });
     expect(defaultReportPeriod(new Date(2027, 0, 3))).toEqual({ year: 2026, month: 11 });
+  });
+
+  it("never exposes a report from before account creation", () => {
+    expect(accountCreationPeriod("2026-08-19T20:15:00.000Z")).toEqual({ year: 2026, month: 7 });
+    expect(clampReportPeriod({ year: 2026, month: 0 }, "2026-08-19T20:15:00.000Z")).toEqual({ year: 2026, month: 7 });
+    expect(clampReportPeriod({ year: 2026, month: 8 }, "2026-08-19T20:15:00.000Z")).toEqual({ year: 2026, month: 8 });
+  });
+
+  it("writes a month-specific narrative and treats the first month as a baseline", () => {
+    expect(insightsNarrative({ completedQuests: 2, consistency: 91, daysShownUp: 25, delta: null, monthName: "August" })).toEqual({
+      headline: "A strong rhythm took shape.",
+      detail: "You showed up on 25 days in August. This is your first recorded month, so it becomes the baseline for what comes next. You completed 2 side quests.",
+    });
   });
 
   it("scopes completed quests to the month being reported", () => {
