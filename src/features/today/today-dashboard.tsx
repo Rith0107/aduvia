@@ -11,6 +11,7 @@ import { monthKey } from "@/lib/calendar";
 import { todayGuidance } from "@/lib/guidance";
 import { buildNewMonthSummary } from "@/lib/month-transition";
 import { monthPhaseGuidance } from "@/lib/month-phase";
+import { latestPriorReflection } from "@/lib/reflection-continuity";
 import { useViewerFirstName } from "@/lib/use-viewer-name";
 import type { QuestSummary } from "@/features/quests/types";
 import type { SideQuestSummary, TodayHabit } from "./types";
@@ -50,6 +51,7 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
   const newMonthSummary = useMemo(() => appData
     ? buildNewMonthSummary(appData.habits, appData.quests, appData.completions)
     : null, [appData]);
+  const priorReflection = useMemo(() => appData ? latestPriorReflection(appData.reflections) : null, [appData]);
 
   function toggleHabit(id: string) {
     if (appData) {
@@ -113,6 +115,12 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
           <div><div className="soft-quest-track"><span style={{ width: `${questProgress}%` }} /></div><p className="mt-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--soft-muted)]">Progress this month</p></div>
           {quests.length > 0 && <div className="mt-6 border-t border-black/[0.09] pt-4"><div className="flex items-center justify-between"><p className="soft-kicker text-[var(--soft-muted)]">Monthly side quests</p><Link className="text-[10px] font-black uppercase tracking-[0.13em] text-[var(--soft-accent)]" href="/quests">Manage</Link></div><div className="mt-3 grid gap-2">{quests.map((quest) => { const complete = quest.status === "completed"; return <button aria-label={`${complete ? "Undo" : "Complete"} ${quest.title}`} className="group flex w-full items-center gap-3 rounded-[14px] bg-white/35 px-3 py-2.5 text-left transition hover:bg-white/60" key={quest.id} onClick={() => toggleQuest(quest.id)} type="button"><span className={`grid size-6 shrink-0 place-items-center rounded-full border text-xs ${complete ? "border-[var(--soft-ink)] bg-[var(--soft-ink)] text-white" : "border-black/15 text-transparent"}`}>✓</span><span className={`min-w-0 flex-1 truncate text-xs font-bold ${complete ? "text-[var(--soft-muted)] line-through" : "text-[var(--soft-ink)]"}`}>{quest.title}</span></button>; })}</div></div>}
         </div>
+
+        {priorReflection && <aside className="lg:col-span-2 flex flex-col gap-4 rounded-[26px] border border-white/65 bg-white/30 px-5 py-5 shadow-[0_20px_60px_-48px_rgba(34,61,49,.5)] sm:flex-row sm:items-center sm:px-7">
+          <div className="shrink-0"><p className="soft-kicker text-[var(--soft-accent)]">A thread from {priorReflection.label}</p><p className="mt-1 text-xs text-[var(--soft-muted)]">Your latest private note</p></div>
+          <blockquote className="min-w-0 flex-1 border-l border-black/[0.09] pl-5 text-sm font-medium leading-6 text-[var(--soft-ink)]">“{priorReflection.note}”</blockquote>
+          <p className="max-w-52 text-xs leading-5 text-[var(--soft-muted)]">Keep the thread if it still matters, or let today say something new.</p>
+        </aside>}
 
         <div className="soft-note-ribbon lg:col-span-2">
           <div><p className="soft-kicker">One quiet note</p><p className="mt-2 text-sm text-[var(--soft-muted)]">Keep the feeling, not the full story.</p></div>
