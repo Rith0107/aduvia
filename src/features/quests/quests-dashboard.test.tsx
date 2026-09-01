@@ -66,10 +66,17 @@ describe("QuestsDashboard", () => {
 
   it("guides an empty account to its first quest", () => {
     render(<QuestsDashboard initialQuests={[]} />);
-    expect(screen.getByText("Add one meaningful finish.")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Create my first quest" }));
+    expect(screen.getByText("Choose one finish worth remembering.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Make something/ }));
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(screen.getByLabelText("Quest title")).toHaveFocus();
+    expect(screen.getByLabelText("Quest title")).toHaveValue("Finish one creative project");
+    expect(screen.queryByText("Finish one creative project", { selector: "article h3" })).not.toBeInTheDocument();
+  });
+
+  it("explains that old quests remain archived instead of carrying forward", () => {
+    render(<QuestsDashboard initialQuests={[{ ...sampleQuests[0], targetMonth: "2026-08-01" }]} />);
+    expect(screen.getByText(/Last month’s quests are safely kept in Archive/)).toBeInTheDocument();
   });
 
   it("calculates overall completion from closed months and completed current quests", () => {

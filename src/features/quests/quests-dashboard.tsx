@@ -23,6 +23,12 @@ type ArchivedQuestMonth = {
   quests: QuestSummary[];
 };
 
+export const questStarterIdeas = [
+  { label: "Make something", title: "Finish one creative project", icon: "Creative" },
+  { label: "Learn something", title: "Complete one learning milestone", icon: "Learning" },
+  { label: "Move life forward", title: "Finish one meaningful personal task", icon: "Personal" },
+] as const;
+
 export function groupArchivedQuests(quests: QuestSummary[]): ArchivedQuestMonth[] {
   const months = new Map<string, QuestSummary[]>();
   quests.forEach((quest) => months.set(quest.targetMonth, [...(months.get(quest.targetMonth) ?? []), quest]));
@@ -102,6 +108,11 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
   const overallCompleted = resolvedQuests.filter((quest) => quest.status === "completed").length;
   const overallIncomplete = resolvedQuests.length - overallCompleted;
   const overallCompletion = resolvedQuests.length ? Math.round(overallCompleted / resolvedQuests.length * 100) : 0;
+
+  function openQuestCreator(starter = "") {
+    setTitle(starter);
+    setIsCreating(true);
+  }
 
   function toggleQuestCompletion(id: string) {
     setQuests((current) =>
@@ -183,7 +194,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
   }
 
   return (
-    <AppShell active="Quests" eyebrow={`${monthContext.monthName} · ${monthPhase.label} · ${monthContext.countdownLabel}`} title={<>{monthPhase.questHeadline}</>} action={<div className="flex max-w-sm flex-col items-start gap-4 sm:items-end"><p className="text-left text-sm leading-6 text-[var(--soft-muted)] sm:text-right">{monthPhase.questPrompt}</p><button className="rounded-full bg-[var(--soft-ink)] px-6 py-4 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5" onClick={() => setIsCreating(true)} type="button">+ New quest</button></div>}>
+    <AppShell active="Quests" eyebrow={`${monthContext.monthName} · ${monthPhase.label} · ${monthContext.countdownLabel}`} title={<>{monthPhase.questHeadline}</>} action={<div className="flex max-w-sm flex-col items-start gap-4 sm:items-end"><p className="text-left text-sm leading-6 text-[var(--soft-muted)] sm:text-right">{monthPhase.questPrompt}</p><button className="rounded-full bg-[var(--soft-ink)] px-6 py-4 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5" onClick={() => openQuestCreator()} type="button">+ New quest</button></div>}>
           <section className="mt-12 grid border-y border-black/[0.09] sm:grid-cols-2 xl:grid-cols-[.8fr_.8fr_1.2fr_1.2fr]">
             <div className="py-6 sm:border-r sm:border-black/[0.09] sm:pr-6"><p className="metric-label"><Flag aria-hidden className="text-[var(--soft-icon-clay)]" />Committed</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{currentQuests.length}</p></div>
             <div className="border-t border-black/[0.09] py-6 sm:border-r sm:border-t-0 sm:px-6"><p className="metric-label"><CircleCheckBig aria-hidden className="text-[var(--soft-icon-green)]" />Completed</p><p className="mt-4 text-5xl font-semibold tracking-[-0.06em]">{completed}</p></div>
@@ -242,7 +253,14 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
                   </article>
                 );
               })}
-              {!visibleQuests.length && <div className="xl:col-span-2 flex min-h-64 flex-col items-center justify-center rounded-[34px] border border-dashed border-[var(--soft-accent)]/25 bg-white/30 px-6 py-12 text-center"><span className="grid size-14 place-items-center rounded-full bg-[var(--soft-tint-b)] text-[var(--soft-icon-clay)]"><Flag className="size-6" /></span><p className="mt-6 text-[10px] font-black uppercase tracking-[.2em] text-[var(--soft-accent)]">{currentQuests.length ? "Nothing in this view" : "Your orbit is open"}</p><h3 className="mt-3 text-3xl font-semibold tracking-[-.04em]">{currentQuests.length ? `No ${filter === "all" ? "" : statusLabels[filter].toLowerCase()} quests.` : "Add one meaningful finish."}</h3><p className="mt-3 max-w-md text-sm leading-6 text-[var(--soft-muted)]">{currentQuests.length ? "Choose another status above to see the rest of your monthly board." : "A side quest is optional. When something feels worth finishing this month, give it a clear name and start from there."}</p>{!currentQuests.length && <button className="mt-6 rounded-full bg-[var(--soft-ink)] px-6 py-3 text-sm font-bold text-white" onClick={() => setIsCreating(true)} type="button">Create my first quest</button>}</div>}
+              {!visibleQuests.length && (currentQuests.length
+                ? <div className="xl:col-span-2 flex min-h-64 flex-col items-center justify-center rounded-[34px] border border-dashed border-[var(--soft-accent)]/25 bg-white/30 px-6 py-12 text-center"><span className="grid size-14 place-items-center rounded-full bg-[var(--soft-tint-b)] text-[var(--soft-icon-clay)]"><Flag className="size-6" /></span><p className="mt-6 text-[10px] font-black uppercase tracking-[.2em] text-[var(--soft-accent)]">Nothing in this view</p><h3 className="mt-3 text-3xl font-semibold tracking-[-.04em]">No {filter === "all" ? "" : statusLabels[filter].toLowerCase()} quests.</h3><p className="mt-3 max-w-md text-sm leading-6 text-[var(--soft-muted)]">Choose another status above to see the rest of your monthly board.</p></div>
+                : <article className="xl:col-span-2 overflow-hidden rounded-[38px] border border-white/65 bg-white/35 shadow-[0_26px_70px_-48px_rgba(34,61,49,.5)]">
+                    <div className="grid gap-8 px-6 py-8 sm:px-9 lg:grid-cols-[.8fr_1.2fr] lg:items-center lg:py-10">
+                      <div><span className="grid size-12 place-items-center rounded-[16px] bg-[var(--soft-ink)] text-white"><Flag className="size-5" /></span><p className="mt-6 text-[10px] font-black uppercase tracking-[.2em] text-[var(--soft-accent)]">A clear {monthContext.monthName} page</p><h3 className="mt-3 text-3xl font-semibold tracking-[-.045em] sm:text-4xl">Choose one finish worth remembering.</h3><p className="mt-3 max-w-lg text-sm leading-6 text-[var(--soft-muted)]">{archivedQuests.length ? "Last month’s quests are safely kept in Archive. Nothing carries forward automatically, so this month can reflect what matters now." : "Side quests are optional monthly outcomes—not habits. Start with one result you would be glad to see finished."}</p><button className="mt-6 rounded-full bg-[var(--soft-ink)] px-5 py-3 text-sm font-bold text-white" onClick={() => openQuestCreator()} type="button">Write my own quest</button></div>
+                      <div><p className="text-[10px] font-black uppercase tracking-[.18em] text-[var(--soft-muted)]">Or begin with a direction</p><div className="mt-3 grid gap-2">{questStarterIdeas.map((idea) => <button className="group flex min-h-20 items-center gap-4 rounded-[20px] border border-white/70 bg-white/45 px-4 py-3 text-left transition hover:-translate-y-0.5 hover:bg-white/75" key={idea.label} onClick={() => openQuestCreator(idea.title)} type="button"><span className="grid size-11 shrink-0 place-items-center rounded-[14px] bg-[var(--soft-tint-b)] text-[var(--soft-icon-clay)]"><ActivityIcon activity={`${idea.title} ${idea.icon}`} className="size-5" /></span><span className="min-w-0 flex-1"><strong className="block text-sm">{idea.label}</strong><small className="mt-1 block text-xs text-[var(--soft-muted)]">{idea.title}</small></span><span aria-hidden="true" className="text-lg text-[var(--soft-muted)] transition group-hover:translate-x-1">→</span></button>)}</div><p className="mt-4 text-xs leading-5 text-[var(--soft-muted)]">Choosing an idea only pre-fills the form. Nothing is created until you review and confirm it.</p></div>
+                    </div>
+                  </article>)}
             </div>}
           </section>
       {isCreating && createPortal(
