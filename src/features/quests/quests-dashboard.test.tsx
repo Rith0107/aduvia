@@ -5,7 +5,7 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { QuestsDashboard } from "./quests-dashboard";
+import { groupArchivedQuests, QuestsDashboard } from "./quests-dashboard";
 import { sampleQuests } from "./sample-data";
 
 afterEach(cleanup);
@@ -85,6 +85,18 @@ describe("QuestsDashboard", () => {
     render(<QuestsDashboard initialQuests={quests} />);
     expect(screen.getByText("50%")).toBeInTheDocument();
     expect(screen.getByText("1 completed · 1 incomplete")).toBeInTheDocument();
+  });
+
+  it("orders each archived month from earliest to latest completion", () => {
+    const base = { ...sampleQuests[0], targetMonth: "2026-08-01", status: "completed" as const };
+    const grouped = groupArchivedQuests([
+      { ...base, id: "latest", title: "Latest", completedAt: "2026-08-23T12:00:00.000Z" },
+      { ...base, id: "unfinished", title: "Unfinished", status: "not-started" as const, completedAt: null },
+      { ...base, id: "earliest", title: "Earliest", completedAt: "2026-08-02T12:00:00.000Z" },
+      { ...base, id: "middle", title: "Middle", completedAt: "2026-08-10T12:00:00.000Z" },
+    ]);
+
+    expect(grouped[0].quests.map((quest) => quest.id)).toEqual(["earliest", "middle", "latest", "unfinished"]);
   });
 
   it("explains an empty filtered view without offering duplicate creation controls", () => {

@@ -29,7 +29,12 @@ export function groupArchivedQuests(quests: QuestSummary[]): ArchivedQuestMonth[
     completed: monthQuests.filter((quest) => quest.status === "completed").length,
     label: new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(new Date(`${targetMonth}T00:00:00`)),
     monthKey: targetMonth,
-    quests: monthQuests,
+    quests: [...monthQuests].sort((a, b) => {
+      if (a.completedAt && b.completedAt) return new Date(a.completedAt).getTime() - new Date(b.completedAt).getTime();
+      if (a.completedAt) return -1;
+      if (b.completedAt) return 1;
+      return a.title.localeCompare(b.title);
+    }),
   }));
 }
 
