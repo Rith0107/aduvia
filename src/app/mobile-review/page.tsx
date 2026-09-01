@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = { title: "Mobile review", robots: { index: false, follow: false } };
 
 const REVIEW_SCREENS: Record<string, { label: string; path: string }> = {
-  today: { label: "Today", path: "/today" },
+  today: { label: "Today", path: "/mobile-preview/today" },
   habits: { label: "Habits", path: "/habits" },
   quests: { label: "Quests", path: "/quests" },
   insights: { label: "Insights", path: "/insights" },
