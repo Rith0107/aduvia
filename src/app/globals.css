@@ -580,8 +580,8 @@ h3 {
   .habits-screen .habit-mobile-efficiency small { display: block; color: var(--soft-muted); font-size: .44rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
   .habits-screen .habit-mobile-efficiency strong { display: block; margin-top: .15rem; font-size: 1.15rem; line-height: 1; letter-spacing: -.04em; }
   .habits-screen .habit-cadence { grid-column: 1 / -1; }
-  .habits-screen .habit-cadence > div { width: max-content; max-width: 100%; margin-inline: auto; grid-template-columns: repeat(7,1.65rem); gap: .4rem; }
-  .habits-screen .habit-cadence span { width: 1.65rem; max-width: 1.65rem; border-radius: .42rem; font-size: .48rem; }
+  .habits-screen .habit-cadence > div { width: max-content; max-width: 100%; margin-inline: auto; grid-template-columns: repeat(7,1.9rem); gap: .3rem; }
+  .habits-screen .habit-cadence span { width: 1.9rem; max-width: 1.9rem; border-radius: .48rem; font-size: .52rem; }
   .habits-screen .habit-mobile-summary { grid-column: 1 / -1; display: grid; grid-template-columns: 8px minmax(0,1fr) .75fr 18px; align-items: center; gap: .55rem; width: 100%; border-top: 1px solid rgb(37 48 42 / 7%); padding-top: .7rem; text-align: left; }
   .habits-screen .habit-mobile-summary small { display: block; color: var(--soft-muted); font-size: .48rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
   .habits-screen .habit-mobile-summary strong { display: block; margin-top: .15rem; overflow: hidden; font-size: .68rem; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
