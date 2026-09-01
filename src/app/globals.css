@@ -547,6 +547,45 @@ h3 {
   .today-screen .soft-note-ribbon { gap: .75rem; border-radius: 1.35rem; padding: 1rem; }
   .today-screen .soft-note-ribbon button { min-height: 2.85rem; }
   .today-screen .soft-closing-stage > aside { border-radius: 1.35rem; padding: 1rem; }
+
+  .habits-screen .premium-toolbar { padding: .75rem 1rem; }
+  .habits-screen .premium-toolbar > a svg { width: 2rem; height: 2rem; }
+  .habits-screen .premium-toolbar > a span > span { font-size: 1rem; }
+  .habits-screen #main-content { padding: 1.35rem 1rem 7rem; }
+  .habits-screen #main-content > header { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: end; gap: .75rem; }
+  .habits-screen #main-content > header h1 { margin-top: .55rem; font-size: 2.35rem; line-height: .93; }
+  .habits-screen .habits-new-button { min-height: 2.65rem; padding: 0 .9rem; font-size: .72rem; box-shadow: none; }
+  .habits-screen .habits-summary { grid-template-columns: repeat(2,minmax(0,1fr)); margin-top: 1.35rem; border: 0; gap: .6rem; }
+  .habits-screen .habits-summary > div { min-height: 5.3rem; border: 1px solid rgb(255 255 255 / 58%); border-radius: 1.25rem; background: rgb(255 255 255 / 32%); padding: .85rem !important; }
+  .habits-screen .habits-summary > div p:last-child { margin-top: .55rem; font-size: 1.75rem; line-height: 1; }
+  .habits-screen .habits-summary .metric-label { gap: .35rem; font-size: .5rem; letter-spacing: .12em; }
+  .habits-screen .habits-library { margin-top: 1.35rem; padding-top: 1rem; }
+  .habits-screen .habits-library-header { gap: .8rem; padding-bottom: .85rem; }
+  .habits-screen .habits-library-header h2 { font-size: 1.15rem; }
+  .habits-screen .habits-library-header p { font-size: .72rem; }
+  .habits-screen .habits-filters { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+  .habits-screen .habits-filters::-webkit-scrollbar { display: none; }
+  .habits-screen .habits-filters button { flex: 1 0 auto; padding: .55rem .8rem; font-size: .65rem; }
+  .habits-screen .habits-card-list { gap: .75rem; }
+  .habits-screen .habit-library-card { grid-template-columns: minmax(0,1fr) auto; min-height: 0; gap: .85rem 1rem; border-radius: 1.5rem; padding: 1rem; }
+  .habits-screen .habit-identity { grid-column: 1 / -1; gap: .75rem; }
+  .habits-screen .habit-identity > span { width: 2.5rem; height: 2.5rem; border-radius: .9rem; background: rgb(255 255 255 / 38%); }
+  .habits-screen .habit-identity svg { width: 1.5rem; height: 1.5rem; }
+  .habits-screen .habit-identity h3 { font-size: 1.02rem; }
+  .habits-screen .habit-identity p { font-size: .68rem; }
+  .habits-screen .habit-cadence { grid-column: 1 / -1; }
+  .habits-screen .habit-cadence > div { max-width: none; gap: .35rem; }
+  .habits-screen .habit-cadence span { max-width: none; border-radius: .65rem; }
+  .habits-screen .habit-health { align-self: center; }
+  .habits-screen .habit-health > p { display: none; }
+  .habits-screen .habit-health > span { margin-top: 0; }
+  .habits-screen .habit-streak { align-self: center; text-align: right; }
+  .habits-screen .habit-streak p:first-child { font-size: .62rem; }
+  .habits-screen .habit-streak p:last-child { font-size: .9rem; }
+  .habits-screen .habit-progress { grid-column: 1 / -1; border-top: 1px solid rgb(37 48 42 / 7%); padding-top: .75rem; }
+  .habits-screen .habit-progress > p { font-size: .66rem; }
+  .habits-screen .habit-actions { grid-column: 1 / -1; grid-template-columns: 1fr 1fr; gap: .5rem; }
+  .habits-screen .habit-actions button { min-height: 2.45rem; padding-block: .55rem; }
 }
 
 .metric-label { display: flex; align-items: center; gap: .55rem; color: var(--soft-muted); font-size: .625rem; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; }
