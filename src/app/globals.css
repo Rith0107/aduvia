@@ -567,20 +567,21 @@ h3 {
   .habits-screen .habits-filters::-webkit-scrollbar { display: none; }
   .habits-screen .habits-filters button { flex: 1 0 auto; padding: .55rem .8rem; font-size: .65rem; }
   .habits-screen .habits-card-list { gap: .75rem; }
-  .habits-screen .habit-library-card { grid-template-columns: minmax(0,1fr) auto; min-height: 0; gap: .85rem 1rem; border-radius: 1.5rem; padding: 1rem; }
+  .habits-screen .habit-library-card { grid-template-columns: minmax(0,1fr) auto; min-height: 13.25rem; align-content: start; gap: .85rem 1rem; border-radius: 1.5rem; padding: 1rem; }
   .habits-screen .habit-identity { grid-column: 1 / -1; gap: .75rem; }
   .habits-screen .habit-identity > span { width: 2.5rem; height: 2.5rem; border-radius: .9rem; background: rgb(255 255 255 / 38%); }
   .habits-screen .habit-identity svg { width: 1.5rem; height: 1.5rem; }
   .habits-screen .habit-identity h3 { font-size: 1.02rem; }
   .habits-screen .habit-identity p { font-size: .68rem; }
-  .habits-screen .habit-anchor { gap: .2rem; padding: .22rem .38rem; font-size: .46rem; letter-spacing: .08em; }
-  .habits-screen .habit-anchor svg { width: .5rem; height: .5rem; }
+  .habits-screen .habit-anchor { gap: .15rem; padding: .16rem .3rem; font-size: .4rem; letter-spacing: .06em; }
+  .habits-screen .habit-anchor svg { width: .42rem; height: .42rem; }
   .habits-screen .habit-cadence { grid-column: 1 / -1; }
-  .habits-screen .habit-cadence > div { width: min(100%,16.5rem); gap: .3rem; }
-  .habits-screen .habit-cadence span { width: 2rem; max-width: 2rem; border-radius: .5rem; font-size: .54rem; }
+  .habits-screen .habit-cadence > div { width: min(100%,13.5rem); gap: .25rem; }
+  .habits-screen .habit-cadence span { width: 1.65rem; max-width: 1.65rem; border-radius: .42rem; font-size: .48rem; }
   .habits-screen .habit-mobile-summary { grid-column: 1 / -1; display: grid; grid-template-columns: 8px minmax(0,1.4fr) .75fr .75fr 18px; align-items: center; gap: .55rem; width: 100%; border-top: 1px solid rgb(37 48 42 / 7%); padding-top: .7rem; text-align: left; }
   .habits-screen .habit-mobile-summary small { display: block; color: var(--soft-muted); font-size: .48rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
   .habits-screen .habit-mobile-summary strong { display: block; margin-top: .15rem; overflow: hidden; font-size: .68rem; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+  .habits-screen .habit-mobile-summary > span:nth-child(3) strong { font-size: .92rem; line-height: 1; }
   .habits-screen .habit-mobile-summary svg { width: 1rem; transition: transform .2s ease; }
   .habits-screen .habit-library-card.is-expanded .habit-mobile-summary svg { transform: rotate(180deg); }
   .habits-screen .habit-status-dot { width: 8px; height: 8px; border-width: 0; border-radius: 999px; padding: 0; }
