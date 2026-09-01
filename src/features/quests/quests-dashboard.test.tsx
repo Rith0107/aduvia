@@ -5,7 +5,7 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { groupArchivedQuests, QuestsDashboard } from "./quests-dashboard";
+import { formatQuestCompletionDate, groupArchivedQuests, QuestsDashboard } from "./quests-dashboard";
 import { sampleQuests } from "./sample-data";
 
 afterEach(cleanup);
@@ -97,6 +97,11 @@ describe("QuestsDashboard", () => {
     ]);
 
     expect(grouped[0].quests.map((quest) => quest.id)).toEqual(["earliest", "middle", "latest", "unfinished"]);
+  });
+
+  it("pads single-digit archived completion days", () => {
+    expect(formatQuestCompletionDate("2026-08-02T12:00:00.000Z")).toBe("AUG 02");
+    expect(formatQuestCompletionDate("2026-08-10T12:00:00.000Z")).toBe("AUG 10");
   });
 
   it("explains an empty filtered view without offering duplicate creation controls", () => {

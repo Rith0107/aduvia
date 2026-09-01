@@ -38,6 +38,12 @@ export function groupArchivedQuests(quests: QuestSummary[]): ArchivedQuestMonth[
   }));
 }
 
+export function formatQuestCompletionDate(completedAt: string) {
+  const date = new Date(completedAt);
+  const month = new Intl.DateTimeFormat("en-US", { month: "short" }).format(date).toUpperCase();
+  return `${month} ${String(date.getDate()).padStart(2, "0")}`;
+}
+
 function inferQuestCategory(title: string): QuestCategory {
   const value = title.toLowerCase();
   if (/budget|saving|save |invest|money|finance|debt|expense|income/.test(value)) return "Finance";
@@ -211,7 +217,7 @@ export function QuestsDashboard({ initialQuests }: QuestsDashboardProps) {
                           return <div className="group relative grid min-h-28 grid-cols-[40px_minmax(0,1fr)] items-center gap-x-4 gap-y-3 bg-[color:color-mix(in_srgb,var(--soft-surface)_86%,transparent)] p-5 transition hover:bg-white/65 sm:grid-cols-[40px_minmax(0,1fr)_auto] sm:gap-x-5 sm:p-6" key={quest.id}>
                             <span className={`grid size-10 place-items-center rounded-[14px] ${isComplete ? "bg-[var(--soft-icon-green)] text-white" : "bg-[var(--soft-tint-b)] text-[var(--soft-icon-clay)]"}`}><ActivityIcon activity={`${quest.title} ${quest.category}`} className="size-[18px]" /></span>
                             <div className="min-w-0"><p className="text-[9px] font-black uppercase tracking-[.17em] text-[var(--soft-accent)]">{quest.category}</p><h4 className="mt-1.5 truncate text-lg font-semibold tracking-[-.035em]">{quest.title}</h4></div>
-                            <div className="col-start-2 flex items-center justify-between gap-4 sm:col-start-auto sm:flex-col sm:items-end sm:justify-center"><span className="font-mono text-[9px] font-bold tracking-[.14em] text-[var(--soft-muted)]/55">QUEST {String(index + 1).padStart(2, "0")}</span><div className="flex items-center gap-2 whitespace-nowrap text-[10px] font-black uppercase tracking-[.1em]"><span className={`grid size-5 place-items-center rounded-full ${isComplete ? "bg-[var(--soft-icon-green)]/15 text-[var(--soft-icon-green)]" : "bg-black/[0.06] text-[var(--soft-muted)]"}`}>{isComplete ? "✓" : "·"}</span><span className={isComplete ? "text-[var(--soft-icon-green)]" : "text-[var(--soft-muted)]"}>{isComplete && quest.completedAt ? `Completed ${new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(new Date(quest.completedAt))}` : "Incomplete at month end"}</span></div></div>
+                            <div className="col-start-2 flex items-center justify-between gap-4 sm:col-start-auto sm:flex-col sm:items-end sm:justify-center"><span className="font-mono text-[9px] font-bold tracking-[.14em] text-[var(--soft-muted)]/55">QUEST {String(index + 1).padStart(2, "0")}</span><div className="flex items-center gap-2 whitespace-nowrap text-[10px] font-black uppercase tracking-[.1em]"><span className={`grid size-5 place-items-center rounded-full ${isComplete ? "bg-[var(--soft-icon-green)]/15 text-[var(--soft-icon-green)]" : "bg-black/[0.06] text-[var(--soft-muted)]"}`}>{isComplete ? "✓" : "·"}</span><span className={isComplete ? "text-[var(--soft-icon-green)]" : "text-[var(--soft-muted)]"}>{isComplete && quest.completedAt ? `Completed ${formatQuestCompletionDate(quest.completedAt)}` : "Incomplete at month end"}</span></div></div>
                           </div>;
                         })}
                       </div>
