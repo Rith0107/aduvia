@@ -12,7 +12,7 @@ import { habitHealth, habitHealthFromSummary } from "@/lib/habit-health";
 import { inferHabitCategory } from "./infer-category";
 import type { HabitDay, HabitFrequency, HabitSummary } from "./types";
 
-type HabitsDashboardProps = { initialHabits: HabitSummary[] };
+type HabitsDashboardProps = { initialHabits: HabitSummary[]; previewMode?: boolean };
 const days: { short: HabitDay; label: string }[] = [
   { short: "Mon", label: "Monday" }, { short: "Tue", label: "Tuesday" },
   { short: "Wed", label: "Wednesday" }, { short: "Thu", label: "Thursday" },
@@ -25,8 +25,9 @@ export function sortHabitsForLibrary(habits: HabitSummary[]) {
   return [...habits].sort((a, b) => rank[a.state] - rank[b.state]);
 }
 
-export function HabitsDashboard({ initialHabits }: HabitsDashboardProps) {
-  const appData = useAppData();
+export function HabitsDashboard({ initialHabits, previewMode = false }: HabitsDashboardProps) {
+  const liveAppData = useAppData();
+  const appData = previewMode ? undefined : liveAppData;
   const [localHabits, setLocalHabits] = useState(initialHabits);
   const habits = appData?.habits ?? localHabits;
   const setHabits = appData?.setHabits ?? setLocalHabits;
