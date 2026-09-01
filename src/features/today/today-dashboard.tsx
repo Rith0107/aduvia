@@ -9,9 +9,11 @@ import { todaysHabits, useAppData } from "@/lib/app-data";
 import { calculateRoutineEfficiency } from "@/lib/metrics";
 import { monthKey } from "@/lib/calendar";
 import { todayGuidance } from "@/lib/guidance";
+import { buildNewMonthSummary } from "@/lib/month-transition";
 import { useViewerFirstName } from "@/lib/use-viewer-name";
 import type { QuestSummary } from "@/features/quests/types";
 import type { SideQuestSummary, TodayHabit } from "./types";
+import { NewMonthWelcome } from "./new-month-welcome";
 
 type TodayDashboardProps = { dateLabel: string; initialHabits: TodayHabit[]; sideQuest: SideQuestSummary };
 
@@ -43,6 +45,9 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
   const efficiency = useMemo(() => calculateRoutineEfficiency(habits.map(({ completion, priority }) => ({ completion, priority }))), [habits]);
   const completedQuests = quests.filter((quest) => quest.status === "completed").length;
   const questProgress = quests.length ? Math.round((completedQuests / quests.length) * 100) : appData ? 0 : Math.round((sideQuest.completedMilestones / sideQuest.totalMilestones) * 100);
+  const newMonthSummary = useMemo(() => appData
+    ? buildNewMonthSummary(appData.habits, appData.quests, appData.completions)
+    : null, [appData]);
 
   function toggleHabit(id: string) {
     if (appData) {
@@ -64,6 +69,7 @@ export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDas
 
   return (
     <AppShell active="Today" eyebrow={dateLabel} title={<>{guidance.greeting}<span className="mt-2 block max-w-3xl text-[.62em] leading-[1.02] tracking-[-.045em] text-[var(--soft-muted)]">{guidance.headline}</span></>} action={<div className="max-w-sm border-l border-black/[0.12] pl-5"><p className="text-sm leading-6 text-[var(--soft-muted)]">{guidance.supporting}</p></div>}>
+      <NewMonthWelcome summary={newMonthSummary} />
       <section className="mt-12">
         <div className="soft-flow soft-task-cards grid gap-3 sm:grid-cols-2">
           {habits.map((habit) => (
