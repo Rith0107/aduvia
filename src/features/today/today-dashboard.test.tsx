@@ -6,7 +6,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { sampleHabits, sampleSideQuest } from "./sample-data";
-import { TodayDashboard, toggleQuestCompletionState } from "./today-dashboard";
+import { questsForCurrentMonth, TodayDashboard, toggleQuestCompletionState } from "./today-dashboard";
 
 afterEach(cleanup);
 
@@ -15,6 +15,13 @@ describe("TodayDashboard", () => {
     const quest = { id: "quest", title: "Finish the draft", category: "Creative", status: "completed" as const, dueLabel: "Completed", effortHours: 2, color: "green" as const, targetMonth: "2026-08-01", completedAt: null, carriedFromId: null, rolloverReviewedAt: null };
     expect(toggleQuestCompletionState(quest)).toMatchObject({ status: "not-started", dueLabel: "This month" });
     expect(toggleQuestCompletionState({ ...quest, status: "not-started" })).toMatchObject({ status: "completed", dueLabel: "Completed" });
+  });
+
+  it("does not show last month's quests on the first day of a new month", () => {
+    const augustQuest = { id: "august", title: "August finish", category: "Creative", status: "not-started" as const, dueLabel: "This month", effortHours: 2, color: "green" as const, targetMonth: "2026-08-01", completedAt: null, carriedFromId: null, rolloverReviewedAt: null };
+    const septemberQuest = { ...augustQuest, id: "september", title: "September finish", targetMonth: "2026-09-01" };
+
+    expect(questsForCurrentMonth([augustQuest, septemberQuest], new Date(2026, 8, 1))).toEqual([septemberQuest]);
   });
 
   it("updates completion and efficiency when a habit is checked in", () => {

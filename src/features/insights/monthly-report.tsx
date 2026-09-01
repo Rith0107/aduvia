@@ -7,6 +7,7 @@ import { MonthCoverPreview } from "./month-cover-preview";
 import { isHabitScheduledOn, useAppData } from "@/lib/app-data";
 import { consistencyCell } from "@/lib/habit-consistency";
 import type { HabitSummary } from "@/features/habits/types";
+import type { QuestSummary } from "@/features/quests/types";
 import { Download, Share2, Smartphone, Square } from "lucide-react";
 import { toBlob } from "html-to-image";
 import {
@@ -137,6 +138,11 @@ export function defaultReportPeriod(today = new Date()) {
     ? new Date(today.getFullYear(), today.getMonth() - 1, 1)
     : new Date(today.getFullYear(), today.getMonth(), 1);
   return { year: reportDate.getFullYear(), month: reportDate.getMonth() };
+}
+
+export function completedQuestTitlesForReport(quests: QuestSummary[], reportYear: number, reportMonth: number) {
+  const reportMonthKey = `${reportYear}-${String(reportMonth + 1).padStart(2, "0")}-01`;
+  return quests.filter((quest) => quest.targetMonth === reportMonthKey && quest.status === "completed").map((quest) => quest.title);
 }
 
 function cardDimensions(format: ShareFormat) {
@@ -467,6 +473,7 @@ export function MonthlyReport() {
   const todayAnswers = appData?.completions[currentDateKey] ?? {};
   const todayIsClosed = todayScheduledHabits.length > 0 && todayScheduledHabits.every((habit) => Boolean(todayAnswers[habit.id]));
   const isCurrentMonth = reportMonthStart.getTime() === currentMonthStart.getTime();
+  const isPreviousMonthReport = reportMonthStart.getTime() < currentMonthStart.getTime();
   const monthName = new Intl.DateTimeFormat("en-US", { month: "long" }).format(new Date(reportMonth.year, reportMonth.month, 1));
   const monthLabel = `${monthName} ${reportMonth.year}`;
 
@@ -512,8 +519,8 @@ export function MonthlyReport() {
   const bestDay = observedWeekdays.reduce((best, day) => day.score > best.score ? day : best, observedWeekdays[0] ?? { day: "–", name: "No data yet", score: 0, sampleSize: 0 });
   const daysShownUp = dailyConsistency.filter((point) => point.completed > 0).length;
   const completedQuestTitles = useMemo(
-    () => appData ? appData.quests.filter((quest) => quest.status === "completed").map((quest) => quest.title) : fallbackCompletedQuests,
-    [appData],
+    () => appData ? completedQuestTitlesForReport(appData.quests, reportMonth.year, reportMonth.month) : fallbackCompletedQuests,
+    [appData, reportMonth.month, reportMonth.year],
   );
   const categoryBalance = useMemo(() => {
     const totals = habits.reduce<Record<string, number>>((result, habit) => {
@@ -598,16 +605,16 @@ export function MonthlyReport() {
   const remainingShareQuests = completedQuestTitles.length - visibleShareQuests.length;
 
   return (
-    <AppShell active="Insights" eyebrow="Monthly review" title={<>Your month,<br />in motion.</>} action={<div className="flex items-center gap-2 rounded-full bg-white/45 p-1 text-xs font-bold"><button aria-label="Previous month" className="rounded-full px-3 py-2 transition hover:bg-white/60" onClick={() => changeMonth(-1)} type="button">←</button><span className="min-w-28 px-2 text-center">{monthLabel}</span><button aria-label="Next month" className="rounded-full px-3 py-2 transition hover:bg-white/60 disabled:cursor-not-allowed disabled:opacity-30" disabled={viewingCurrentMonth} onClick={() => changeMonth(1)} type="button">→</button></div>}>
+    <AppShell active="Insights" eyebrow={isPreviousMonthReport ? `Previous month review · ${monthLabel}` : "Monthly review"} title={isPreviousMonthReport ? <>{monthName},<br />in review.</> : <>Your month,<br />in motion.</>} action={<div className="flex items-center gap-2 rounded-full bg-white/45 p-1 text-xs font-bold"><button aria-label="Previous month" className="rounded-full px-3 py-2 transition hover:bg-white/60" onClick={() => changeMonth(-1)} type="button">←</button><span className="min-w-28 px-2 text-center">{monthLabel}</span><button aria-label="Next month" className="rounded-full px-3 py-2 transition hover:bg-white/60 disabled:cursor-not-allowed disabled:opacity-30" disabled={viewingCurrentMonth} onClick={() => changeMonth(1)} type="button">→</button></div>}>
       <div className="insights-flow">
           <section className="mt-12 grid gap-4 xl:grid-cols-[1.35fr_0.75fr]">
             <article className="relative overflow-hidden rounded-[44px_44px_96px_44px] bg-[var(--chart-deep)] p-6 text-white shadow-[0_28px_70px_-30px_rgba(20,61,49,0.55)] sm:p-8">
               <div className="absolute -right-20 -top-20 size-64 rounded-full border-[46px] border-[color-mix(in_srgb,var(--chart-primary)_12%,transparent)]" />
               <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-                <div><p className="text-xs font-semibold uppercase tracking-[0.17em] text-[var(--chart-primary)]">Consistency signal</p><p className="mt-4 text-6xl font-semibold tracking-[-0.065em]">{overallConsistency}%</p><p className="mt-1 text-sm text-white/50">{consistencyDelta === 0 ? "Level with last month" : `${consistencyDelta > 0 ? "Up" : "Down"} ${Math.abs(consistencyDelta)} points from last month`}</p><p className="mt-5 inline-flex rounded-full bg-white/[0.08] px-3 py-2 text-xs font-medium text-white/70">You showed up on {daysShownUp} {daysShownUp === 1 ? "day" : "days"} this month</p></div>
+                <div><p className="text-xs font-semibold uppercase tracking-[0.17em] text-[var(--chart-primary)]">{isPreviousMonthReport ? `${monthName} consistency` : "Consistency signal"}</p><p className="mt-4 text-6xl font-semibold tracking-[-0.065em]">{overallConsistency}%</p><p className="mt-1 text-sm text-white/50">{consistencyDelta === 0 ? `Level with ${isPreviousMonthReport ? `the month before ${monthName}` : "last month"}` : `${consistencyDelta > 0 ? "Up" : "Down"} ${Math.abs(consistencyDelta)} points from ${isPreviousMonthReport ? `the month before ${monthName}` : "last month"}`}</p><p className="mt-5 inline-flex rounded-full bg-white/[0.08] px-3 py-2 text-xs font-medium text-white/70">You showed up on {daysShownUp} {daysShownUp === 1 ? "day" : "days"} {isPreviousMonthReport ? `in ${monthName}` : "this month"}</p></div>
                 <div className="grid grid-cols-7 gap-1.5 rounded-2xl bg-white/[0.08] p-4" aria-label={`${monthName} activity heatmap`} role="img">{Array.from({ length: Math.ceil(daysInMonth / 7) * 7 }, (_, index) => { const point = dailyConsistency[index]; const state = heatmapState(point); return <span aria-hidden="true" className={`size-3 rounded-[4px] ${state === "complete" ? "bg-[var(--heatmap-high)]" : state === "partial" ? "bg-[var(--heatmap-mid)]" : state === "none" ? "bg-[var(--heatmap-low)]" : "bg-transparent"}`} key={index} title={point ? `${monthName} ${point.day} · ${point.completed} of ${point.scheduled} completed` : undefined} />; })}</div>
               </div>
-              <div className="relative mt-7"><p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/45">Daily consistency trend · month to date</p></div>
+              <div className="relative mt-7"><p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/45">Daily consistency trend · {isPreviousMonthReport ? `${monthName} complete` : "month to date"}</p></div>
               <div className="relative mt-8 h-52 w-full">
                 <ResponsiveContainer height="100%" width="100%">
                   <AreaChart data={dailyConsistency} margin={{ left: 0, right: 8, top: 52, bottom: 0 }}>
@@ -623,7 +630,7 @@ export function MonthlyReport() {
 
             <article className="relative overflow-hidden rounded-[64px_28px_64px_64px] border border-white/70 bg-[color:color-mix(in_srgb,var(--theme-paper)_90%,transparent)] p-6 shadow-[0_24px_60px_-38px_rgba(39,56,47,.4)] sm:p-7">
               <div className="absolute -right-14 -top-14 size-40 rounded-full bg-[color-mix(in_srgb,var(--chart-primary)_12%,transparent)]" />
-              <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">Life balance</p><h2 className="mt-2 text-xl font-semibold tracking-[-0.03em]">Where your effort went</h2><p className="mt-2 text-xs text-stone-400">Share of completed activity this month</p></div>
+              <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">Life balance</p><h2 className="mt-2 text-xl font-semibold tracking-[-0.03em]">Where your effort went</h2><p className="mt-2 text-xs text-stone-400">Share of completed activity {isPreviousMonthReport ? `in ${monthName}` : "this month"}</p></div>
               <div className="relative mx-auto mt-3 h-56 max-w-[280px]">
                 <ResponsiveContainer height="100%" width="100%"><PieChart><Pie cx="50%" cy="50%" data={categoryBalance} dataKey="value" innerRadius={62} nameKey="name" outerRadius={91} paddingAngle={4} stroke="none">{categoryBalance.map((entry) => <Cell fill={entry.color} key={entry.name} />)}</Pie></PieChart></ResponsiveContainer>
                 <div className="pointer-events-none absolute inset-0 grid place-items-center text-center"><div><p className="text-3xl font-semibold">{categoryBalance.length}</p><p className="text-[10px] uppercase tracking-[0.12em] text-stone-400">focus areas</p></div></div>
@@ -633,12 +640,12 @@ export function MonthlyReport() {
           </section>
 
           <section className="mt-6 grid items-center gap-7 lg:grid-cols-[0.5fr_1.5fr]">
-            <article className="relative mx-auto flex aspect-square w-full max-w-[310px] flex-col items-center justify-center overflow-hidden rounded-full bg-[var(--soft-tint-c)] p-10 text-center text-[var(--soft-icon-blue)] shadow-[0_26px_60px_-34px_rgba(40,79,97,.5)] lg:mx-0"><div className="absolute -right-10 -top-10 size-36 rounded-full border-[26px] border-white/25" /><p className="absolute left-1/2 top-12 -translate-x-1/2 whitespace-nowrap text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Best weekday so far</p><div className="relative -translate-y-1"><p className="text-4xl font-semibold tracking-[-0.05em]">{bestDay.name}</p><p className="mx-auto mt-2 max-w-[230px] text-sm leading-5 opacity-60">{bestDay.sampleSize ? `${bestDay.score}% across ${bestDay.sampleSize} ${bestDay.sampleSize === 1 ? "day" : "days"}.` : "Complete a check-in to begin."}</p></div><span className="absolute bottom-9 left-1/2 grid size-11 -translate-x-1/2 place-items-center rounded-full bg-[var(--soft-icon-blue)] text-xl text-white">↗</span></article>
+            <article className="relative mx-auto flex aspect-square w-full max-w-[310px] flex-col items-center justify-center overflow-hidden rounded-full bg-[var(--soft-tint-c)] p-10 text-center text-[var(--soft-icon-blue)] shadow-[0_26px_60px_-34px_rgba(40,79,97,.5)] lg:mx-0"><div className="absolute -right-10 -top-10 size-36 rounded-full border-[26px] border-white/25" /><p className="absolute left-1/2 top-12 -translate-x-1/2 whitespace-nowrap text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Best weekday {isPreviousMonthReport ? `in ${monthName}` : "so far"}</p><div className="relative -translate-y-1"><p className="text-4xl font-semibold tracking-[-0.05em]">{bestDay.name}</p><p className="mx-auto mt-2 max-w-[230px] text-sm leading-5 opacity-60">{bestDay.sampleSize ? `${bestDay.score}% across ${bestDay.sampleSize} ${bestDay.sampleSize === 1 ? "day" : "days"}.` : "Complete a check-in to begin."}</p></div><span className="absolute bottom-9 left-1/2 grid size-11 -translate-x-1/2 place-items-center rounded-full bg-[var(--soft-icon-blue)] text-xl text-white">↗</span></article>
             <article className="overflow-hidden rounded-[52px] bg-[var(--chart-surface)] p-6 text-[var(--chart-ink)] shadow-[0_28px_65px_-42px_rgba(110,91,60,.55)] sm:p-8"><div><p className="text-xs font-semibold uppercase tracking-[0.15em] opacity-55">Weekly rhythm</p><p className="mt-2 text-xl font-semibold">Completion by weekday</p></div><div className="mt-4 h-36"><ResponsiveContainer height="100%" width="100%"><BarChart data={weekdayReport} margin={{ top: 42 }}><XAxis axisLine={false} dataKey="day" tick={{ fill: "var(--chart-ink)", fontSize: 10 }} tickLine={false} /><Tooltip content={() => null} cursor={false} /><Bar activeBar={<RhythmActiveBar />} dataKey="score" fill="var(--chart-ink)" radius={[18, 18, 18, 18]} /></BarChart></ResponsiveContainer></div></article>
           </section>
 
           <section className="mt-7 rounded-[44px] border border-white/70 bg-[color:color-mix(in_srgb,var(--soft-surface)_80%,transparent)] p-4 shadow-[0_26px_70px_-48px_rgba(34,61,49,.42)] sm:p-7">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-xl font-semibold">Daily consistency map</h2><p className="mt-1 text-sm text-[var(--soft-muted)]">Read-only history from your daily check-ins.</p></div><div className="flex flex-wrap items-center gap-3 text-xs text-[var(--soft-muted)]"><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--chart-green)]" />Done</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--theme-missed)]" />Missed</span><span className="flex items-center gap-1.5"><i className="size-3 rounded border border-[var(--soft-muted)]/25 bg-transparent" />Today pending</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--theme-muted-cell)]" />Not scheduled</span><span className="rounded-full bg-[var(--theme-paper-warm)] px-3 py-1.5 font-semibold text-[var(--chart-ink)]">{daysInMonth} of {calendarDaysInMonth} days</span></div></div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-xl font-semibold">{isPreviousMonthReport ? `${monthName} consistency map` : "Daily consistency map"}</h2><p className="mt-1 text-sm text-[var(--soft-muted)]">Read-only history from {isPreviousMonthReport ? `${monthName}'s` : "your daily"} check-ins.</p></div><div className="flex flex-wrap items-center gap-3 text-xs text-[var(--soft-muted)]"><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--chart-green)]" />Done</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--theme-missed)]" />Missed</span><span className="flex items-center gap-1.5"><i className="size-3 rounded border border-[var(--soft-muted)]/25 bg-transparent" />Today pending</span><span className="flex items-center gap-1.5"><i className="size-3 rounded bg-[var(--theme-muted-cell)]" />Not scheduled</span><span className="rounded-full bg-[var(--theme-paper-warm)] px-3 py-1.5 font-semibold text-[var(--chart-ink)]">{daysInMonth} of {calendarDaysInMonth} days</span></div></div>
             <div aria-label="Daily consistency table" className="mt-6 overflow-x-auto rounded-2xl border border-black/[0.06] bg-[var(--theme-paper)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]" role="region" tabIndex={0}>
               <table className="table-fixed border-separate border-spacing-0 text-xs" style={{ width: "100%" }}>
                 <colgroup><col style={{ width: 176 }} />{Array.from({ length: daysInMonth }, (_, index) => <col key={index} />)}<col style={{ width: 80 }} /></colgroup>

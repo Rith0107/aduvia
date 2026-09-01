@@ -5,7 +5,7 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { consistencyFromHabits, dailyConsistencyFromHabits, defaultReportPeriod, heatmapState, MonthlyReport, reportCellState, reportDayCount } from "./monthly-report";
+import { completedQuestTitlesForReport, consistencyFromHabits, dailyConsistencyFromHabits, defaultReportPeriod, heatmapState, MonthlyReport, reportCellState, reportDayCount } from "./monthly-report";
 
 afterEach(cleanup);
 
@@ -14,9 +14,9 @@ describe("MonthlyReport", () => {
     render(<MonthlyReport />);
     expect(screen.getByLabelText("Daily consistency across August")).toBeInTheDocument();
     expect(screen.getByText(/Month\s*average/)).toBeInTheDocument();
-    expect(screen.getByText("Read-only history from your daily check-ins.")).toBeInTheDocument();
+    expect(screen.getByText("Read-only history from August's check-ins.")).toBeInTheDocument();
     expect(screen.getByLabelText("Morning walk, August 1: done")).not.toHaveAttribute("role", "button");
-    expect(screen.queryByLabelText("Morning walk, August 10: done")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Morning walk, August 31: done")).toBeInTheDocument();
   });
 
   it("switches social card formats", () => {
@@ -68,16 +68,25 @@ describe("MonthlyReport", () => {
     expect(defaultReportPeriod(new Date(2027, 0, 3))).toEqual({ year: 2026, month: 11 });
   });
 
+  it("scopes completed quests to the month being reported", () => {
+    const quest = { id: "quest", title: "August finish", category: "Creative", status: "completed" as const, dueLabel: "Completed", effortHours: 2, color: "green" as const, targetMonth: "2026-08-01", completedAt: "2026-08-20T12:00:00.000Z", carriedFromId: null, rolloverReviewedAt: null };
+    expect(completedQuestTitlesForReport([quest, { ...quest, id: "july", title: "July finish", targetMonth: "2026-07-01" }], 2026, 7)).toEqual(["August finish"]);
+  });
+
   it("does not navigate into future months", () => {
     render(<MonthlyReport />);
-    expect(screen.getByRole("button", { name: "Next month" })).toBeDisabled();
+    const next = screen.getByRole("button", { name: "Next month" });
+    expect(next).toBeEnabled();
+    fireEvent.click(next);
+    expect(next).toBeDisabled();
   });
 
   it("centers status cells beneath their date and marks the real current date", () => {
     render(<MonthlyReport />);
     const currentDate = new Date().getDate();
+    fireEvent.click(screen.getByRole("button", { name: "Next month" }));
     expect(screen.getByRole("columnheader", { name: String(currentDate) })).toHaveAttribute("aria-current", "date");
-    expect(screen.getByLabelText(`Morning walk, August 1: done`)).toHaveClass("mx-auto");
+    expect(screen.getByLabelText(`Morning walk, September 1: done`)).toHaveClass("mx-auto");
   });
 
   it("weights monthly consistency by scheduled check-ins and ignores pending days", () => {

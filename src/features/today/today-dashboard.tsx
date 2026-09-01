@@ -7,6 +7,7 @@ import { AppShell } from "@/components/app-shell";
 import { ActivityIcon } from "@/components/activity-icon";
 import { todaysHabits, useAppData } from "@/lib/app-data";
 import { calculateRoutineEfficiency } from "@/lib/metrics";
+import { monthKey } from "@/lib/calendar";
 import type { QuestSummary } from "@/features/quests/types";
 import type { SideQuestSummary, TodayHabit } from "./types";
 
@@ -20,11 +21,16 @@ export function toggleQuestCompletionState(quest: QuestSummary): QuestSummary {
   return { ...quest, status: quest.status === "completed" ? "not-started" : "completed", dueLabel: quest.status === "completed" ? "This month" : "Completed" };
 }
 
+export function questsForCurrentMonth(quests: QuestSummary[], today = new Date()) {
+  const currentMonth = monthKey(today);
+  return quests.filter((quest) => quest.targetMonth === currentMonth);
+}
+
 export function TodayDashboard({ dateLabel, initialHabits, sideQuest }: TodayDashboardProps) {
   const appData = useAppData();
   const [localHabits, setLocalHabits] = useState(initialHabits);
   const habits = appData ? todaysHabits(appData.habits, appData.completions) : localHabits;
-  const quests = appData?.quests ?? [];
+  const quests = questsForCurrentMonth(appData?.quests ?? []);
   const todayKey = (() => { const date = new Date(); return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`; })();
   const [reflectionDraft, setReflectionDraft] = useState<string | null>(null);
   const reflection = reflectionDraft ?? appData?.reflections[todayKey] ?? "";
