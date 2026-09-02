@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: "Mobile review", robots: { index: fal
 const REVIEW_SCREENS: Record<string, { label: string; path: string }> = {
   today: { label: "Today", path: "/mobile-preview/today" },
   habits: { label: "Habits", path: "/mobile-preview/habits" },
-  quests: { label: "Quests", path: "/quests" },
+  quests: { label: "Quests", path: "/mobile-preview/quests" },
   insights: { label: "Insights", path: "/insights" },
   "check-in": { label: "Evening check-in", path: "/check-in" },
 };

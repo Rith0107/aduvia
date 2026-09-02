@@ -596,6 +596,45 @@ h3 {
   .habits-screen .habit-actions { display: none; grid-column: 1 / -1; grid-template-columns: 1fr 1fr; gap: .5rem; }
   .habits-screen .habit-library-card.is-expanded .habit-progress, .habits-screen .habit-library-card.is-expanded .habit-actions { display: grid; }
   .habits-screen .habit-actions button { min-height: 2.45rem; padding-block: .55rem; }
+
+  .quests-screen .premium-toolbar { padding: .75rem 1rem; }
+  .quests-screen .premium-toolbar > a svg { width: 2rem; height: 2rem; }
+  .quests-screen .premium-toolbar > a span > span { font-size: 1rem; }
+  .quests-screen #main-content { padding: 1.35rem 1rem 7rem; }
+  .quests-screen #main-content > header { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: end; gap: .75rem; }
+  .quests-screen #main-content > header h1 { margin-top: .55rem; font-size: 2.35rem; line-height: .93; }
+  .quests-screen .quests-page-action { max-width: 7rem; gap: .5rem; align-items: flex-end; }
+  .quests-screen .quests-page-action > p { display: none; }
+  .quests-screen .quests-new-button { min-height: 2.65rem; padding: 0 .9rem; font-size: .72rem; box-shadow: none; }
+  .quests-screen .quests-summary { grid-template-columns: repeat(2,minmax(0,1fr)); margin-top: 1.35rem; border: 0; gap: .6rem; }
+  .quests-screen .quests-summary > div { min-height: 5.5rem; border: 1px solid rgb(255 255 255 / 58%); border-radius: 1.25rem; background: rgb(255 255 255 / 32%); padding: .85rem !important; }
+  .quests-screen .quests-summary > div > p:last-child { margin-top: .55rem; font-size: 1.75rem; line-height: 1; }
+  .quests-screen .quests-summary .metric-label { gap: .35rem; font-size: .48rem; letter-spacing: .1em; }
+  .quests-screen .quests-summary > div:nth-child(n+3) > div:first-child > p:last-child { font-size: 1.6rem; }
+  .quests-screen .quests-summary > div:nth-child(n+3) > div:last-child { margin-top: .8rem; height: .3rem; }
+  .quests-screen .quests-summary > div:nth-child(4) div > p:nth-child(2) { margin-top: .35rem; font-size: .55rem; line-height: 1.1; }
+  .quests-screen .quests-board { margin-top: 1.35rem; padding-top: 1rem; }
+  .quests-screen .quests-board-header { gap: .8rem; padding-bottom: .85rem; }
+  .quests-screen .quests-board-header h2 { font-size: 1.15rem; }
+  .quests-screen .quests-board-header p { font-size: .72rem; }
+  .quests-screen .quests-filters { flex-wrap: nowrap; gap: 0; scrollbar-width: none; }
+  .quests-screen .quests-filters::-webkit-scrollbar { display: none; }
+  .quests-screen .quests-filters button { flex: 1 0 auto; padding: .55rem .72rem; font-size: .62rem; }
+  .quests-screen .quests-card-list { margin-top: .75rem; gap: .7rem; }
+  .quests-screen .quest-library-card { position: relative; grid-template-columns: 2.5rem minmax(0,1fr); min-height: 0; gap: .7rem .75rem; border-radius: 1.45rem; padding: .9rem; }
+  .quests-screen .quest-icon { width: 2.5rem; height: 2.5rem; border-radius: .85rem; background: rgb(255 255 255 / 38%); }
+  .quests-screen .quest-icon svg { width: 1.45rem; height: 1.45rem; }
+  .quests-screen .quest-identity { min-width: 0; }
+  .quests-screen .quest-identity > div { gap: .45rem; padding-right: 2.2rem; }
+  .quests-screen .quest-identity > div > span { font-size: .5rem; }
+  .quests-screen .quest-identity h3 { margin-top: .35rem; font-size: 1rem; line-height: 1.08; }
+  .quests-screen .quest-identity > p { display: none; }
+  .quests-screen .quest-edit { position: absolute; top: .8rem; right: .8rem; width: 2rem; height: 2rem; justify-content: center; padding: 0; border-radius: 999px; }
+  .quests-screen .quest-edit svg { width: .75rem; }
+  .quests-screen .quest-edit { font-size: 0; }
+  .quests-screen .quest-status { grid-column: 1 / -1; }
+  .quests-screen .quest-status > button { min-height: 2.5rem; padding-inline: .8rem; font-size: .68rem; }
+  .quests-screen .quest-complete { grid-column: 1 / -1; min-height: 2.5rem; padding-inline: .8rem; font-size: .68rem; }
 }
 
 .metric-label { display: flex; align-items: center; gap: .55rem; color: var(--soft-muted); font-size: .625rem; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; }
