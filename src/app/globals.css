@@ -632,15 +632,17 @@ h3 {
   .quests-screen .quest-edit { position: absolute; top: .8rem; right: .8rem; width: 2rem; height: 2rem; justify-content: center; padding: 0; border-radius: 999px; }
   .quests-screen .quest-edit svg { width: .75rem; }
   .quests-screen .quest-edit { font-size: 0; }
-  .quests-screen .quest-status { grid-column: 1 / -1; }
+  .quests-screen .quest-controls { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: .5rem; }
+  .quests-screen .quest-status { min-width: 0; }
   .quests-screen .quest-status > button { min-height: 2.5rem; padding-inline: .8rem; font-size: .68rem; }
-  .quests-screen .quest-complete { grid-column: 1 / -1; min-height: 2.5rem; padding-inline: .8rem; font-size: .68rem; }
+  .quests-screen .quest-complete { min-height: 2.5rem; padding-inline: .65rem; font-size: .66rem; }
 }
 
 .metric-label { display: flex; align-items: center; gap: .55rem; color: var(--soft-muted); font-size: .625rem; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; }
 .metric-label svg { width: 1rem; height: 1rem; stroke-width: 2; }
 .habit-mobile-summary { display: none; }
 .habit-mobile-efficiency { display: none; }
+.quest-controls { display: contents; }
 
 .creation-overlay { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; overflow-y: auto; background: rgb(31 42 36 / 32%); padding: 1rem; backdrop-filter: blur(18px) saturate(90%); }
 .creation-sheet { position: relative; display: grid; width: min(100%, 62rem); max-height: calc(100vh - 2rem); overflow: auto; border: 1px solid rgb(255 255 255 / 72%); border-radius: clamp(1.8rem,4vw,3rem); background: color-mix(in srgb, var(--soft-surface) 96%, white); box-shadow: 0 42px 120px rgb(21 34 27 / 30%), inset 0 1px 0 white; }
