@@ -634,9 +634,14 @@ h3 {
   .quests-screen .quest-edit { font-size: 0; }
   .quests-screen .quest-controls { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: .5rem; }
   .quests-screen .quest-status { min-width: 0; }
-  .quests-screen .quest-status > button { display: grid; min-height: 2.5rem; grid-template-columns: .5rem minmax(0,1fr) .875rem; padding-inline: .8rem; font-size: .68rem; text-align: center; }
-  .quests-screen .quest-status > button > span:nth-child(2) { text-align: center; }
-  .quests-screen .quest-status [role="menu"] > button { display: grid; grid-template-columns: .5rem minmax(0,1fr) .875rem; text-align: center; }
+  .quests-screen .quest-status > button { display: grid; min-height: 2.5rem; grid-template-columns: .875rem minmax(0,1fr) .875rem; justify-items: center; padding-inline: .8rem; font-size: .68rem; text-align: center; }
+  .quests-screen .quest-status > button > span:first-child { justify-self: start; }
+  .quests-screen .quest-status > button > span:nth-child(2) { width: 100%; text-align: center; }
+  .quests-screen .quest-status > button > svg { justify-self: end; }
+  .quests-screen .quest-status [role="menu"] > button { display: grid; grid-template-columns: .875rem minmax(0,1fr) .875rem; justify-items: center; text-align: center; }
+  .quests-screen .quest-status [role="menu"] > button > span:first-child { justify-self: start; }
+  .quests-screen .quest-status [role="menu"] > button > span:nth-child(2) { width: 100%; text-align: center; }
+  .quests-screen .quest-status [role="menu"] > button > svg { justify-self: end; }
   .quests-screen .quest-complete { min-height: 2.5rem; padding-inline: .65rem; font-size: .66rem; }
 }
 
